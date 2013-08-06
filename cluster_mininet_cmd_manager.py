@@ -15,7 +15,7 @@ def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map):
     if cmd != 'exit\n':
         while not buff.endswith('mininet> '):
             buff += ssh_chan_map[node_IP].recv(9999)
-        print("SUCCESS:" + node_IP + ": " + cmd)
+        # print("SUCCESS:" + node_IP + ": " + cmd)
         logger_MininetCE.info("SUCCESS:" + node_IP + ": " + cmd)
 
 

@@ -24,9 +24,12 @@ def config_logger():
 from paramiko import *
 import os
 import sys
+import time
 import networkx as nx
 
 # SOME IMPORTANT CONSTANTS =)
+STRING_ALIGNMENT = 77
+
 MININETCE_HOME_FOLDER = '/Users/vitalyantonenko/PycharmProjects/MininetClusterManagerRC'
 
 LOG_FILEPATH      = MININETCE_HOME_FOLDER + '/logs/MininetCluster.log'
@@ -98,54 +101,69 @@ def cli_mode():
     cli_director = CLI_director(host_map, host_to_node_map, ssh_chan_map)
     cli_director.cmdloop()
 
+def start_waiting():
+    while True:
+        time.sleep(1)
+        print('.'),
+
+
 
 if __name__ == '__main__':
     util.log_to_file('paramiko.log')
 
     # config logger
+    print('Configuring loggers'.ljust(STRING_ALIGNMENT, ' ')),
     delete_logs() # for testing period ONLY
     config_logger()
-    print('Configuring loggers - DONE!')
+    print('DONE!')
 
     # take nodelist from file
+    print('Taking nodelist from config file'.ljust(STRING_ALIGNMENT, ' ')),
     node_map, node_intf_map = read_nodelist_from_file(NODELIST_FILEPATH)
-    print('Taking nodelist from config file - DONE!')
+    print('DONE!')
 
     # open ssh sessions to nodes
+    print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
     ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
-    print('Opening SSH connections to all nodes in Cluster - DONE!')
+    print('DONE!')
 
     # prepare scripts to nodes
+    print('Parsing network graph'.ljust(STRING_ALIGNMENT, ' ')),
     G = nx.Graph()
     if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
         G = mininet_script_operator.standard_mininet_script_parser(sys.argv[1], G)
     else:
         G = mininet_script_operator.standard_mininet_script_parser('test_script', G)
-    print('Parsing network graph - DONE!')
+    print('DONE!')
 
+    print('Splitting network graph for nodes'.ljust(STRING_ALIGNMENT, ' ')),
     leaves = mininet_script_operator.define_leaves_in_graph(G)
     node_groups, edge_groups = mininet_script_operator.split_graph_on_parts(G, len(node_map))
     for gr_number in node_groups.keys():
         node_IP_gr_map[node_map.keys()[gr_number]] = gr_number
-    print('Splitting network graph for nodes - DONE!')
+    print('DONE!')
 
+    print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
     mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
                                                                       edge_groups, leaves, node_map)
-    print('Generating start up scripts for nodes Mininet - DONE!')
+    print('DONE!')
 
     # send scripts to nodes
+    print('Sending scripts to nodes'.ljust(STRING_ALIGNMENT, ' ')),
     make_threaded(send_support_scripts_to_cluster_node, [node_map,], node_map)
-    print('Sending scripts to nodes - DONE!')
+    print('DONE!')
 
     # STAGE 1. Execute start-up scripts on nodes
+    print('Executing start up scripts on nodes'.ljust(STRING_ALIGNMENT, ' ')),
     make_threaded(exec_start_up_script, [node_intf_map, ssh_chan_map], node_map)
-    print('Executing start up scripts on nodes - DONE!')
+    print('DONE!')
 
+    print('Configuring host-proccesses eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
     node_IP_pool_map = define_node_ip_pool(node_groups, node_IP_gr_map, leaves, node_map)
 
     make_threaded(host_process_configurator_nodegroup, [node_groups, node_IP_gr_map, node_IP_pool_map,
                                 str(HOST_NETMASK), leaves, host_to_node_map, host_map, ssh_chan_map], node_map)
-    print('Configuring host-proccesses eth interfaces - DONE!')
+    print('DONE!')
 
     # STAGE 2. Execute test scenario.
 
@@ -154,17 +172,21 @@ if __name__ == '__main__':
         malware_propagation_mode()
     elif CLI_MODE:
         cli_mode()
-        print('Turning OFF CLI interface - DONE!')
+        print('Turn OFF CLI interface'.ljust(STRING_ALIGNMENT, ' ')),
+        print('DONE!')
 
     # STAGE 3. Shutdown all cluster nodes.
+    print('Sending exit to Mininet on nodes'.ljust(STRING_ALIGNMENT, ' ')),
     make_threaded(send_mininet_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map)
-    print('Sending exit to Mininet on nodes - DONE!')
+    print('DONE!')
 
     # close ssh sessions to nodes
+    print('Sending exit to cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
     make_threaded(send_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map)
-    print('Sending exit to cluster nodes - DONE!')
+    print('DONE!')
 
+    print('Sending CLOSE to all ssh connections'.ljust(STRING_ALIGNMENT, ' ')),
     close_ssh_to_nodes(ssh_map)
-    print('Sending CLOSE to all ssh connections - DONE!')
+    print('DONE!')
 
     print('FINISH')

@@ -92,7 +92,7 @@ def send_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map):
         endswith_str = 'root@' + CLUSTER_NODE_MACHINE_NAME + ':~# '
         while not buff.endswith(endswith_str): # Need to change name, or use the variable.
             buff += ssh_chan_map[node_IP].recv(9999)
-        print('SUCCESS:' + node_IP + ': ' + cmd)
+        # print('SUCCESS:' + node_IP + ': ' + cmd)
         logger_MininetCE.info('SUCCESS:' + node_IP + ': ' + cmd)
 
 def exec_start_up_script(node_IP, node_intf_map, ssh_chan_map):
@@ -127,5 +127,5 @@ def send_mn_turn_on_cmd_to_cluster_node(node_IP, ssh_chan_map):
     buff = ""
     while not buff.endswith('mininet> '):
         buff += ssh_chan_map[node_IP].recv(9999)
-    print("SUCCESS:" + node_IP + ": Mininet turning ON")
+    # print("SUCCESS:" + node_IP + ": Mininet turning ON")
     logger_MininetCE.info("SUCCESS:" + node_IP + ": Mininet turning ON")
