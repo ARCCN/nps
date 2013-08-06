@@ -39,7 +39,7 @@ class CLI_director(cmd.Cmd):
         ## The only reason to define this method is for the help text in the doc string
         cmd.Cmd.do_help(self, args)
 
-    def do_ping(self,args):
+    def do_ping(self, args):
         args = args.split()
         if len(args) != 2:
             print('*** invalid number of arguments')
@@ -90,7 +90,12 @@ class CLI_director(cmd.Cmd):
         """Called on an input line when the command prefix is not recognized.
            In that case we execute the line as Python code.
         """
-        try:
-            exec(line) in self._locals, self._globals
-        except Exception, e:
-            print e.__class__, ":", e
+        words = line.split()
+        if words[1] == 'ping' and len(words) == 3:
+            new_line = words[0] + ' ' + words[2]
+            self.do_ping(new_line)
+        else:
+            try:
+                exec(line) in self._locals, self._globals
+            except Exception, e:
+                print e.__class__, ":", e
