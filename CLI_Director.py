@@ -50,6 +50,12 @@ class CLI_director(cmd.Cmd):
         cmd = self.host_map[src_ip] + ' ping -c 4 ' + dst_ip
         send_mininet_ping_to_cluster_node(self.host_to_node_map[src_ip], cmd, self.ssh_chan_map)
 
+    def help_ping(self):
+        print('usage:')
+        print('\t_srcHostIP ping _dstHostIP')
+        print('example:')
+        print('\t10.0.0.1 ping 10.0.0.2')
+
 
     ## Override methods in Cmd object ##
     def preloop(self):
