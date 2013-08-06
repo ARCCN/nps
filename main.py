@@ -33,9 +33,7 @@ def config_logger():
 
 from paramiko import *
 from time import sleep
-from random import randint
 import os
-import cmd
 import sys
 import threading
 from SocketServer import ThreadingUDPServer, DatagramRequestHandler
@@ -71,8 +69,6 @@ MALWARE_PROP_STEP_NUMBER = 101
 HOST_NUMBER  = 250 # number of hosts in one cluster node
 HOST_NETMASK = 16 # mask of host intf on mininet cluster node
 
-malware_node_list = []
-malware_list_semaphore = threading.BoundedSemaphore(value=1)
 
 
 from KThread import KThread
@@ -84,8 +80,7 @@ from cluster_mininet_cmd_manager import *
 from cluster_support import *
 from host_configurator import *
 from CLI_Director import CLI_director
-from Malware_Node import Malware_Node
-
+from Malware_Propagation_Director import Malware_propagation_director
 
 node_map         = {} # maps node IP to node username
 node_intf_map    = {} # maps node IP to node outbound interface
@@ -94,281 +89,10 @@ host_map         = {} # maps host IP to host name
 host_to_node_map = {} # maps host IP to node IP
 ssh_map          = {} # maps node IP to ssh session object
 ssh_chan_map     = {}
-ssh_sessions_map = {}
-ssh_stdin_map    = {} # maps node IP to ssh stdin flow
-ssh_stdout_map   = {} # maps node IP to ssh stdout flow
-ssh_stderr_map   = {} # maps node IP to ssh stderr flow
-
-
-
-
-def read_nodelist_from_file(nodelist_filepath):
-    '''Read list of cluster nodes from file.
-
-    Args:
-        nodelist_file: Name of file with list of cluster nodes.
-    '''
-    # open nodelist file
-    logger_MininetCE.info('Reading nodelist from file')
-    nodelist_file = open(nodelist_filepath, 'r')
-    file_lines = nodelist_file.readlines()
-    for file_line in file_lines:
-        splitted_line = file_line.split(' ')
-        node_map[splitted_line[0]]      = splitted_line[1]
-        node_intf_map[splitted_line[0]] = splitted_line[2][:-1]
-    logger_MininetCE.info('DONE!')
-
-
-
-class Malware_request_handler(DatagramRequestHandler):
-    '''Class for handling request from host process about there infectioning.
-    '''
-    def handle(self):
-        malware_list_semaphore.acquire()
-        new_infected_ip = self.rfile.read()
-        print("MALWARE:" + node_IP + ": " + "New worm instance " + str(new_infected_ip))
-        logger_MininetCE.info("MALWARE:" + node_IP + ": " + "New worm instance " + str(new_infected_ip))
-        new_infected_node = self.is_mal_node_in_network(new_infected_ip)
-        if new_infected_node is not None:
-            if new_infected_node.is_vulnerable():
-                new_infected_node.set_infected(True)
-        malware_list_semaphore.release()
-
-    def is_mal_node_in_network(self,IP):
-        for mal_node in malware_node_list:
-            if mal_node.get_host_IP() == IP:
-                return mal_node
-        return None
-
-
-class Malware_propagation_director:
-    def __init__(self):
-        self.server_thread = KThread(target=self.start_malware_center, args=(MALWARE_CENTER_IP, MALWARE_CENTER_PORT))
-        self.server_thread.start()
-        self.try_count = 0
-        self.success_count = 0
-        self.count = 0
-        self.critical = threading.BoundedSemaphore(value=1)
-        self.current_population = 0
-
-        self.sniffer_node_map = {}
-        self.generator_node_map = {}
-
-        self.available_map = {}
-        self.ping_map = {}
-
-    def set_init_population(self, init_population):
-        self.current_population = init_population
-
-    def inc_try_count(self):
-        self.critical.acquire()
-        self.try_count += 1
-        self.critical.release()
-
-    def inc_success_count(self):
-        self.critical.acquire()
-        self.success_count += 1
-        self.critical.release()
-
-    def inc_count(self):
-        self.critical.acquire()
-        self.count += 1
-        self.critical.release()
-
-    def dec_count(self):
-        self.critical.acquire()
-        self.count -= 1
-        self.critical.release()
-
-    def start_malware_center(self, ip="1.2.3.254", port=56565):
-        server = ThreadingUDPServer((ip, port), Malware_request_handler)
-        server.allow_reuse_address = True
-        print("server started")
-        server.serve_forever()
-        return server
-
-    def stop_malware_center(self):
-        print("server stoped")
-        self.server_thread.kill()
-
-    def add_malware_node(self, host_IP, cluster_IP, vulnerable, infected ):
-        malware_node = Malware_Node( host_IP, cluster_IP, vulnerable, infected )
-        malware_node_list.append( malware_node )
-
-    def is_mal_node_in_network(self,IP):
-        for mal_node in malware_node_list:
-            if mal_node.get_host_IP() == IP:
-                return mal_node
-        return None
-
-    # def operate_with_mal_node(self, mal_node):
-    #     if mal_node.is_infected():
-    #
-    #         victim_ip = get_random_test_IP()
-    #         cmd = host_map[mal_node.get_host_IP()] + ' ping ' + victim_ip + " -c 2"
-    #         available = send_mininet_ping_to_cluster_node(mal_node.get_cluster_IP(), cmd, ssh_chan_map)
-    #
-    #         victim_node = self.is_mal_node_in_network(victim_ip)
-    #
-    #         if (victim_node is not None) and available:
-    #             if victim_node.is_vulnerable():
-    #                 intf_name = host_map[victim_ip] + "-eth0"
-    #                 cmd = host_map[victim_ip] + ' python ' + DST_SCRIPT_FOLDER + 'port_sniffer.py ' + victim_ip + \
-    #                       "pin " + intf_name
-    #                 send_mininet_cmd_to_cluster_node(victim_node.get_cluster_IP(), cmd)
-    #                 self.inc_success_count()
-    #             intf_name = host_map[mal_node.get_host_IP()] + "-eth0"
-    #             cmd = host_map[mal_node.get_host_IP()] + ' python ' + DST_SCRIPT_FOLDER + 'scapy_packet_gen.py ' \
-    #                   + victim_ip + " " + intf_name
-    #             send_mininet_cmd_to_cluster_node(mal_node.get_cluster_IP(), cmd)
-    #         self.inc_try_count()
-
-    def setup_sniffer(self, sniffer_list):
-        for sniffer in sniffer_list:
-            victim_node = sniffer[0]
-            victim_ip   = sniffer[1]
-            intf_name = host_map[victim_ip] + "-eth0"
-            cmd = host_map[victim_ip] + ' python ' + DST_SCRIPT_FOLDER + 'port_sniffer.py ' + victim_ip + \
-                  " " + intf_name
-            send_mininet_cmd_to_cluster_node(victim_node.get_cluster_IP(), cmd, ssh_chan_map)
-
-    def setup_generator(self, generator_list):
-        for generator in generator_list:
-            mal_node  = generator[0]
-            victim_ip = generator[1]
-            intf_name = host_map[mal_node.get_host_IP()] + "-eth0"
-            cmd = host_map[mal_node.get_host_IP()] + ' python ' + DST_SCRIPT_FOLDER + 'scapy_packet_gen.py ' \
-                  + victim_ip + " " + intf_name
-            send_mininet_cmd_to_cluster_node(mal_node.get_cluster_IP(), cmd, ssh_chan_map)
-
-    def search_victim(self, mal_node):
-        if mal_node.is_infected():
-            victim_ip = get_random_test_IP()
-            if mal_node.get_cluster_IP() not in self.ping_map.keys():
-                self.ping_map[mal_node.get_cluster_IP()] = [(mal_node.get_host_IP(), victim_ip)]
-            else:
-                self.ping_map[mal_node.get_cluster_IP()].append((mal_node.get_host_IP(), victim_ip))
-
-    def make_ping(self, ping_list, node_IP):
-        for ping in ping_list:
-            src_ip = ping[0]
-            dst_ip = ping[1]
-            cmd = host_map[src_ip] + ' ping ' + dst_ip + " -c 2"
-            available = send_mininet_ping_to_cluster_node(node_IP, cmd, ssh_chan_map)
-            self.available_map[(src_ip, dst_ip)] = available
-            self.inc_try_count()
-
-    def operate_with_mal_node(self):
-        for pair_host, available in self.available_map.items():
-            if available:
-                mal_ip = pair_host[0]
-                victim_ip = pair_host[1]
-                mal_node = self.is_mal_node_in_network(mal_ip)
-                victim_node = self.is_mal_node_in_network(victim_ip)
-                if (victim_node is not None) and (mal_node is not None):
-                    if victim_node.is_vulnerable():
-                        if victim_node.get_cluster_IP() not in self.sniffer_node_map.keys():
-                            self.sniffer_node_map[victim_node.get_cluster_IP()] = [(victim_node, victim_ip)]
-                        else:
-                            self.sniffer_node_map[victim_node.get_cluster_IP()].append((victim_node, victim_ip))
-                        self.inc_success_count()
-                    if mal_node.get_cluster_IP() not in self.generator_node_map.keys():
-                        self.generator_node_map[mal_node.get_cluster_IP()] = [(mal_node, victim_ip)]
-                    else:
-                        self.generator_node_map[mal_node.get_cluster_IP()].append((mal_node, victim_ip))
-
-    def propagation_step_threaded(self):
-        self.success_count = 0
-        self.try_count = 0
-        self.sniffer_node_map   = {}
-        self.generator_node_map = {}
-
-        self.ping_map = {}
-        for mal_node in malware_node_list:
-            self.search_victim(mal_node)
-
-        self.available_map = {}
-        ping_threads = []
-        for node_ip in self.ping_map.keys():
-            thread = KThread(target=self.make_ping, args=(self.ping_map[node_ip], node_ip))
-            ping_threads.append(thread)
-        for thread in ping_threads:
-            thread.start()
-        for thread in ping_threads:
-            thread.join()
-
-        self.operate_with_mal_node()
-        self.current_population += self.success_count
-        logger_MalwareProp.info(str(self.try_count) + "\t\t\t" + str(self.success_count) +
-                                "\t\t\t" + str(self.current_population) + '\t\t\t' + str(len(malware_node_list)))
-
-        sniffer_threads = []
-        for node_ip in self.sniffer_node_map.keys():
-            thread = KThread(target=self.setup_sniffer, args=(self.sniffer_node_map[node_ip],))
-            sniffer_threads.append(thread)
-        for thread in sniffer_threads:
-            thread.start()
-        for thread in sniffer_threads:
-            thread.join()
-
-        generator_threads = []
-        for node_ip in self.generator_node_map.keys():
-            thread = KThread(target=self.setup_generator, args=(self.generator_node_map[node_ip],))
-            generator_threads.append(thread)
-        for thread in generator_threads:
-            thread.start()
-        for thread in generator_threads:
-            thread.join()
-
-        sleep(MALWARE_PROP_DELAY)
-
-    # def propagation_step(self):
-    #     self.success_count = 0
-    #     self.try_count = 0
-    #     for mal_node in malware_node_list:
-    #         self.operate_with_mal_node(mal_node)
-    #     logger_MalwareProp.info(str(self.success_count) + "\t\t\t" + str(self.try_count) +
-    #                           '\t\t\t' + str(len(malware_node_list)))
-    #     sleep(MALWARE_PROP_DELAY)
-
-    def propagation_loop(self, step_number):
-        for i in xrange(step_number):
-            print("STEP: " + str(i))
-            self.propagation_step_threaded()
-
-    def get_infected_nodes_number(self):
-        count = 0
-        for mal_node in malware_node_list:
-            if mal_node.is_infected():
-                count += 1
-        return count
-
-    def show_node_list(self):
-        for mal_node in malware_node_list:
-            mal_node.show()
-        print("infected nodes number = " + str(self.get_infected_nodes_number()))
-
-
-# def host_process_configurator_nodegroup(node_IP, node_group, first_host_ip, CIDR_mask, leaves):
-#     # curr_host = first_host
-#     curr_host_ip = first_host_ip
-#     for node in node_group:
-#         if node in leaves:
-#             # reset config on host interface
-#             curr_host = 'h' + str(node)
-#             cmd = curr_host + ' ifconfig ' + curr_host + '-eth0 0'
-#             send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map)
-#             # config new IP address on host interface
-#             cmd = curr_host + ' ifconfig ' + curr_host + '-eth0 ' + curr_host_ip + '/' + CIDR_mask
-#             send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map)
-#             host_to_node_map[curr_host_ip] = node_IP
-#             host_map[curr_host_ip] = curr_host
-#             if MALWARE_PROPAGATION_MODE:
-#                 malware_list_semaphore.acquire()
-#                 malware_director.add_malware_node(curr_host_ip, node_IP, True, randomize_infected(MALWARE_INIT_INF_PROB))
-#                 malware_list_semaphore.release()
-#             # prepare for next host
-#             curr_host_ip = get_next_IP(curr_host_ip)
+# ssh_sessions_map = {}
+# ssh_stdin_map    = {} # maps node IP to ssh stdin flow
+# ssh_stdout_map   = {} # maps node IP to ssh stdout flow
+# ssh_stderr_map   = {} # maps node IP to ssh stderr flow
 
 
 def malware_propagation_mode():
@@ -400,7 +124,7 @@ if __name__ == '__main__':
     print('Configuring loggers - DONE!')
 
     # take nodelist from file
-    read_nodelist_from_file(NODELIST_FILEPATH)
+    node_map, node_intf_map = read_nodelist_from_file(NODELIST_FILEPATH)
     print('Taking nodelist from config file - DONE!')
 
     # open ssh sessions to nodes

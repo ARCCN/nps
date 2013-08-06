@@ -1,6 +1,7 @@
 from cluster_mininet_cmd_manager import send_mininet_cmd_to_cluster_node
 from cluster_support import randomize_infected, get_next_IP
-from main import MALWARE_PROPAGATION_MODE, MALWARE_INIT_INF_PROB, malware_list_semaphore
+from main import MALWARE_PROPAGATION_MODE, MALWARE_INIT_INF_PROB
+from Malware_Propagation_Director import malware_list_semaphore
 
 # def host_process_configurator(node_IP, first_host, first_host_ip, CIDR_mask, hosts_number):
 #     curr_host = first_host

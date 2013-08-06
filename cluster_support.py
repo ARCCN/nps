@@ -1,3 +1,25 @@
+from main import logger_MininetCE
+
+def read_nodelist_from_file(nodelist_filepath):
+    '''Read list of cluster nodes from file.
+
+    Args:
+        nodelist_file: Name of file with list of cluster nodes.
+    '''
+    node_map = {}
+    node_intf_map = {}
+    # open nodelist file
+    logger_MininetCE.info('Reading nodelist from file')
+    nodelist_file = open(nodelist_filepath, 'r')
+    file_lines = nodelist_file.readlines()
+    for file_line in file_lines:
+        splitted_line = file_line.split(' ')
+        node_map[splitted_line[0]]      = splitted_line[1]
+        node_intf_map[splitted_line[0]] = splitted_line[2][:-1]
+    logger_MininetCE.info('DONE!')
+
+    return node_map, node_intf_map
+
 
 def get_next_IP(IP):
     '''Generate next IP address. The next IP address is the incrementation (+1) of current IP address.
