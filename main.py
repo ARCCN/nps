@@ -1,12 +1,3 @@
-# from mininet.cli import CLI
-# from mininet.log import setLogLevel, info, error
-# from mininet.net import Mininet
-# from mininet.node import RemoteController, OVSKernelSwitch
-# from mininet.topolib import TreeTopo
-# from mininet.topo import Topo
-# from mininet.util import quietRun, irange
-# from mininet.link import Intf
-
 import logging
 def delete_logs():
     if os.path.isfile(LOG_FILEPATH):
@@ -30,15 +21,10 @@ def config_logger():
     logger_MininetCE.addHandler(logging.FileHandler(LOG_FILEPATH))
     logger_MalwareProp.addHandler(logging.FileHandler(MALWARE_LOG_PATH))
 
-
 from paramiko import *
-from time import sleep
 import os
 import sys
-import threading
-from SocketServer import ThreadingUDPServer, DatagramRequestHandler
 import networkx as nx
-
 
 # SOME IMPORTANT CONSTANTS =)
 MININETCE_HOME_FOLDER = '/Users/vitalyantonenko/PycharmProjects/MininetClusterManagerRC'
@@ -53,25 +39,23 @@ NODELIST_FILEPATH = MININETCE_HOME_FOLDER + '/config/nodelist.txt'
 MALWARE_CENTER_IP   = "10.211.55.2"
 MALWARE_CENTER_PORT = 56565
 
+FIRST_HOST_IP = '1.2.3.1'
+
 CLUSTER_NODE_MACHINE_NAME = 'clusternode-Parallels-Virtual-Platform'
 
 MALWARE_PROP_DELAY             = 0
 MALWARE_INIT_INF_PROB          = 5
 MININET_SEGMENT_CREATION_DELAY = 0
-
+MALWARE_PROP_STEP_NUMBER = 101
 
 # MININETCE SIMULATION MODES CONSTANTS
 MALWARE_PROPAGATION_MODE = False
 CLI_MODE                 = True
 
-MALWARE_PROP_STEP_NUMBER = 101
 
-HOST_NUMBER  = 250 # number of hosts in one cluster node
 HOST_NETMASK = 16 # mask of host intf on mininet cluster node
 
 
-
-from KThread import KThread
 import mininet_script_generator
 import mininet_script_operator
 from cluster_cmd_manager import *
@@ -80,7 +64,9 @@ from cluster_mininet_cmd_manager import *
 from cluster_support import *
 from host_configurator import *
 from CLI_Director import CLI_director
-from Malware_Propagation_Director import Malware_propagation_director
+from Malware_Propagation_Director import Malware_propagation_director, malware_node_list
+
+
 
 node_map         = {} # maps node IP to node username
 node_intf_map    = {} # maps node IP to node outbound interface
@@ -89,10 +75,7 @@ host_map         = {} # maps host IP to host name
 host_to_node_map = {} # maps host IP to node IP
 ssh_map          = {} # maps node IP to ssh session object
 ssh_chan_map     = {}
-# ssh_sessions_map = {}
-# ssh_stdin_map    = {} # maps node IP to ssh stdin flow
-# ssh_stdout_map   = {} # maps node IP to ssh stdout flow
-# ssh_stderr_map   = {} # maps node IP to ssh stderr flow
+node_IP_pool_map = {}
 
 
 def malware_propagation_mode():
@@ -107,13 +90,14 @@ def malware_propagation_mode():
     malware_director.propagation_loop(MALWARE_PROP_STEP_NUMBER)
     malware_director.show_node_list()
     print("initial population number = " + str(init_population_number))
-    print("total population number = " + str(HOST_NUMBER * len(node_map.items())))
+    print("total population number = ")
 
     malware_director.stop_malware_center()
 
 def cli_mode():
     cli_director = CLI_director(host_map, host_to_node_map, ssh_chan_map)
     cli_director.cmdloop()
+
 
 if __name__ == '__main__':
     util.log_to_file('paramiko.log')
@@ -149,61 +133,21 @@ if __name__ == '__main__':
                                                                       edge_groups, leaves, node_map)
     print('Generating start up scripts for nodes Mininet - DONE!')
 
-    # for node_IP in node_map.keys():
-    #    mininet_script_generator.generate_mininet_turn_on_script(node_IP, node_intf_map[node_IP], HOST_NUMBER)
-    #    logger_MininetCE.info('generating turn on script for ' + str(node_IP))
-
     # send scripts to nodes
-    threads = []
-    for node_IP in node_map.keys():
-        thread = KThread(target=send_support_scripts_to_cluster_node, args=(node_IP, node_map))
-        threads.append(thread)
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    make_threaded(send_support_scripts_to_cluster_node, [node_map,], node_map)
     print('Sending scripts to nodes - DONE!')
 
     # STAGE 1. Execute start-up scripts on nodes
-    threads = []
-    for node_IP in node_map.keys():
-        thread = KThread(target=exec_start_up_script, args=(node_IP,node_intf_map, ssh_chan_map))
-        threads.append(thread)
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    make_threaded(exec_start_up_script, [node_intf_map, ssh_chan_map], node_map)
     print('Executing start up scripts on nodes - DONE!')
 
-    first_IP = '1.2.3.1'
-    next_IP_pool = first_IP
-    threads = []
-    for node_IP in node_map.keys():
-        # Configure IP address on nodes (cos by default there is 10.0.0.0/24 subnet). For correct config-function
-        # execution we need to set the number of hosts proccesses on one cluster node.
-        host_num = len(node_groups[node_IP_gr_map[node_IP]])
-        for node in node_groups[node_IP_gr_map[node_IP]]:
-            if node not in leaves:
-                host_num -= 1
+    node_IP_pool_map = define_node_ip_pool(node_groups, node_IP_gr_map, leaves, node_map)
 
-        thread = KThread(target=host_process_configurator_nodegroup, args=(node_IP, node_groups[node_IP_gr_map[node_IP]], next_IP_pool,
-                                                                 str(HOST_NETMASK), leaves, host_to_node_map, host_map, ssh_chan_map))
-        threads.append(thread)
-        next_IP_pool = get_next_IP_pool(next_IP_pool, host_num)
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    make_threaded(host_process_configurator_nodegroup, [node_groups, node_IP_gr_map, node_IP_pool_map,
+                                str(HOST_NETMASK), leaves, host_to_node_map, host_map, ssh_chan_map], node_map)
     print('Configuring host-proccesses eth interfaces - DONE!')
 
     # STAGE 2. Execute test scenario.
-    # for i,node_IP  in enumerate(node_map.keys()):
-    #     if node_IP == '10.30.40.62':
-    #         send_mininet_cmd_to_cluster_node( node_IP, 'h1 ping 1.2.3.117 -c 2' )
-    #         sleep(2)
-    #     elif node_IP == '10.30.40.65':
-    #         send_mininet_cmd_to_cluster_node( node_IP, 'h1 ping 1.2.3.2 -c 2' )
-    #         sleep(2)
 
     # STAGE 2.5. Simulation
     if MALWARE_PROPAGATION_MODE:
@@ -212,32 +156,15 @@ if __name__ == '__main__':
         cli_mode()
         print('Turning OFF CLI interface - DONE!')
 
-
     # STAGE 3. Shutdown all cluster nodes.
-    threads = []
-    for node_IP in node_map.keys():
-        thread = KThread(target=send_mininet_cmd_to_cluster_node, args=(node_IP, 'exit', ssh_chan_map))
-        threads.append(thread)
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    make_threaded(send_mininet_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map)
     print('Sending exit to Mininet on nodes - DONE!')
 
-
     # close ssh sessions to nodes
-    threads = []
-    for node_IP in node_map.keys():
-        thread = KThread(target=send_cmd_to_cluster_node, args=(node_IP, 'exit', ssh_chan_map))
-        threads.append(thread)
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    make_threaded(send_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map)
     print('Sending exit to cluster nodes - DONE!')
 
     close_ssh_to_nodes(ssh_map)
     print('Sending CLOSE to all ssh connections - DONE!')
-
 
     print('FINISH')

@@ -1,4 +1,6 @@
 from main import logger_MininetCE
+from KThread import KThread
+from random import randint
 
 def read_nodelist_from_file(nodelist_filepath):
     '''Read list of cluster nodes from file.
@@ -110,3 +112,17 @@ def randomize_infected(prob):
         return True
     else:
         return False
+
+def make_threaded(function, args, node_map):
+    threads = []
+    list_args = list(args)
+    for node_IP in node_map.keys():
+        list_args.insert(0, node_IP)
+        thread = KThread(target=function, args=tuple(list_args))
+        threads.append(thread)
+        list_args.pop(0)
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
