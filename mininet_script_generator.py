@@ -1,23 +1,4 @@
-
-
-SCRIPT_FOLDER = 'scripts/nodes/'
-REMOTE_CONTROLLER_IP   = '10.211.55.2'
-REMOTE_CONTROLLER_PORT = '6633'
-
-
-
-
-
-def generate_mininet_turn_on_script( node_IP, nodes_ext_intf, hosts_number ):
-    filename = 'turn_on_script_for_' + str(node_IP) + '.py'
-    filepath = SCRIPT_FOLDER + filename
-
-    octets = node_IP.split('.')
-
-    file = open(filepath, 'w')
-    gen_rtk_example_turn_on_script(file, nodes_ext_intf, hosts_number, octets[3] )
-    file.close()
-
+from config.config_constants import SCRIPT_FOLDER, REMOTE_CONTROLLER_IP, REMOTE_CONTROLLER_PORT
 
 def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group, leaves):
     file.write('import re\n')

@@ -24,40 +24,14 @@ def config_logger():
 from paramiko import *
 import os
 import sys
-import time
 import networkx as nx
+from multiprocessing import Process
 
-# SOME IMPORTANT CONSTANTS =)
-STRING_ALIGNMENT = 77
-
-MININETCE_HOME_FOLDER = '/Users/vitalyantonenko/PycharmProjects/MininetClusterManagerRC'
-
-LOG_FILEPATH      = MININETCE_HOME_FOLDER + '/logs/MininetCluster.log'
-ROOT_LOG_FILEPATH = MININETCE_HOME_FOLDER + '/logs/MininetCluster_root.log'
-MALWARE_LOG_PATH  = MININETCE_HOME_FOLDER + '/logs/MalwarePropagation.log'
-SRC_SCRIPT_FOLDER = MININETCE_HOME_FOLDER + '/scripts/'
-DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/'
-NODELIST_FILEPATH = MININETCE_HOME_FOLDER + '/config/nodelist.txt'
-
-MALWARE_CENTER_IP   = "10.211.55.2"
-MALWARE_CENTER_PORT = 56565
-
-FIRST_HOST_IP = '1.2.3.1'
-
-CLUSTER_NODE_MACHINE_NAME = 'clusternode-Parallels-Virtual-Platform'
-
-MALWARE_PROP_DELAY             = 0
-MALWARE_INIT_INF_PROB          = 5
-MININET_SEGMENT_CREATION_DELAY = 0
-MALWARE_PROP_STEP_NUMBER = 101
-
-# MININETCE SIMULATION MODES CONSTANTS
-MALWARE_PROPAGATION_MODE = False
-CLI_MODE                 = True
-
-
-HOST_NETMASK = 16 # mask of host intf on mininet cluster node
-
+from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
+from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH
+from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE
+from config.config_constants import HOST_NETMASK
+from config.config_constants import RANDOM_GRAPH_FLAG,RANDOM_GRAPH_SIZE
 
 import mininet_script_generator
 import mininet_script_operator
@@ -66,50 +40,21 @@ from cluster_ssh_manager import *
 from cluster_mininet_cmd_manager import *
 from cluster_support import *
 from host_configurator import *
-from CLI_Director import CLI_director
-from Malware_Propagation_Director import Malware_propagation_director, malware_node_list
-
-
+from cluster_manager_modes import *
 
 node_map         = {} # maps node IP to node username
 node_intf_map    = {} # maps node IP to node outbound interface
-node_IP_gr_map   = {}
+node_IP_gr_map   = {} # maps node IP to node group
 host_map         = {} # maps host IP to host name
+host_IP_map      = {} # maps host name to host IP
 host_to_node_map = {} # maps host IP to node IP
 ssh_map          = {} # maps node IP to ssh session object
-ssh_chan_map     = {}
-node_IP_pool_map = {}
-
-
-def malware_propagation_mode():
-    # prepare malware director
-    malware_director = Malware_propagation_director()
-
-    init_population_number = malware_director.get_infected_nodes_number()
-    logger_MalwareProp.info("Try\t\t\tSuccess\t\t\tCurrent\t\t\tTotal")
-    logger_MalwareProp.info("0\t\t\t" + "0\t\t\t" + str(init_population_number) +
-                            '\t\t\t' + str(len(malware_node_list)))
-    malware_director.set_init_population(init_population_number)
-    malware_director.propagation_loop(MALWARE_PROP_STEP_NUMBER)
-    malware_director.show_node_list()
-    print("initial population number = " + str(init_population_number))
-    print("total population number = ")
-
-    malware_director.stop_malware_center()
-
-def cli_mode():
-    cli_director = CLI_director(host_map, host_to_node_map, ssh_chan_map)
-    cli_director.cmdloop()
-
-def start_waiting():
-    while True:
-        time.sleep(1)
-        print('.'),
-
-
+ssh_chan_map     = {} # maps node IP to ssh chan objects
+node_IP_pool_map = {} # maps node IP to host IP pool
 
 if __name__ == '__main__':
     util.log_to_file('paramiko.log')
+    malware_node_list = {}
 
     # config logger
     print('Configuring loggers'.ljust(STRING_ALIGNMENT, ' ')),
@@ -128,13 +73,20 @@ if __name__ == '__main__':
     print('DONE!')
 
     # prepare scripts to nodes
-    print('Parsing network graph'.ljust(STRING_ALIGNMENT, ' ')),
-    G = nx.Graph()
-    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-        G = mininet_script_operator.standard_mininet_script_parser(sys.argv[1], G)
+    if RANDOM_GRAPH_FLAG:
+        print('Generating random network graph'.ljust(STRING_ALIGNMENT, ' ')),
+        G = nx.random_lobster(6, 1.0, 0.33)
+        print('DONE!')
     else:
-        G = mininet_script_operator.standard_mininet_script_parser('test_script', G)
-    print('DONE!')
+        print('Parsing network graph'.ljust(STRING_ALIGNMENT, ' ')),
+        G = nx.Graph()
+        if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
+            G = mininet_script_operator.standard_mininet_script_parser(sys.argv[1], G)
+        else:
+            G = mininet_script_operator.standard_mininet_script_parser('test_script', G)
+        print('DONE!')
+
+
 
     print('Splitting network graph for nodes'.ljust(STRING_ALIGNMENT, ' ')),
     leaves = mininet_script_operator.define_leaves_in_graph(G)
@@ -142,6 +94,16 @@ if __name__ == '__main__':
     for gr_number in node_groups.keys():
         node_IP_gr_map[node_map.keys()[gr_number]] = gr_number
     print('DONE!')
+
+    if DRAWING_FLAG:
+        print('Drawing graph'.ljust(STRING_ALIGNMENT, ' ')),
+        p = Process(target=mininet_script_operator.draw_graph, args=tuple([G, node_groups, edge_groups, leaves]),)
+        p.daemon = True
+        p.start()
+        #
+        # sys.stdin.read(1)
+        # exit(-1)
+        print('DONE!')
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
     mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
@@ -158,20 +120,22 @@ if __name__ == '__main__':
     make_threaded(exec_start_up_script, [node_intf_map, ssh_chan_map], node_map)
     print('DONE!')
 
-    print('Configuring host-proccesses eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
+    print('Configuring host-processes eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
     node_IP_pool_map = define_node_ip_pool(node_groups, node_IP_gr_map, leaves, node_map)
 
-    make_threaded(host_process_configurator_nodegroup, [node_groups, node_IP_gr_map, node_IP_pool_map,
-                                str(HOST_NETMASK), leaves, host_to_node_map, host_map, ssh_chan_map], node_map)
+    make_threaded(host_process_configurator_nodegroup,
+                        [node_groups, node_IP_gr_map, node_IP_pool_map, str(HOST_NETMASK),
+                            leaves, host_to_node_map, host_map, host_IP_map, ssh_chan_map],
+                        node_map)
     print('DONE!')
 
     # STAGE 2. Execute test scenario.
 
     # STAGE 2.5. Simulation
     if MALWARE_PROPAGATION_MODE:
-        malware_propagation_mode()
+        malware_propagation_mode(malware_node_list)
     elif CLI_MODE:
-        cli_mode()
+        cli_mode(host_map, host_to_node_map, host_IP_map, ssh_chan_map)
         print('Turn OFF CLI interface'.ljust(STRING_ALIGNMENT, ' ')),
         print('DONE!')
 

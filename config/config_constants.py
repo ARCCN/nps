@@ -1,0 +1,40 @@
+STRING_ALIGNMENT = 77
+DRAWING_FLAG = True
+
+MININETCE_HOME_FOLDER = '/Users/vitalyantonenko/PycharmProjects/MininetClusterManagerRC'
+
+LOG_FILEPATH      = MININETCE_HOME_FOLDER + '/logs/MininetCluster.log'
+ROOT_LOG_FILEPATH = MININETCE_HOME_FOLDER + '/logs/MininetCluster_root.log'
+MALWARE_LOG_PATH  = MININETCE_HOME_FOLDER + '/logs/MalwarePropagation.log'
+SRC_SCRIPT_FOLDER = MININETCE_HOME_FOLDER + '/scripts/'
+DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/'
+NODELIST_FILEPATH = MININETCE_HOME_FOLDER + '/config/nodelist.txt'
+
+MALWARE_CENTER_IP   = "10.211.55.2"
+MALWARE_CENTER_PORT = 56565
+
+FIRST_HOST_IP = '1.2.3.1'
+
+CLUSTER_NODE_MACHINE_NAME = 'clusternode-Parallels-Virtual-Platform'
+
+MALWARE_PROP_DELAY             = 0
+MALWARE_INIT_INF_PROB          = 5
+MININET_SEGMENT_CREATION_DELAY = 0
+MALWARE_PROP_STEP_NUMBER = 101
+
+# MININETCE SIMULATION MODES CONSTANTS
+MALWARE_PROPAGATION_MODE = False
+CLI_MODE                 = True
+
+
+HOST_NETMASK = 16 # mask of host intf on mininet cluster node
+
+ALPHA_VALUE = 0.33
+
+RANDOM_GRAPH_FLAG = True
+RANDOM_GRAPH_SIZE = 35
+
+SCRIPT_FOLDER = 'scripts/nodes/'
+REMOTE_CONTROLLER_IP   = '10.211.55.2'
+REMOTE_CONTROLLER_PORT = '6633'
+

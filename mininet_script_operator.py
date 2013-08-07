@@ -1,10 +1,8 @@
-__author__ = 'anvial'
+from config.config_constants import ALPHA_VALUE
 
 import networkx as nx
 import metis
-from mininet_script_generator import generate_mininet_turn_on_script_auto
-from random import random, expovariate
-from networkx.algorithms import bipartite
+import matplotlib.pyplot as plt
 
 
 def split_graph_on_parts(G, number_pf_parts):
@@ -68,6 +66,16 @@ def standard_mininet_script_parser(filename, G):
             G.add_edge(string_name_to_ID_map[link_elem_1],string_name_to_ID_map[link_elem_2])
     return G
 
+def custom_mininet_script_parser(filename, G):
+    mininet_sript = open(filename, 'r')
+    lines = mininet_sript.readlines()
+    for i, line in enumerate(lines):
+        if 'class Topology' in line:
+
+            if lines[i+1][0] in [' ', '\t', '\n']:
+                print(lines[i+1][0])
+
+
 def define_leaves_in_graph(G):
     leaves = []
     for key,value in nx.degree(G).items():
@@ -75,7 +83,9 @@ def define_leaves_in_graph(G):
             leaves.append(key)
     return leaves
 
-def draw_graph(G, node_groups, edge_groups):
+def draw_graph(G, node_groups, edge_groups, leaves):
+    pos = nx.spring_layout(G)
+
     plt.figure(1)
     plt.subplot(121)
     nx.draw_networkx_nodes(G, pos)
@@ -85,31 +95,40 @@ def draw_graph(G, node_groups, edge_groups):
 
     colors = ['b','g','r','c','m','y']
 
+    labels = {}
+    for n in G.nodes():
+        if n in leaves:
+            labels[n] = 'h' + str(n)
+        else:
+            labels[n] = 's' + str(n)
+
     for group in node_groups.keys():
-        nx.draw_networkx_nodes(G, pos, nodelist=node_groups[group], node_color=colors[group])
+        nx.draw_networkx_nodes(G, pos, nodelist=node_groups[group], node_color=colors[group], alpha=ALPHA_VALUE)
 
     for group in edge_groups.keys():
         if group != 'no_group':
-            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group])
+            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group], alpha=ALPHA_VALUE)
         else:
-            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k')
-    nx.draw_networkx_labels(G, pos)
+            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k', alpha=ALPHA_VALUE)
+    nx.draw_networkx_labels(G, pos, labels)
     plt.show()
 
 
 if __name__ == '__main__':
-    print('HELLO!\n')
+#     print('HELLO!\n')
+#     G = nx.Graph()
+#
+#     G = standard_mininet_script_parser('test_script',G)
+#
+#
+# #    G = nx.bipartite_random_graph(10,5,0.4)
+#     pos = nx.spring_layout(G)
+#
+#     leaves = define_leaves_in_graph(G)
+#     node_groups,edge_groups = split_graph_on_parts(G, 2)
+#
+#     # generate_mininet_turn_on_script_auto("eth0", node_groups, edge_groups, leaves)
+#
+#     draw_graph(G, node_groups, edge_groups)
     G = nx.Graph()
-
-    G = standard_mininet_script_parser('test_script',G)
-
-
-#    G = nx.bipartite_random_graph(10,5,0.4)
-    pos = nx.spring_layout(G)
-
-    leaves = define_leaves_in_graph(G)
-    node_groups,edge_groups = split_graph_on_parts(G, 2)
-
-    generate_mininet_turn_on_script_auto("eth0", node_groups, edge_groups, leaves)
-
-    draw_graph(G, node_groups, edge_groups)
+    custom_mininet_script_parser('mn_config.py', G)

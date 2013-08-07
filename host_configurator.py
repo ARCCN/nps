@@ -1,6 +1,6 @@
 from cluster_mininet_cmd_manager import send_mininet_cmd_to_cluster_node
 from cluster_support import randomize_infected, get_next_IP, get_next_IP_pool
-from main import MALWARE_PROPAGATION_MODE, MALWARE_INIT_INF_PROB, FIRST_HOST_IP
+from config.config_constants import MALWARE_PROPAGATION_MODE, MALWARE_INIT_INF_PROB, FIRST_HOST_IP
 from Malware_Propagation_Director import malware_list_semaphore
 
 # def host_process_configurator(node_IP, first_host, first_host_ip, CIDR_mask, hosts_number):
@@ -25,7 +25,7 @@ from Malware_Propagation_Director import malware_list_semaphore
 
 
 def host_process_configurator_nodegroup(node_IP, node_groups, node_IP_gr_map, node_IP_pool_map, CIDR_mask, leaves,
-                                        host_to_node_map, host_map, ssh_chan_map):
+                                        host_to_node_map, host_map, host_IP_map, ssh_chan_map):
     # curr_host = first_host
     first_host_ip = node_IP_pool_map[node_IP]
     curr_host_ip = first_host_ip
@@ -41,6 +41,7 @@ def host_process_configurator_nodegroup(node_IP, node_groups, node_IP_gr_map, no
             send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map)
             host_to_node_map[curr_host_ip] = node_IP
             host_map[curr_host_ip] = curr_host
+            host_IP_map[curr_host] = curr_host_ip
             if MALWARE_PROPAGATION_MODE:
                 malware_list_semaphore.acquire()
                 malware_director.add_malware_node(curr_host_ip, node_IP, True,

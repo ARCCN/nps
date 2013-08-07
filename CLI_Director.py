@@ -4,13 +4,14 @@ from cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node
 
 class CLI_director(cmd.Cmd):
 
-    def __init__(self, host_map, host_to_node_map, ssh_chan_map):
+    def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map):
         cmd.Cmd.__init__(self)
         self.prompt = "+> "
         self.intro  = "Welcome to Mininet CE console!"  ## defaults to None
 
         self.host_map = host_map
         self.host_to_node_map = host_to_node_map
+        self.host_IP_map = host_IP_map
         self.ssh_chan_map = ssh_chan_map
 
     ## Command definitions ##
@@ -44,18 +45,86 @@ class CLI_director(cmd.Cmd):
         if len(args) != 2:
             print('*** invalid number of arguments')
             return
-        src_ip = args[0]
-        dst_ip = args[1]
+        src = args[0]
+        dst = args[1]
 
-        cmd = self.host_map[src_ip] + ' ping -c 4 ' + dst_ip
-        send_mininet_ping_to_cluster_node(self.host_to_node_map[src_ip], cmd, self.ssh_chan_map)
+
+        if src not in self.host_IP_map.keys() and src not in self.host_IP_map.values():
+            print('No such src host')
+            return
+        if dst not in self.host_IP_map.keys() and dst not in self.host_IP_map.values():
+            print('No such dst host')
+            return
+
+        if not self.is_hostname(src):
+            src = self.host_map[src]
+        if self.is_hostname(dst):
+            dst = self.host_IP_map[dst]
+
+        print(self.host_IP_map.values())
+
+
+        cmd = src + ' ping -c 4 ' + dst
+        send_mininet_ping_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd, self.ssh_chan_map)
 
     def help_ping(self):
         print('usage:')
-        print('\t_srcHostIP ping _dstHostIP')
+        print('\t_srcHostIP (_srcHostname) ping _dstHostIP (_dstHostname)')
         print('example:')
         print('\t10.0.0.1 ping 10.0.0.2')
+        print('\th1       ping 10.0.0.2')
+        print('\t10.0.0.1 ping h2')
+        print('\th1       ping h2')
 
+    def do_ifconfig(self, args):
+        args = args.split()
+        if len(args) != 1:
+            print('*** invalid number of arguments')
+            return
+        src= args[0]
+
+        if src not in self.host_IP_map.keys() and src not in self.host_IP_map.values():
+            print('No such host')
+            return
+
+        if self.is_hostname(src):
+            cmd = src + ' ifconfig'
+        else:
+            cmd = self.host_map[src] + ' ifconfig'
+
+        if self.is_hostname(src):
+            send_mininet_ping_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd, self.ssh_chan_map)
+        else:
+            send_mininet_ping_to_cluster_node(self.host_to_node_map[src], cmd, self.ssh_chan_map)
+
+    def help_ifconfig(self):
+        print('usage:')
+        print('\t_srcHostIP (_srcHostname) ifconfig')
+        print('example:')
+        print('\t10.0.0.1 ifconfig')
+        print('\th1       ifconfig')
+
+    def do_hosts(self, args):
+        args = args.split()
+        if len(args) == 0:
+            for host in self.host_IP_map.keys():
+                print(host),
+                print(' '),
+            print('')
+        elif len(args) == 1 and args[0].lower() == 'ip':
+            for host, ip in self.host_IP_map.items():
+                print(host.ljust(7, ' ')),
+                print(': '),
+                print(ip)
+        else:
+            print('wrong syntax in command "hosts"')
+
+    def help_hosts(self):
+        print('usage:')
+        print('\thosts [ip]')
+        print('example:')
+        print('\thosts')
+        print('\thosts ip')
 
     ## Override methods in Cmd object ##
     def preloop(self):
@@ -100,8 +169,17 @@ class CLI_director(cmd.Cmd):
         if words[1] == 'ping' and len(words) == 3:
             new_line = words[0] + ' ' + words[2]
             self.do_ping(new_line)
+        elif words[1] == 'ifconfig' and len(words) == 2:
+            new_line = words[0]
+            self.do_ifconfig(new_line)
         else:
             try:
                 exec(line) in self._locals, self._globals
             except Exception, e:
                 print e.__class__, ":", e
+
+    def is_hostname(self, str):
+        if str[0] == 'h':
+            return True
+        else:
+            return False

@@ -1,5 +1,6 @@
 from paramiko import *
-from main import logger_MininetCE, SRC_SCRIPT_FOLDER, DST_SCRIPT_FOLDER, CLUSTER_NODE_MACHINE_NAME
+from main import logger_MininetCE
+from config.config_constants import SRC_SCRIPT_FOLDER, DST_SCRIPT_FOLDER, CLUSTER_NODE_MACHINE_NAME
 
 
 def send_script_to_cluster_node(node_IP, script_filename, node_map):
