@@ -31,7 +31,7 @@ from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
 from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH
 from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE
 from config.config_constants import HOST_NETMASK
-from config.config_constants import RANDOM_GRAPH_FLAG,RANDOM_GRAPH_SIZE
+from config.config_constants import RANDOM_GRAPH_FLAG
 
 import mininet_script_generator
 import mininet_script_operator
@@ -86,11 +86,9 @@ if __name__ == '__main__':
             G = mininet_script_operator.standard_mininet_script_parser('test_script', G)
         print('DONE!')
 
-
-
     print('Splitting network graph for nodes'.ljust(STRING_ALIGNMENT, ' ')),
     leaves = mininet_script_operator.define_leaves_in_graph(G)
-    node_groups, edge_groups = mininet_script_operator.split_graph_on_parts(G, len(node_map))
+    node_groups, edge_groups, node_ext_intf_group = mininet_script_operator.split_graph_on_parts(G, len(node_map))
     for gr_number in node_groups.keys():
         node_IP_gr_map[node_map.keys()[gr_number]] = gr_number
     print('DONE!')
@@ -100,15 +98,15 @@ if __name__ == '__main__':
         p = Process(target=mininet_script_operator.draw_graph, args=tuple([G, node_groups, edge_groups, leaves]),)
         p.daemon = True
         p.start()
-        #
-        # sys.stdin.read(1)
-        # exit(-1)
         print('DONE!')
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
     mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
-                                                                      edge_groups, leaves, node_map)
+                                                                      edge_groups, node_ext_intf_group, leaves, node_map)
     print('DONE!')
+
+    # sys.stdin.read(1)
+    # exit(-1)
 
     # send scripts to nodes
     print('Sending scripts to nodes'.ljust(STRING_ALIGNMENT, ' ')),

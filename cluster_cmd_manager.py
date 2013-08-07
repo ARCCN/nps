@@ -102,6 +102,10 @@ def exec_start_up_script(node_IP, node_intf_map, ssh_chan_map):
     Args:
         node_IP: IP address of cluster node.
     '''
+
+    reset_vs_db_cmd = 'ovs-vsctl list-br | xargs -L1 sudo ovs-vsctl del-br'
+    send_cmd_to_cluster_node(node_IP, reset_vs_db_cmd, ssh_chan_map)
+
     # Flush options on eth1 interface on nodes in cluster. This interface will be use for inter
     # Mininet instances communications
     reset_intf_cmd = 'ifconfig ' + node_intf_map[node_IP] + ' 0'

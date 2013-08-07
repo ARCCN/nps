@@ -18,6 +18,7 @@ def split_graph_on_parts(G, number_pf_parts):
     for p in parts:
         edge_groups[p] = []
     edge_groups['no_group'] = []
+    node_ext_intf_group = []
     for edge in G.edges():
         in_one_group_flag = False
         for group in node_groups.keys():
@@ -28,8 +29,12 @@ def split_graph_on_parts(G, number_pf_parts):
             edge_groups[group].append(edge)
         else:
             edge_groups['no_group'].append(edge)
+            if edge[0] not in node_ext_intf_group:
+                node_ext_intf_group.append(edge[0])
+            if edge[1] not in node_ext_intf_group:
+                node_ext_intf_group.append(edge[1])
 
-    return node_groups,edge_groups
+    return node_groups, edge_groups, node_ext_intf_group
 
 def standard_mininet_script_parser(filename, G):
     ''' Parse standart Mininet sript.

@@ -48,7 +48,6 @@ class CLI_director(cmd.Cmd):
         src = args[0]
         dst = args[1]
 
-
         if src not in self.host_IP_map.keys() and src not in self.host_IP_map.values():
             print('No such src host')
             return
@@ -60,9 +59,6 @@ class CLI_director(cmd.Cmd):
             src = self.host_map[src]
         if self.is_hostname(dst):
             dst = self.host_IP_map[dst]
-
-        print(self.host_IP_map.values())
-
 
         cmd = src + ' ping -c 4 ' + dst
         send_mininet_ping_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd, self.ssh_chan_map)
@@ -112,19 +108,46 @@ class CLI_director(cmd.Cmd):
                 print(' '),
             print('')
         elif len(args) == 1 and args[0].lower() == 'ip':
+            print('hostname'.center(7, ' ')),
+            print(': '),
+            print('host IP'.center(15, ' ')),
+            print(' : ')
             for host, ip in self.host_IP_map.items():
                 print(host.ljust(7, ' ')),
-                print(': '),
+                print(' : '),
                 print(ip)
+        elif len(args) == 1 and args[0].lower() in ['node', 'cluster']:
+            print('host IP'.center(15, ' ')),
+            print(': '),
+            print('node IP'.center(15, ' '))
+            for host, node in self.host_to_node_map.items():
+                print(host.ljust(15, ' ')),
+                print(' : '),
+                print(node)
+        elif len(args) == 1 and args[0].lower() == 'info':
+            print('hostname'.center(7, ' ')),
+            print(': '),
+            print('host IP'.center(15, ' ')),
+            print(' : '),
+            print('node IP'.center(15, ' '))
+            for host, ip in self.host_IP_map.items():
+                print(host.ljust(7, ' ')),
+                print(' : '),
+                print(ip.ljust(15, ' ')),
+                print(' : '),
+                print(self.host_to_node_map[ip])
         else:
             print('wrong syntax in command "hosts"')
 
     def help_hosts(self):
         print('usage:')
-        print('\thosts [ip]')
+        print('\thosts [ip, node, cluster, info]')
         print('example:')
         print('\thosts')
         print('\thosts ip')
+        print('\thosts node')
+        print('\thosts cluster')
+        print('\thosts info')
 
     ## Override methods in Cmd object ##
     def preloop(self):
