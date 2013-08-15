@@ -2,11 +2,14 @@ from config.config_constants import ALPHA_VALUE
 
 import networkx as nx
 import metis
+import random
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+
 
 
 def split_graph_on_parts(G, number_pf_parts):
-    (edgecuts, parts) = metis.part_graph(G, number_pf_parts)
+    (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=True)
 
     node_groups = {}
     for p in parts:
@@ -88,15 +91,37 @@ def define_leaves_in_graph(G):
             leaves.append(key)
     return leaves
 
-def draw_graph(G, node_groups, edge_groups, leaves):
+def draw_graph(G, node_groups, edge_groups, leaves, node_map):
+    mpl.rcParams['toolbar'] = 'None'
+    mpl.rcParams['font.size'] = 11
+    mpl.rcParams['font.family'] = 'Candara'
+
     pos = nx.spring_layout(G)
 
-    plt.figure(1)
+    fig = plt.figure(1, figsize=(15, 8))
+    fig.canvas.set_window_title("Mininet CE Network Graph")
+    fig.patch.set_facecolor('white')
+
+
     plt.subplot(121)
-    nx.draw_networkx_nodes(G, pos)
-    nx.draw_networkx_edges(G, pos)
-    nx.draw_networkx_labels(G, pos)
+    frame1 = plt.gca()
+    frame1.axes.get_xaxis().set_visible(False)
+    frame1.axes.get_yaxis().set_visible(False)
+    frame1.patch.set_facecolor((1.0, 0.5, 1.0, 0.1))
+
+
+
+    nx.draw_networkx_nodes(G, pos, node_size=50)
+    nx.draw_networkx_edges(G, pos, alpha=ALPHA_VALUE, width=3.0)
+    label_pos = {k: [v[0],v[1]+0.03] for k, v in pos.items()}
+    nx.draw_networkx_labels(G, label_pos, font_size=10, font_family='candara')
+
     plt.subplot(122)
+    frame2 = plt.gca()
+    frame2.axes.get_xaxis().set_visible(False)
+    frame2.axes.get_yaxis().set_visible(False)
+    frame2.patch.set_facecolor((0.0, 0.0, 0.8, 0.1))
+
 
     colors = ['b','g','r','c','m','y']
 
@@ -107,16 +132,33 @@ def draw_graph(G, node_groups, edge_groups, leaves):
         else:
             labels[n] = 's' + str(n)
 
+    pl_nodes = []
     for group in node_groups.keys():
-        nx.draw_networkx_nodes(G, pos, nodelist=node_groups[group], node_color=colors[group], alpha=ALPHA_VALUE)
+        pl_node = nx.draw_networkx_nodes(G, pos, nodelist=node_groups[group], node_color=colors[group], node_size=50)
+        pl_nodes.append(pl_node)
 
     for group in edge_groups.keys():
         if group != 'no_group':
-            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group], alpha=ALPHA_VALUE)
+            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group], alpha=ALPHA_VALUE, width=3.0)
         else:
-            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k', alpha=ALPHA_VALUE)
-    nx.draw_networkx_labels(G, pos, labels)
+            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k', alpha=ALPHA_VALUE, width=3.0)
+
+    label_pos = {k: [v[0],v[1]+0.03] for k, v in pos.items()}
+
+    nx.draw_networkx_labels(G, label_pos, labels, font_size=10, font_family='candara')
+    leg = plt.legend(pl_nodes, node_map.keys(), prop={'size': 8}, handletextpad=3)
+    leg.legendPatch.set_alpha(0.77)
+
     plt.show()
+
+def nodes_number_optimization(G, node_map, node_intf_map):
+    new_nodes_num = len(node_map)
+    while len(G.nodes())/new_nodes_num < 2.0:
+        new_nodes_num -= 1
+        key = random.choice(node_map.keys())
+        del node_map[key]
+        del node_intf_map[key]
+    return node_map, node_intf_map
 
 
 if __name__ == '__main__':

@@ -67,11 +67,6 @@ if __name__ == '__main__':
     node_map, node_intf_map = read_nodelist_from_file(NODELIST_FILEPATH)
     print('DONE!')
 
-    # open ssh sessions to nodes
-    print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
-    ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
-    print('DONE!')
-
     # prepare scripts to nodes
     if RANDOM_GRAPH_FLAG:
         print('Generating random network graph'.ljust(STRING_ALIGNMENT, ' ')),
@@ -85,6 +80,16 @@ if __name__ == '__main__':
         else:
             G = mininet_script_operator.standard_mininet_script_parser('test_script', G)
         print('DONE!')
+    node_map, node_intf_map = mininet_script_operator.nodes_number_optimization(G, node_map, node_intf_map)
+
+
+    # open ssh sessions to nodes
+    print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
+    ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
+    print('DONE!')
+
+
+
 
     print('Splitting network graph for nodes'.ljust(STRING_ALIGNMENT, ' ')),
     leaves = mininet_script_operator.define_leaves_in_graph(G)
@@ -95,7 +100,7 @@ if __name__ == '__main__':
 
     if DRAWING_FLAG:
         print('Drawing graph'.ljust(STRING_ALIGNMENT, ' ')),
-        p = Process(target=mininet_script_operator.draw_graph, args=tuple([G, node_groups, edge_groups, leaves]),)
+        p = Process(target=mininet_script_operator.draw_graph, args=tuple([G, node_groups, edge_groups, leaves, node_map]),)
         p.daemon = True
         p.start()
         print('DONE!')

@@ -1,12 +1,13 @@
 import cmd
 
 from cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node
+from config.config_constants import CLI_PROMPT_STRING
 
 class CLI_director(cmd.Cmd):
 
     def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map):
         cmd.Cmd.__init__(self)
-        self.prompt = "+> "
+        self.prompt = CLI_PROMPT_STRING
         self.intro  = "Welcome to Mininet CE console!"  ## defaults to None
 
         self.host_map = host_map
@@ -189,17 +190,21 @@ class CLI_director(cmd.Cmd):
            In that case we execute the line as Python code.
         """
         words = line.split()
-        if words[1] == 'ping' and len(words) == 3:
-            new_line = words[0] + ' ' + words[2]
-            self.do_ping(new_line)
-        elif words[1] == 'ifconfig' and len(words) == 2:
-            new_line = words[0]
-            self.do_ifconfig(new_line)
+        if len(words) == 3:
+            if words[1] == 'ping':
+                new_line = words[0] + ' ' + words[2]
+                self.do_ping(new_line)
+        elif len(words) == 2:
+            if words == 'ifconfig':
+                new_line = words[0]
+                self.do_ifconfig(new_line)
         else:
-            try:
-                exec(line) in self._locals, self._globals
-            except Exception, e:
-                print e.__class__, ":", e
+            print('Sorry, unknown command')
+
+            # try:
+            #     exec(line) in self._locals, self._globals
+            # except Exception, e:
+            #     print e.__class__, ":", e
 
     def is_hostname(self, str):
         if str[0] == 'h':
