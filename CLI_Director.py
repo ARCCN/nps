@@ -1,6 +1,6 @@
 import cmd
 
-from cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node
+from cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node, send_mininet_cmd_to_cluster_node
 from config.config_constants import CLI_PROMPT_STRING
 
 class CLI_director(cmd.Cmd):
@@ -78,7 +78,7 @@ class CLI_director(cmd.Cmd):
         if len(args) != 1:
             print('*** invalid number of arguments')
             return
-        src= args[0]
+        src = args[0]
 
         if src not in self.host_IP_map.keys() and src not in self.host_IP_map.values():
             print('No such host')
@@ -88,11 +88,11 @@ class CLI_director(cmd.Cmd):
             cmd = src + ' ifconfig'
         else:
             cmd = self.host_map[src] + ' ifconfig'
-
         if self.is_hostname(src):
-            send_mininet_ping_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd, self.ssh_chan_map)
+            send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd,
+                                             self.ssh_chan_map, quite=False)
         else:
-            send_mininet_ping_to_cluster_node(self.host_to_node_map[src], cmd, self.ssh_chan_map)
+            send_mininet_cmd_to_cluster_node(self.host_to_node_map[src], cmd, self.ssh_chan_map, quite=False)
 
     def help_ifconfig(self):
         print('usage:')
@@ -194,10 +194,19 @@ class CLI_director(cmd.Cmd):
             if words[1] == 'ping':
                 new_line = words[0] + ' ' + words[2]
                 self.do_ping(new_line)
-        elif len(words) == 2:
-            if words == 'ifconfig':
+                return
+        if len(words) == 2:
+            if words[1] == 'ifconfig':
                 new_line = words[0]
                 self.do_ifconfig(new_line)
+                return
+        if self.is_hostname(words[0]):
+            cmd = ''
+            for word in words:
+                cmd += word + ' '
+            send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[words[0]]],
+                                              cmd, self.ssh_chan_map, quite=False)
+            return
         else:
             print('Sorry, unknown command')
 
