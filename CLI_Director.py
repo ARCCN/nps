@@ -73,6 +73,21 @@ class CLI_director(cmd.Cmd):
         print('\t10.0.0.1 ping h2')
         print('\th1       ping h2')
 
+    def do_pingAll(self, args):
+        for src in self.host_IP_map.keys():
+            for dst in self.host_IP_map.keys():
+                if src != dst:
+                    dst = self.host_IP_map[dst]
+                    cmd = src + ' ping -c 4 ' + dst
+                    send_mininet_ping_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd, self.ssh_chan_map)
+
+    def help_pingAll(self):
+        print('usage:')
+        print('\tpingAll')
+        print('example:')
+        print('\tpingAll')
+
+
     def do_ifconfig(self, args):
         args = args.split()
         if len(args) != 1:
