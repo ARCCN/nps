@@ -9,7 +9,9 @@ import matplotlib as mpl
 
 
 def split_graph_on_parts(G, number_pf_parts):
-    (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=False, contig=True, compress=True)
+    print(G.nodes())
+    print(number_pf_parts)
+    (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=True, contig=True, compress=True)
 
     node_groups = {}
     for p in parts:
@@ -36,7 +38,6 @@ def split_graph_on_parts(G, number_pf_parts):
                 node_ext_intf_group.append(edge[0])
             if edge[1] not in node_ext_intf_group:
                 node_ext_intf_group.append(edge[1])
-
     return node_groups, edge_groups, node_ext_intf_group
 
 def standard_mininet_script_parser(filename, G):

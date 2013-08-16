@@ -789,7 +789,7 @@ def part_graph(graph, nparts=2,
         _METIS_PartGraphRecursive(*args)
     else:
         _METIS_PartGraphKway(*args)
-    
+
     return objval.value, list(partition)
 
 def example_adjlist():
