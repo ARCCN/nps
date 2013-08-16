@@ -5,7 +5,7 @@ from config.config_constants import CLI_PROMPT_STRING
 
 class CLI_director(cmd.Cmd):
 
-    def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num):
+    def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num, h_and_sw_node_map):
         cmd.Cmd.__init__(self)
         self.prompt = CLI_PROMPT_STRING
         self.intro  = "Welcome to Mininet CE console!"  ## defaults to None
@@ -15,6 +15,7 @@ class CLI_director(cmd.Cmd):
         self.host_IP_map = host_IP_map
         self.ssh_chan_map = ssh_chan_map
         self.switch_num = switch_num
+        self.h_and_sw_node_map = h_and_sw_node_map
 
     ## Command definitions ##
     def do_hist(self, args):
@@ -179,6 +180,20 @@ class CLI_director(cmd.Cmd):
     def help_switchnum(self):
         print('usage:')
         print('\tswitchnum')
+
+    def do_clusterinfo(self,args):
+        print('Number of nodes in graph is ' + str(len(self.host_map.keys())+self.switch_num) + '.')
+        print('Number of hosts is ' + str(len(self.host_map.keys())) + '.')
+        print('Number of switches is ' + str(self.switch_num) + '.')
+        print('')
+        print('Cluster graph distribution:')
+        for cn in self.h_and_sw_node_map.keys():
+            print(str(cn) + ') ' + 'hosts = ' + str(self.h_and_sw_node_map[cn][0]).rjust(5, ' ') + " ; "
+                  + 'switches = ' + str(self.h_and_sw_node_map[cn][1]).rjust(5, ' ') + ".")
+
+    def help_clusterinfo(self):
+        print('usage:')
+        print('\tclusterinfo')
 
     ## Override methods in Cmd object ##
     def preloop(self):

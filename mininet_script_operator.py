@@ -9,7 +9,7 @@ import matplotlib as mpl
 
 
 def split_graph_on_parts(G, number_pf_parts):
-    (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=True)
+    (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=False, contig=True, compress=True)
 
     node_groups = {}
     for p in parts:

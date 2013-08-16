@@ -19,6 +19,6 @@ def malware_propagation_mode(malware_node_list):
 
     malware_director.stop_malware_center()
 
-def cli_mode(host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num):
-    cli_director = CLI_director(host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num)
+def cli_mode(host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num, h_and_sw_node_map):
+    cli_director = CLI_director(host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num, h_and_sw_node_map)
     cli_director.cmdloop()

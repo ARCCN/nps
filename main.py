@@ -74,7 +74,7 @@ if __name__ == '__main__':
     if RANDOM_GRAPH_FLAG:
         print('Generating random network graph'.ljust(STRING_ALIGNMENT, ' ')),
         # G = nx.random_lobster(RANDOM_GRAPH_SIZE, 1.0, 0.33)
-        G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE,1)
+        G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     elif LOAD_GRAPH_FLAG:
@@ -151,7 +151,12 @@ if __name__ == '__main__':
         malware_propagation_mode(malware_node_list)
     elif CLI_MODE:
         switch_num = len(set(G.nodes()).difference( set(leaves) ))
-        cli_mode(host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num)
+        h_and_sw_node_map = {}
+        for group in node_groups.keys():
+            h_num = len(set(node_groups[group]).intersection(leaves))
+            sw_num = len(node_groups[group]) - h_num
+            h_and_sw_node_map[group] = (h_num, sw_num)
+        cli_mode(host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num, h_and_sw_node_map)
         print('Turn OFF CLI interface'.ljust(STRING_ALIGNMENT, ' ')),
         print('DONE!')
 
