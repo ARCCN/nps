@@ -188,7 +188,7 @@ class CLI_director(cmd.Cmd):
         print('')
         print('Cluster graph distribution:')
         for cn in self.h_and_sw_node_map.keys():
-            print(str(cn) + ') ' + 'hosts = ' + str(self.h_and_sw_node_map[cn][0]).rjust(5, ' ') + " ; "
+            print('\t' + str(cn) + ') ' + 'hosts = ' + str(self.h_and_sw_node_map[cn][0]).rjust(5, ' ') + " ; "
                   + 'switches = ' + str(self.h_and_sw_node_map[cn][1]).rjust(5, ' ') + ".")
 
     def help_clusterinfo(self):
