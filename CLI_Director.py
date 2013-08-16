@@ -5,7 +5,7 @@ from config.config_constants import CLI_PROMPT_STRING
 
 class CLI_director(cmd.Cmd):
 
-    def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map):
+    def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num):
         cmd.Cmd.__init__(self)
         self.prompt = CLI_PROMPT_STRING
         self.intro  = "Welcome to Mininet CE console!"  ## defaults to None
@@ -14,6 +14,7 @@ class CLI_director(cmd.Cmd):
         self.host_to_node_map = host_to_node_map
         self.host_IP_map = host_IP_map
         self.ssh_chan_map = ssh_chan_map
+        self.switch_num = switch_num
 
     ## Command definitions ##
     def do_hist(self, args):
@@ -164,6 +165,20 @@ class CLI_director(cmd.Cmd):
         print('\thosts node')
         print('\thosts cluster')
         print('\thosts info')
+
+    def do_hostnum(self,args):
+        print('Number of hosts is ' + str(len(self.host_map.keys())) + '.')
+
+    def help_hostnum(self):
+        print('usage:')
+        print('\thostnum')
+
+    def do_switchnum(self,args):
+        print('Number of switches is ' + str(self.switch_num) + '.')
+
+    def help_switchnum(self):
+        print('usage:')
+        print('\tswitchnum')
 
     ## Override methods in Cmd object ##
     def preloop(self):

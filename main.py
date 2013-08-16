@@ -25,13 +25,15 @@ from paramiko import *
 import os
 import sys
 import networkx as nx
+import time
+import pickle
 from multiprocessing import Process
 
 from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
 from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH
 from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE
 from config.config_constants import HOST_NETMASK
-from config.config_constants import RANDOM_GRAPH_FLAG
+from config.config_constants import RANDOM_GRAPH_SIZE, RANDOM_GRAPH_FLAG, LOAD_GRAPH_FLAG
 
 import mininet_script_generator
 import mininet_script_operator
@@ -53,6 +55,7 @@ ssh_chan_map     = {} # maps node IP to ssh chan objects
 node_IP_pool_map = {} # maps node IP to host IP pool
 
 if __name__ == '__main__':
+    begin_config_timestamp = time.time()
     util.log_to_file('paramiko.log')
     malware_node_list = {}
 
@@ -70,8 +73,12 @@ if __name__ == '__main__':
     # prepare scripts to nodes
     if RANDOM_GRAPH_FLAG:
         print('Generating random network graph'.ljust(STRING_ALIGNMENT, ' ')),
-        G = nx.random_lobster(6, 1.0, 0.33)
+        # G = nx.random_lobster(RANDOM_GRAPH_SIZE, 1.0, 0.33)
+        G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE,1)
+        pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
+    elif LOAD_GRAPH_FLAG:
+        G = pickle.load(open('graph.txt'))
     else:
         print('Parsing network graph'.ljust(STRING_ALIGNMENT, ' ')),
         G = nx.Graph()
@@ -89,12 +96,13 @@ if __name__ == '__main__':
     ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
     print('DONE!')
 
-
-
-
     print('Splitting network graph for nodes'.ljust(STRING_ALIGNMENT, ' ')),
     leaves = mininet_script_operator.define_leaves_in_graph(G)
     node_groups, edge_groups, node_ext_intf_group = mininet_script_operator.split_graph_on_parts(G, len(node_map))
+    if len(node_groups.keys()) == 1:
+        node_groups = {0: node_groups[1]}
+        edge_groups = {0: edge_groups[1]}
+
     for gr_number in node_groups.keys():
         node_IP_gr_map[node_map.keys()[gr_number]] = gr_number
     print('DONE!')
@@ -133,19 +141,28 @@ if __name__ == '__main__':
                         node_map)
     print('DONE!')
 
+    end_config_timestamp = time.time()
+    print('Setting up cluster for ' + str(end_config_timestamp-begin_config_timestamp) + ' sec.')
+
     # STAGE 2. Execute test scenario.
 
     # STAGE 2.5. Simulation
     if MALWARE_PROPAGATION_MODE:
         malware_propagation_mode(malware_node_list)
     elif CLI_MODE:
-        cli_mode(host_map, host_to_node_map, host_IP_map, ssh_chan_map)
+        switch_num = len(set(G.nodes()).difference( set(leaves) ))
+        cli_mode(host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num)
         print('Turn OFF CLI interface'.ljust(STRING_ALIGNMENT, ' ')),
         print('DONE!')
 
     # STAGE 3. Shutdown all cluster nodes.
     print('Sending exit to Mininet on nodes'.ljust(STRING_ALIGNMENT, ' ')),
     make_threaded(send_mininet_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map)
+    print('DONE!')
+
+    # Deleting ovs bridges from nodes
+    print('Deleting ovs bridges from cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
+    make_threaded(send_cmd_to_cluster_node, ['ovs-vsctl list-br | xargs -L1 ovs-vsctl del-br', ssh_chan_map], node_map)
     print('DONE!')
 
     # close ssh sessions to nodes
