@@ -9,9 +9,10 @@ import matplotlib as mpl
 
 
 def split_graph_on_parts(G, number_pf_parts):
-    print(G.nodes())
-    print(number_pf_parts)
-    (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=True, contig=True, compress=True)
+    if number_pf_parts == 1:
+        (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=True)
+    else:
+        (edgecuts, parts) = metis.part_graph(G, number_pf_parts, contig=True, compress=True)
 
     node_groups = {}
     for p in parts:
@@ -103,14 +104,11 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map):
     fig.canvas.set_window_title("Mininet CE Network Graph")
     fig.patch.set_facecolor('white')
 
-
     plt.subplot(121)
     frame1 = plt.gca()
     frame1.axes.get_xaxis().set_visible(False)
     frame1.axes.get_yaxis().set_visible(False)
     frame1.patch.set_facecolor((1.0, 0.5, 1.0, 0.1))
-
-
 
     nx.draw_networkx_nodes(G, pos, node_size=50)
     nx.draw_networkx_edges(G, pos, alpha=ALPHA_VALUE, width=3.0)
@@ -122,7 +120,6 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map):
     frame2.axes.get_xaxis().set_visible(False)
     frame2.axes.get_yaxis().set_visible(False)
     frame2.patch.set_facecolor((0.0, 0.0, 0.8, 0.1))
-
 
     colors = ['b','g','r','c','m','y']
 
