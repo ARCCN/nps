@@ -28,12 +28,11 @@ import networkx as nx
 import time
 import pickle
 import subprocess
-import signal
 
 from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
 from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH
 from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE
-from config.config_constants import HOST_NETMASK
+from config.config_constants import HOST_NETMASK, VIEW_PROGRAMM_NAME
 from config.config_constants import RANDOM_GRAPH_SIZE, RANDOM_GRAPH_FLAG, LOAD_GRAPH_FLAG, GRAPH_EDITOR_FLAG
 
 import mininet_script_generator
@@ -195,8 +194,8 @@ if __name__ == '__main__':
     close_ssh_to_nodes(ssh_map)
     print('DONE!')
 
-    # print('Killing viewing results process'.ljust(STRING_ALIGNMENT, ' '))
-    # os.killpg(view_proc.pid, signal.SIGTERM)
-    # print('DONE!')
+    print('Killing viewing results process'.ljust(STRING_ALIGNMENT, ' '))
+    os.system("ps -A | grep " + VIEW_PROGRAMM_NAME + " | grep -v grep | tail -n 1 | awk '{print $1}' | xargs kill -9")
+    print('DONE!')
 
     print('FINISH')
