@@ -29,11 +29,12 @@ import time
 import pickle
 from multiprocessing import Process
 
+
 from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
 from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH
 from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE
 from config.config_constants import HOST_NETMASK
-from config.config_constants import RANDOM_GRAPH_SIZE, RANDOM_GRAPH_FLAG, LOAD_GRAPH_FLAG
+from config.config_constants import RANDOM_GRAPH_SIZE, RANDOM_GRAPH_FLAG, LOAD_GRAPH_FLAG, GRAPH_EDITOR_FLAG
 
 import mininet_script_generator
 import mininet_script_operator
@@ -43,6 +44,7 @@ from cluster_mininet_cmd_manager import *
 from cluster_support import *
 from host_configurator import *
 from cluster_manager_modes import *
+from GEdit import *
 
 node_map         = {} # maps node IP to node username
 node_intf_map    = {} # maps node IP to node outbound interface
@@ -77,6 +79,16 @@ if __name__ == '__main__':
         G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
+    elif GRAPH_EDITOR_FLAG:
+        print('Waiting for user draw its graph'.ljust(STRING_ALIGNMENT, ' ')),
+        GUI = GEdit()
+        GUI.main_loop()
+        if GUI.get_random_flag():
+            G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
+        else:
+            G = GUI.get_networkX_graph()
+        pickle.dump(G, open('graph.txt', 'w'))
+        print('DONE!')
     elif LOAD_GRAPH_FLAG:
         G = pickle.load(open('graph.txt'))
     else:
@@ -109,9 +121,10 @@ if __name__ == '__main__':
 
     if DRAWING_FLAG:
         print('Drawing graph'.ljust(STRING_ALIGNMENT, ' ')),
-        p = Process(target=mininet_script_operator.draw_graph, args=tuple([G, node_groups, edge_groups, leaves, node_map]),)
-        p.daemon = True
-        p.start()
+        # p = Process(target=draw_graph, args=[G, node_groups, edge_groups, leaves, node_map])
+        # p.daemon = True
+        # p.start()
+        draw_graph(G, node_groups, edge_groups, leaves, node_map)
         print('DONE!')
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
