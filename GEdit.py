@@ -63,8 +63,8 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map):
     leg = plt.legend(pl_nodes, node_map.keys(), prop={'size': 8}, handletextpad=3)
     leg.legendPatch.set_alpha(0.77)
 
-    plt.show()
-
+    plt.savefig('GUI/result.png', dpi=500)
+    # plt.show()
 
 ########################################################################
 class WebPanel(wx.Panel):
@@ -211,7 +211,7 @@ class GUI_Editor(wx.Frame):
         """Constructor"""
         # wx.Frame.__init__(self, None, title="Mininet CE Graph Editor")
         wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style= wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX)
-        self.SetSize((875,675))
+        self.SetSize((1075,675))
 
         panel = WebPanel(self)
         self.Show()

@@ -27,8 +27,8 @@ import sys
 import networkx as nx
 import time
 import pickle
-from multiprocessing import Process
-
+import subprocess
+import signal
 
 from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
 from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH
@@ -125,6 +125,9 @@ if __name__ == '__main__':
         # p.daemon = True
         # p.start()
         draw_graph(G, node_groups, edge_groups, leaves, node_map)
+        view_proc = subprocess.Popen('open GUI/result.png', shell=True,
+                       stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT)
         print('DONE!')
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
@@ -191,5 +194,9 @@ if __name__ == '__main__':
     print('Sending CLOSE to all ssh connections'.ljust(STRING_ALIGNMENT, ' ')),
     close_ssh_to_nodes(ssh_map)
     print('DONE!')
+
+    # print('Killing viewing results process'.ljust(STRING_ALIGNMENT, ' '))
+    # os.killpg(view_proc.pid, signal.SIGTERM)
+    # print('DONE!')
 
     print('FINISH')

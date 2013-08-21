@@ -68,10 +68,11 @@ $(function() {
 //        multigraph : true,
 //    });
 
-    my_graph_editor = new GraphEditor('#graph_ed', { JSONdata: K4_graph,
-      width : 500,
+    my_graph_editor = new GraphEditor('#graph_ed', { JSONdata: cube,
+      width : 700,
       height : 500,
-      multigraph: true});
+      multigraph: true,
+      node_radius: 7.0});
 
     document.cookie = 'graph=' + my_graph_editor.export_sage();
 
