@@ -3,7 +3,8 @@
 <head>
 <title>Simple JS Graph Editor Example Gallery</title>
     <link type="text/css" href="css/graph-editor.css" rel="Stylesheet" />
-    <script src="build/graph-editor.min.js"></script>
+    <!--<script src="build/graph-editor.min.js"></script>-->
+    <script src="build/graph-editor.js"></script>
 
     <link type="text/css" href="lib/jquery-ui/css/ui-lightness/jquery-ui-1.8.20.custom.css" rel="Stylesheet" />
     <link type="text/css" href="lib/highlight/styles/github.css" rel="Stylesheet" />
@@ -16,8 +17,17 @@
         /*width: 800px;*/
         width: auto;
         margin: auto;
-        font-family: Candara;
-        background: #fcfcfc;
+        font-family: candara;
+        /*background: #7A7AF5;*/
+
+        background: #3380d7; /* Old browsers */
+        background: -moz-radial-gradient(center, ellipse cover,  #3380d7 0%, #4d9de3 51%, #9ecbee 100%); /* FF3.6+ */
+        background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#3380d7), color-stop(51%,#4d9de3), color-stop(100%,#9ecbee)); /* Chrome,Safari4+ */
+        background: -webkit-radial-gradient(center, ellipse cover,  #3380d7 0%,#4d9de3 51%,#9ecbee 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-radial-gradient(center, ellipse cover,  #3380d7 0%,#4d9de3 51%,#9ecbee 100%); /* Opera 12+ */
+        background: -ms-radial-gradient(center, ellipse cover,  #3380d7 0%,#4d9de3 51%,#9ecbee 100%); /* IE10+ */
+        background: radial-gradient(ellipse at center,  #3380d7 0%,#4d9de3 51%,#9ecbee 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3380d7', endColorstr='#9ecbee',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
       }
     </style>
     <script>
@@ -80,10 +90,10 @@ $(function() {
 //    $('#set_json').click(function() {
 //        my_graph_editor.import_from_JSON($('#json').val());
 //    });
-    $('#get_sage').click(function() {
-//        $('#sage').val(my_graph_editor.export_sage);
-        document.cookie = 'graph=' + my_graph_editor.export_sage();
-    });
+//    $('#get_sage').click(function() {
+////        $('#sage').val(my_graph_editor.export_sage);
+//        document.cookie = 'graph=' + my_graph_editor.export_sage();
+//    });
 //    $('#get_latex').click(function() {
 //        $('#latex').val(my_graph_editor.export_tkz);
 //    });
@@ -92,7 +102,7 @@ $(function() {
 
 </head>
 <body>
-<input type="button" id="get_sage" value="Save Graph"><br>
+<!--<input type="button" id="get_sage" value="Save Graph"><br>-->
 <div id='graph_ed'></div>
 </body>
 </html>

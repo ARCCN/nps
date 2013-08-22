@@ -15,7 +15,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     NODE_RADIUS = options.node_radius || 10.0,
     LIVE = false,
     AUTO_MAXIMIZE = true,
-    NODE_NUMBERS = false,
+    NODE_NUMBERS = true,
     SPRING = 0.999,
     SPEED = 2.0,
     FIXED_LENGTH = 100.0,
@@ -879,7 +879,14 @@ function create_controls(div) {
     var tweaks, canvaspos = $(div +' canvas').offset(), buttondiv = div + ' #graph_editor_button_container',
     canvas = $(div +' canvas')[0];
     $(div).prepend('<div id="graph_editor_button_container"></div>');
+
+    $('<div id="save_button" class="graph_editor_button">save</div>').appendTo(buttondiv)
+    .click(function() {
+        document.cookie = 'graph=' + my_graph_editor.export_sage();
+    });
+
     $('<div id="live_button" class="graph_editor_button">live</div>').appendTo(buttondiv).click(toggle_live);
+
     $('<div id="tweaks_button" class="graph_editor_button">tweaks</div>').appendTo(buttondiv)
     .toggle(function() {
         $(div).animate({'width': SIZE.x + 310 + 'px'},
