@@ -20,14 +20,14 @@
         font-family: candara;
         /*background: #7A7AF5;*/
 
-        background: rgb(138,168,232); /* Old browsers */
-        background: -moz-radial-gradient(center, ellipse cover,  rgba(138,168,232,1) 0%, rgba(199,218,245,1) 100%); /* FF3.6+ */
-        background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(138,168,232,1)), color-stop(100%,rgba(199,218,245,1))); /* Chrome,Safari4+ */
-        background: -webkit-radial-gradient(center, ellipse cover,  rgba(138,168,232,1) 0%,rgba(199,218,245,1) 100%); /* Chrome10+,Safari5.1+ */
-        background: -o-radial-gradient(center, ellipse cover,  rgba(138,168,232,1) 0%,rgba(199,218,245,1) 100%); /* Opera 12+ */
-        background: -ms-radial-gradient(center, ellipse cover,  rgba(138,168,232,1) 0%,rgba(199,218,245,1) 100%); /* IE10+ */
-        background: radial-gradient(ellipse at center,  rgba(138,168,232,1) 0%,rgba(199,218,245,1) 100%); /* W3C */
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8aa8e8', endColorstr='#c7daf5',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+        background: rgb(193,216,243); /* Old browsers */
+        background: -moz-linear-gradient(-45deg,  rgba(193,216,243,1) 0%, rgba(250,219,253,1) 19%, rgba(200,225,246,1) 61%, rgba(226,240,250,1) 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(193,216,243,1)), color-stop(19%,rgba(250,219,253,1)), color-stop(61%,rgba(200,225,246,1)), color-stop(100%,rgba(226,240,250,1))); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(-45deg,  rgba(193,216,243,1) 0%,rgba(250,219,253,1) 19%,rgba(200,225,246,1) 61%,rgba(226,240,250,1) 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(-45deg,  rgba(193,216,243,1) 0%,rgba(250,219,253,1) 19%,rgba(200,225,246,1) 61%,rgba(226,240,250,1) 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(-45deg,  rgba(193,216,243,1) 0%,rgba(250,219,253,1) 19%,rgba(200,225,246,1) 61%,rgba(226,240,250,1) 100%); /* IE10+ */
+        background: linear-gradient(135deg,  rgba(193,216,243,1) 0%,rgba(250,219,253,1) 19%,rgba(200,225,246,1) 61%,rgba(226,240,250,1) 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c1d8f3', endColorstr='#e2f0fa',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
       }
     </style>
@@ -83,7 +83,7 @@ $(function() {
       width : 700,
       height : 500,
       multigraph: true,
-      node_radius: 7.0});
+      node_radius: 11.0});
 
     document.cookie = 'graph=' + my_graph_editor.export_sage();
 
