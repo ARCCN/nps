@@ -74,7 +74,6 @@ if __name__ == '__main__':
     # prepare scripts to nodes
     if RANDOM_GRAPH_FLAG:
         print('Generating random network graph'.ljust(STRING_ALIGNMENT, ' ')),
-        # G = nx.random_lobster(RANDOM_GRAPH_SIZE, 1.0, 0.33)
         G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
@@ -85,7 +84,7 @@ if __name__ == '__main__':
         if GUI.get_random_flag():
             G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
         else:
-            G = GUI.get_networkX_graph()
+            G, pos = GUI.get_networkX_graph()
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     elif LOAD_GRAPH_FLAG:
@@ -123,7 +122,7 @@ if __name__ == '__main__':
         # p = Process(target=draw_graph, args=[G, node_groups, edge_groups, leaves, node_map])
         # p.daemon = True
         # p.start()
-        draw_graph(G, node_groups, edge_groups, leaves, node_map)
+        draw_graph(G, node_groups, edge_groups, leaves, node_map, pos)
         view_proc = subprocess.Popen('open GUI/result.png', shell=True,
                        stdout=subprocess.PIPE,
                        stderr=subprocess.STDOUT)
