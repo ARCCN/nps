@@ -300,7 +300,6 @@ class GEdit():
         return G, pos
 
 
-
     def delete_gedit(self):
         self.Destroy()
 

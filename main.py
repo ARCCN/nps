@@ -81,10 +81,7 @@ if __name__ == '__main__':
         print('Waiting for user draw its graph'.ljust(STRING_ALIGNMENT, ' ')),
         GUI = GEdit()
         GUI.main_loop()
-        if GUI.get_random_flag():
-            G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
-        else:
-            G, pos = GUI.get_networkX_graph()
+        G, pos = GUI.get_networkX_graph()
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     elif LOAD_GRAPH_FLAG:
