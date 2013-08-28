@@ -1,6 +1,8 @@
-from main import logger_MininetCE
-from KThread import KThread
 from random import randint
+
+from main import logger_MininetCE
+from src.KThread import KThread
+
 
 def read_nodelist_from_file(nodelist_filepath):
     '''Read list of cluster nodes from file.

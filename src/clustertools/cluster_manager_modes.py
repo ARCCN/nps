@@ -1,5 +1,5 @@
-from Malware_Propagation_Director import Malware_propagation_director
-from CLI_Director import CLI_director
+from src.malwaretools.Malware_Propagation_Director import Malware_propagation_director
+from src.CLI_Director import CLI_director
 from main import logger_MalwareProp
 from config.config_constants import MALWARE_PROP_STEP_NUMBER
 

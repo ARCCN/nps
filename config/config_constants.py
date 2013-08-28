@@ -2,6 +2,8 @@ STRING_ALIGNMENT = 77
 DRAWING_FLAG = True
 
 MININETCE_HOME_FOLDER = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
+CONTROLLER_HOME_FOLDER = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
+
 
 LOG_FILEPATH      = MININETCE_HOME_FOLDER + '/logs/MininetCluster.log'
 ROOT_LOG_FILEPATH = MININETCE_HOME_FOLDER + '/logs/MininetCluster_root.log'
@@ -39,6 +41,7 @@ RANDOM_GRAPH_SIZE = 17
 SCRIPT_FOLDER = 'scripts/nodes/'
 REMOTE_CONTROLLER_IP   = '10.211.55.2'
 REMOTE_CONTROLLER_PORT = '6633'
+
 
 CLI_PROMPT_STRING = 'mininet CE> '
 

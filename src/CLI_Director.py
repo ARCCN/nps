@@ -1,6 +1,6 @@
 import cmd
 
-from cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node, send_mininet_cmd_to_cluster_node
+from src.clustertools.cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node, send_mininet_cmd_to_cluster_node
 from config.config_constants import CLI_PROMPT_STRING
 
 class CLI_director(cmd.Cmd):

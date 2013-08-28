@@ -71,6 +71,7 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI)
     # plt.show()
 
+
 ########################################################################
 class WebPanel(wx.Panel):
     """"""
@@ -247,7 +248,7 @@ class GUI_Editor(wx.Frame):
         """Constructor"""
         # wx.Frame.__init__(self, None, title="Mininet CE Graph Editor")
         wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style= wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX)
-        self.SetSize((1075,675))
+        self.SetSize((1075,655)) # (1075,675)
 
         panel = WebPanel(self)
         self.Show()
@@ -280,6 +281,12 @@ class GEdit():
 
     def get_random_flag(self):
         return self.random_flag
+
+    def check_graph(self):
+        if self.graph_data == {}:
+            return False
+        else:
+            return True
 
     def get_networkX_graph(self):
         G = nx.Graph()

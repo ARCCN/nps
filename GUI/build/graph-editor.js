@@ -876,14 +876,34 @@ function add_slider(name, variable, container_id, min, max, onchangef) {
 
 function create_controls(div) {
     //Create controls and attach click functions
-    var tweaks, canvaspos = $(div +' canvas').offset(), buttondiv = div + ' #graph_editor_button_container',
+    var result_gr, tweaks, canvaspos = $(div +' canvas').offset(), buttondiv = div + ' #graph_editor_button_container',
     canvas = $(div +' canvas')[0];
+
     $(div).prepend('<div id="graph_editor_button_container"></div>');
 
     $('<div id="save_button" class="graph_editor_button">save</div>').appendTo(buttondiv)
     .click(function() {
         document.cookie = 'graph=' + my_graph_editor.export_sage();
     });
+
+//    $('<div id="result_button" class="graph_editor_button">result</div>').appendTo(buttondiv)
+//    .toggle(function() {
+//        $(div).animate({'width': SIZE.x + 500 + 'px'},
+//            {queue: true, duration: 'fast', easing: 'linear', complete: function (){
+//                $(div + ' #result_graph').slideToggle('fast');
+////                UIside_panel_opened = true;
+//            }
+//        });
+//        $(div+' #result_button').toggleClass('graph_editor_button_on');
+//    },
+//    function() {
+//        $(div + ' #result_graph').slideToggle('fast', function (){
+//            $(div).animate({'width': SIZE.x +'px'},
+//            {queue: true, duration: 'fast', easing: 'linear'});
+////            UIside_panel_opened = undefined;
+//        });
+//        $(div+' #result_button').toggleClass('graph_editor_button_on');
+//    });
 
     $('<div id="live_button" class="graph_editor_button">live</div>').appendTo(buttondiv).click(toggle_live);
 
@@ -928,6 +948,16 @@ function create_controls(div) {
         ,"menubar=false,toolba=false,location=false,width="
         + SIZE.x + ",height=" + SIZE.y);
     });
+
+
+    $(div).append('<div id="result_graph"></div>');
+    result_gr = div+' #result_graph';
+
+    $(result_gr).append("<h4>Result graph</h4>\
+    <table>\
+    <img src='result.png' height='475' width='475' />\
+    </table>").hide();
+
 
     $(div).append('<div id="graph_editor_tweaks"></div>');
     tweaks = div+' #graph_editor_tweaks';

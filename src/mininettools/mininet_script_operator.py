@@ -1,11 +1,8 @@
-from config.config_constants import ALPHA_VALUE
+import random
 
 import networkx as nx
-import metis
-import random
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 
+from src import metis
 
 
 def split_graph_on_parts(G, number_pf_parts):

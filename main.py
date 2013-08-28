@@ -1,4 +1,7 @@
 import logging
+from src.mininettools import mininet_script_generator, mininet_script_operator
+
+
 def delete_logs():
     if os.path.isfile(LOG_FILEPATH):
         os.remove(LOG_FILEPATH)
@@ -35,14 +38,12 @@ from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE
 from config.config_constants import HOST_NETMASK, VIEW_PROGRAMM_NAME
 from config.config_constants import RANDOM_GRAPH_SIZE, RANDOM_GRAPH_FLAG, LOAD_GRAPH_FLAG, GRAPH_EDITOR_FLAG
 
-import mininet_script_generator
-import mininet_script_operator
-from cluster_cmd_manager import *
-from cluster_ssh_manager import *
-from cluster_mininet_cmd_manager import *
-from cluster_support import *
-from host_configurator import *
-from cluster_manager_modes import *
+from src.clustertools.cluster_cmd_manager import *
+from src.clustertools.cluster_ssh_manager import *
+from src.clustertools.cluster_mininet_cmd_manager import *
+from src.clustertools.cluster_support import *
+from src.mininettools.host_configurator import *
+from src.clustertools.cluster_manager_modes import *
 from GEdit import *
 
 node_map         = {} # maps node IP to node username
@@ -55,10 +56,12 @@ ssh_map          = {} # maps node IP to ssh session object
 ssh_chan_map     = {} # maps node IP to ssh chan objects
 node_IP_pool_map = {} # maps node IP to host IP pool
 
+
 if __name__ == '__main__':
     begin_config_timestamp = time.time()
     util.log_to_file('paramiko.log')
     malware_node_list = {}
+    pos = None
 
     # config logger
     print('Configuring loggers'.ljust(STRING_ALIGNMENT, ' ')),
@@ -78,7 +81,7 @@ if __name__ == '__main__':
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     elif GRAPH_EDITOR_FLAG:
-        print('Waiting for user draw its graph'.ljust(STRING_ALIGNMENT, ' ')),
+        print('Waiting for You draw graph'.ljust(STRING_ALIGNMENT, ' ')),
         GUI = GEdit()
         GUI.main_loop()
         G, pos = GUI.get_networkX_graph()
@@ -190,8 +193,9 @@ if __name__ == '__main__':
     close_ssh_to_nodes(ssh_map)
     print('DONE!')
 
-    print('Killing viewing results process'.ljust(STRING_ALIGNMENT, ' '))
-    os.system("ps -A | grep " + VIEW_PROGRAMM_NAME + " | grep -v grep | tail -n 1 | awk '{print $1}' | xargs kill -9")
-    print('DONE!')
+    if DRAWING_FLAG:
+        print('Killing viewing results process'.ljust(STRING_ALIGNMENT, ' '))
+        os.system("ps -A | grep " + VIEW_PROGRAMM_NAME + " | grep -v grep | tail -n 1 | awk '{print $1}' | xargs kill -9")
+        print('DONE!')
 
     print('FINISH')
