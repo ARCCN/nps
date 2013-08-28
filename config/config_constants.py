@@ -1,8 +1,9 @@
-STRING_ALIGNMENT = 77
-DRAWING_FLAG = True
+STRING_ALIGNMENT = 50
+PYTHONPATH = '/Library/Frameworks/Python.framework/Versions/2.7/bin/python'
 
 MININETCE_HOME_FOLDER = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
 CONTROLLER_HOME_FOLDER = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
+GUI_HTML = 'GUI/GUI.html'
 
 
 LOG_FILEPATH      = MININETCE_HOME_FOLDER + '/logs/MininetCluster.log'
@@ -34,9 +35,11 @@ HOST_NETMASK = 16 # mask of host intf on mininet cluster node
 ALPHA_VALUE = 0.33
 
 RANDOM_GRAPH_FLAG = False
+SEPARATE_GUI_FLAG = True
 LOAD_GRAPH_FLAG = False
-GRAPH_EDITOR_FLAG = True
-RANDOM_GRAPH_SIZE = 17
+GRAPH_EDITOR_FLAG = False
+DRAWING_FLAG = True
+RANDOM_GRAPH_SIZE = 11
 
 SCRIPT_FOLDER = 'scripts/nodes/'
 REMOTE_CONTROLLER_IP   = '10.211.55.2'

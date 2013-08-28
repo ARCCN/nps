@@ -1,14 +1,76 @@
 from config.config_constants import ALPHA_VALUE, RANDOM_GRAPH_SIZE, RESULT_PIC_DPI
 
 import networkx as nx
-from networkx.readwrite import json_graph
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import pexpect
+import sys
 
 import wx
 import wx.html2 as webview
 import os
 import json
+
+# def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
+#     mpl.rcParams['toolbar'] = 'None'
+#     mpl.rcParams['font.size'] = 11
+#     mpl.rcParams['font.family'] = 'Candara'
+#
+#     max_pos = 0
+#     for v in pos.values():
+#         if v[0] > max_pos:
+#             max_pos = v[0]
+#         if v[1] > max_pos:
+#             max_pos = v[1]
+#     avr_pos = max_pos / 50
+#
+#     fig = plt.figure(1, figsize=(15, 8))
+#     fig.canvas.set_window_title("Mininet CE Network Graph")
+#     fig.patch.set_facecolor('white')
+#
+#     plt.subplot(121)
+#     frame1 = plt.gca()
+#     frame1.axes.get_xaxis().set_visible(False)
+#     frame1.axes.get_yaxis().set_visible(False)
+#     frame1.patch.set_facecolor((1.0, 0.5, 1.0, 0.1))
+#
+#     nx.draw_networkx_nodes(G, pos, node_size=50)
+#     nx.draw_networkx_edges(G, pos, alpha=ALPHA_VALUE, width=3.0)
+#     label_pos = {k: [v[0],v[1]+ avr_pos] for k, v in pos.items()}
+#     nx.draw_networkx_labels(G, label_pos, font_size=10, font_family='candara')
+#
+#     plt.subplot(122)
+#     frame2 = plt.gca()
+#     frame2.axes.get_xaxis().set_visible(False)
+#     frame2.axes.get_yaxis().set_visible(False)
+#     frame2.patch.set_facecolor((0.0, 0.0, 0.8, 0.1))
+#
+#     colors = ['b','g','r','c','m','y']
+#
+#     labels = {}
+#     for n in G.nodes():
+#         if n in leaves:
+#             labels[n] = 'h' + str(n)
+#         else:
+#             labels[n] = 's' + str(n)
+#
+#     pl_nodes = []
+#     for group in node_groups.keys():
+#         pl_node = nx.draw_networkx_nodes(G, pos, nodelist=node_groups[group], node_color=colors[group], node_size=50)
+#         pl_nodes.append(pl_node)
+#
+#     for group in edge_groups.keys():
+#         if group != 'no_group':
+#             nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group], alpha=ALPHA_VALUE, width=3.0)
+#         else:
+#             nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k', alpha=ALPHA_VALUE, width=3.0)
+#
+#     nx.draw_networkx_labels(G, label_pos, labels, font_size=10, font_family='candara')
+#     leg = plt.legend(pl_nodes, node_map.keys(), prop={'size': 8}, handletextpad=3)
+#     leg.legendPatch.set_alpha(0.77)
+#
+#     plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI)
+#     # plt.show()
 
 def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     mpl.rcParams['toolbar'] = 'None'
@@ -25,24 +87,13 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
 
     fig = plt.figure(1, figsize=(15, 8))
     fig.canvas.set_window_title("Mininet CE Network Graph")
-    fig.patch.set_facecolor('white')
 
-    plt.subplot(121)
-    frame1 = plt.gca()
-    frame1.axes.get_xaxis().set_visible(False)
-    frame1.axes.get_yaxis().set_visible(False)
-    frame1.patch.set_facecolor((1.0, 0.5, 1.0, 0.1))
+    frame = plt.gca()
+    frame.axes.get_xaxis().set_visible(False)
+    frame.axes.get_yaxis().set_visible(False)
+    frame.patch.set_facecolor((0.0, 0.0, 0.8, 0.1))
 
-    nx.draw_networkx_nodes(G, pos, node_size=50)
-    nx.draw_networkx_edges(G, pos, alpha=ALPHA_VALUE, width=3.0)
     label_pos = {k: [v[0],v[1]+ avr_pos] for k, v in pos.items()}
-    nx.draw_networkx_labels(G, label_pos, font_size=10, font_family='candara')
-
-    plt.subplot(122)
-    frame2 = plt.gca()
-    frame2.axes.get_xaxis().set_visible(False)
-    frame2.axes.get_yaxis().set_visible(False)
-    frame2.patch.set_facecolor((0.0, 0.0, 0.8, 0.1))
 
     colors = ['b','g','r','c','m','y']
 
@@ -68,21 +119,19 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     leg = plt.legend(pl_nodes, node_map.keys(), prop={'size': 8}, handletextpad=3)
     leg.legendPatch.set_alpha(0.77)
 
-    plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI)
+    plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI, transparent=True)
     # plt.show()
 
 
-########################################################################
 class WebPanel(wx.Panel):
     """"""
 
     #----------------------------------------------------------------------
     def __init__(self, parent):
-        """Based on the Webview demo in the wxPython demo"""
+        self.p = None
         wx.Panel.__init__(self, parent)
 
-
-        self.current = os.path.realpath('GUI/GUI.html')
+        self.current = os.path.realpath(parent.parent.html_path)
         self.frame = parent
         if parent:
             self.titleBase = parent.GetTitle()
@@ -90,8 +139,6 @@ class WebPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.wv = webview.WebView.New(self)
-        self.Bind(webview.EVT_WEB_VIEW_NAVIGATING, self.OnWebViewNavigating, self.wv)
-        # self.Bind(webview.EVT_WEB_VIEW_LOADED, self.OnWebViewLoaded, self.wv)
 
 
         btn = wx.Button(self, -1, "Simulate", style=wx.BU_EXACTFIT)
@@ -106,87 +153,72 @@ class WebPanel(wx.Panel):
         self.node_num.ChangeValue(str(17))
         btnSizer.Add(self.node_num, 0, wx.EXPAND|wx.ALL, 2)
 
-        # btn = wx.Button(self, -1, "Open", style=wx.BU_EXACTFIT)
-        # self.Bind(wx.EVT_BUTTON, self.OnOpenButton, btn)
-        # btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL, 2)
-        #
-        # btn = wx.Button(self, -1, "<--", style=wx.BU_EXACTFIT)
-        # self.Bind(wx.EVT_BUTTON, self.OnPrevPageButton, btn)
-        # btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL, 2)
-        # self.Bind(wx.EVT_UPDATE_UI, self.OnCheckCanGoBack, btn)
-        #
-        # btn = wx.Button(self, -1, "-->", style=wx.BU_EXACTFIT)
-        # self.Bind(wx.EVT_BUTTON, self.OnNextPageButton, btn)
-        # btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL, 2)
-        # self.Bind(wx.EVT_UPDATE_UI, self.OnCheckCanGoForward, btn)
-        #
-        # btn = wx.Button(self, -1, "Stop", style=wx.BU_EXACTFIT)
-        # self.Bind(wx.EVT_BUTTON, self.OnStopButton, btn)
-        # btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL, 2)
-        #
-        # btn = wx.Button(self, -1, "Refresh", style=wx.BU_EXACTFIT)
-        # self.Bind(wx.EVT_BUTTON, self.OnRefreshPageButton, btn)
-        # btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL, 2)
-
-
         sizer.Add(btnSizer, 0, wx.EXPAND)
         sizer.Add(self.wv, 1, wx.EXPAND)
-        self.SetSizer(sizer)
+
+        self.console = wx.TextCtrl(self, wx.ID_ANY, size=(235,100),
+                          style = wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
+        font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        self.console.SetFont(font_console)
+
+        btn = wx.Button(self, wx.ID_ANY, 'Send')
+        self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
+
+        self.cmd_line = wx.TextCtrl(self, wx.ID_ANY, size=(235,-1))
+        self.cmd_line.SetFont(font_console)
+
+        # Add widgets to a sizer
+        con_hsizer = wx.BoxSizer(wx.HORIZONTAL)
+        con_hsizer.Add(self.cmd_line, 0, wx.EXPAND)
+        con_hsizer.Add(btn, 1, wx.EXPAND)
+
+        con_sizer = wx.BoxSizer(wx.VERTICAL)
+        con_sizer.Add(self.console, 1, wx.ALL|wx.EXPAND, 5)
+        con_sizer.Add(con_hsizer, 0, wx.ALL|wx.CENTER, 5)
+
+        glob_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        glob_sizer.Add(con_sizer, 0, wx.EXPAND)
+        glob_sizer.Add(sizer, 1, wx.EXPAND)
+
+        self.SetSizer(glob_sizer)
         self.wv.LoadURL(self.current)
 
-
-    def ShutdownDemo(self):
-        # put the frame title back
-        if self.frame:
-            self.frame.SetTitle(self.titleBase)
-
-
-    # WebView events
-    def OnWebViewNavigating(self, evt):
-        # this event happens prior to trying to get a resource
-        if evt.GetURL() == 'http://www.microsoft.com/':
-            if wx.MessageBox("Are you sure you want to visit Microsoft?",
-                             style=wx.YES_NO|wx.ICON_QUESTION) == wx.NO:
-                # This is how you can cancel loading a page.
-                evt.Veto()
-
-    # def OnWebViewLoaded(self, evt):
-    #     # The full document has loaded
-    #     self.current = evt.GetURL()
-    #     self.location.SetValue(self.current)
-
-
-    # Control bar events
-    # def OnLocationSelect(self, evt):
-    #     url = self.location.GetStringSelection()
-    #     self.wv.LoadURL(url)
-    #
-    # def OnLocationEnter(self, evt):
-    #     url = self.location.GetValue()
-    #     self.location.Append(url)
-    #     self.wv.LoadURL(url)
-    #
-    #
-    # def OnOpenButton(self, event):
-    #     dlg = wx.TextEntryDialog(self, "Open Location",
-    #                             "Enter a full URL or local path",
-    #                             self.current, wx.OK|wx.CANCEL)
-    #     dlg.CentreOnParent()
-    #
-    #     if dlg.ShowModal() == wx.ID_OK:
-    #         self.current = dlg.GetValue()
-    #         self.wv.LoadURL(self.current)
-    #
-    #     dlg.Destroy()
+    def onSendButton(self, event):
+        cmd = self.cmd_line.GetValue()
+        if cmd != 'exit':
+            self.p.sendline(cmd)
+            self.p.expect('mininet CE> ')
+            for s in self.p.before:
+                if len(s) != 0 and s != '\n':
+                    self.console.AppendText(s)
+            self.cmd_line.ChangeValue('')
+        else:
+            self.p.sendline(cmd)
+            self.p.expect(pexpect.EOF)
+            for s in self.p.before:
+                if len(s) != 0 and s != '\n':
+                    self.console.AppendText(s)
+            self.cmd_line.ChangeValue('')
 
     def OnSimulateButton(self, event):
+        os.system("cp GUI/res/not_ready.png GUI/result.png")
+        self.console.ChangeValue('')
         prev_title = self.wv.GetCurrentTitle()
         self.wv.RunScript("document.title = document.cookie")
         cookies = self.wv.GetCurrentTitle()
         self.wv.RunScript("document.title = %s" % prev_title)
-        graph_data = json.loads(cookies.split('=')[1])
-        p = self.GetParent()
-        p.set_graph_data(graph_data)
+        graph_data = cookies.split('=')[1]
+        # p = self.GetParent()
+        # p.set_graph_data(graph_data)
+
+        self.p = pexpect.spawn(sys.prefix + '/bin/python main.py \'' + graph_data + '\'')
+
+        self.p.expect('mininet CE> ')
+        # self.p.expect(pexpect.EOF)
+        for s in self.p.before:
+            if len(s) != 0 and s != '\n':
+                self.console.AppendText(s)
+        self.wv.Reload()
 
     def OnRandomButton(self, event):
         # p = self.GetParent()
@@ -220,35 +252,14 @@ class WebPanel(wx.Panel):
             self.node_num.ChangeValue("Number only")
 
 
-
-    # def OnPrevPageButton(self, event):
-    #     self.wv.GoBack()
-    #
-    # def OnNextPageButton(self, event):
-    #     self.wv.GoForward()
-    #
-    # def OnCheckCanGoBack(self, event):
-    #     event.Enable(self.wv.CanGoBack())
-    #
-    # def OnCheckCanGoForward(self, event):
-    #     event.Enable(self.wv.CanGoForward())
-    #
-    # def OnStopButton(self, evt):
-    #     self.wv.Stop()
-    #
-    # def OnRefreshPageButton(self, evt):
-    #     self.wv.Reload()
-
-########################################################################
 class GUI_Editor(wx.Frame):
     """"""
-    #----------------------------------------------------------------------
     def __init__(self, parent):
         self.parent = parent
         """Constructor"""
         # wx.Frame.__init__(self, None, title="Mininet CE Graph Editor")
         wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style= wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX)
-        self.SetSize((1075,655)) # (1075,675)
+        self.SetSize((self.parent.width,self.parent.height)) # (1075,675)
 
         panel = WebPanel(self)
         self.Show()
@@ -263,10 +274,14 @@ class GUI_Editor(wx.Frame):
 
 
 class GUIApp():
-    def __init__(self):
+    def __init__(self, html_path, width=1075, height=655):
+        os.system("cp GUI/res/not_ready.png GUI/result.png")
+
         self.graph_data = {}
         self.node_num_map = {}
         self.random_flag = False
+        self.html_path = html_path
+        self.width, self.height = width, height
 
     def main_loop(self):
         app = wx.App(False)

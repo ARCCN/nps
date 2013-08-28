@@ -31,11 +31,13 @@ import networkx as nx
 import time
 import pickle
 import subprocess
+import json
+
 
 from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
 from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH
-from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE
-from config.config_constants import HOST_NETMASK, VIEW_PROGRAMM_NAME
+from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE, SEPARATE_GUI_FLAG
+from config.config_constants import HOST_NETMASK, VIEW_PROGRAMM_NAME, GUI_HTML
 from config.config_constants import RANDOM_GRAPH_SIZE, RANDOM_GRAPH_FLAG, LOAD_GRAPH_FLAG, GRAPH_EDITOR_FLAG
 
 from src.clustertools.cluster_cmd_manager import *
@@ -63,6 +65,7 @@ if __name__ == '__main__':
     malware_node_list = {}
     pos = None
 
+
     # config logger
     print('Configuring loggers'.ljust(STRING_ALIGNMENT, ' ')),
     delete_logs() # for testing period ONLY
@@ -82,13 +85,19 @@ if __name__ == '__main__':
         print('DONE!')
     elif GRAPH_EDITOR_FLAG:
         print('Waiting for You draw graph'.ljust(STRING_ALIGNMENT, ' ')),
-        GUI = GUIApp()
+        GUI = GUIApp(GUI_HTML)
         GUI.main_loop()
         G, pos = GUI.get_networkX_graph()
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     elif LOAD_GRAPH_FLAG:
         G = pickle.load(open('graph.txt'))
+    elif SEPARATE_GUI_FLAG:
+        print('Preparing graph'.ljust(STRING_ALIGNMENT, ' ')),
+        graph_data = json.loads(str(sys.argv[1]))
+        G, pos = get_networkX_graph(graph_data)
+        pickle.dump(G, open('graph.txt', 'w'))
+        print('DONE!')
     else:
         print('Parsing network graph'.ljust(STRING_ALIGNMENT, ' ')),
         G = nx.Graph()
@@ -123,9 +132,9 @@ if __name__ == '__main__':
         # p.daemon = True
         # p.start()
         draw_graph(G, node_groups, edge_groups, leaves, node_map, pos)
-        view_proc = subprocess.Popen('open GUI/result.png', shell=True,
-                       stdout=subprocess.PIPE,
-                       stderr=subprocess.STDOUT)
+        # view_proc = subprocess.Popen('open GUI/result.png', shell=True,
+        #                stdout=subprocess.PIPE,
+        #                stderr=subprocess.STDOUT)
         print('DONE!')
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
@@ -195,7 +204,7 @@ if __name__ == '__main__':
 
     if DRAWING_FLAG:
         print('Killing viewing results process'.ljust(STRING_ALIGNMENT, ' '))
-        os.system("ps -A | grep " + VIEW_PROGRAMM_NAME + " | grep -v grep | tail -n 1 | awk '{print $1}' | xargs kill -9")
+        # os.system("ps -A | grep " + VIEW_PROGRAMM_NAME + " | grep -v grep | tail -n 1 | awk '{print $1}' | xargs kill -9")
         print('DONE!')
 
     print('FINISH')
