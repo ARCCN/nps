@@ -44,7 +44,7 @@ from src.clustertools.cluster_mininet_cmd_manager import *
 from src.clustertools.cluster_support import *
 from src.mininettools.host_configurator import *
 from src.clustertools.cluster_manager_modes import *
-from GEdit import *
+from GUIApp import *
 
 node_map         = {} # maps node IP to node username
 node_intf_map    = {} # maps node IP to node outbound interface
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         print('DONE!')
     elif GRAPH_EDITOR_FLAG:
         print('Waiting for You draw graph'.ljust(STRING_ALIGNMENT, ' ')),
-        GUI = GEdit()
+        GUI = GUIApp()
         GUI.main_loop()
         G, pos = GUI.get_networkX_graph()
         pickle.dump(G, open('graph.txt', 'w'))

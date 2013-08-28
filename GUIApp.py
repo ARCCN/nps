@@ -262,7 +262,7 @@ class GUI_Editor(wx.Frame):
         self.Destroy()
 
 
-class GEdit():
+class GUIApp():
     def __init__(self):
         self.graph_data = {}
         self.node_num_map = {}
@@ -312,7 +312,7 @@ class GEdit():
 
 
 if __name__ == "__main__":
-    gui = GEdit()
+    gui = GUIApp()
     gui.main_loop()
     G = gui.get_networkX_graph()
     print G.nodes()
