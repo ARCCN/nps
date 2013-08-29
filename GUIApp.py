@@ -9,7 +9,6 @@ import sys
 import wx
 import wx.html2 as webview
 import os
-import json
 
 # def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
 #     mpl.rcParams['toolbar'] = 'None'
@@ -119,7 +118,7 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     leg = plt.legend(pl_nodes, node_map.keys(), prop={'size': 8}, handletextpad=3)
     leg.legendPatch.set_alpha(0.77)
 
-    plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI, transparent=True)
+    plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI, transparent=True, bbox_inches='tight', pad_inches=0)
     # plt.show()
 
 
@@ -218,12 +217,8 @@ class WebPanel(wx.Panel):
         for s in self.p.before:
             if len(s) != 0 and s != '\n':
                 self.console.AppendText(s)
-        self.wv.Reload()
 
     def OnRandomButton(self, event):
-        # p = self.GetParent()
-        # p.set_random_flag(True)
-
         raw_value = self.node_num.GetValue().strip()
         # numeric check
         if all(x in '0123456789.+-' for x in raw_value):
@@ -231,25 +226,30 @@ class WebPanel(wx.Panel):
             value = round(float(raw_value), 2)
             self.node_num.ChangeValue(str(value))
             G = nx.barabasi_albert_graph(value, 1, 777)
-            pos = nx.spring_layout(G)
-            js_data = {}
-            js_data["vertices"] = []
-            js_data["pos"] = {}
-            for n in G.nodes():
-                js_data["vertices"].append(str(n))
-                js_data["pos"][str(n)] = [pos[n][0], pos[n][1]]
-            js_data["edges"] = []
-            for e in G.edges():
-                js_data["edges"].append([str(e[0]), str(e[1]), None])
-            js_data["name"] = "G"
-            js_str = str(js_data)
-            js_str = js_str.replace('None','null')
-            js_str = js_str.replace('\'','\"')
+            js_str = self.import_from_networkx_to_json(G)
             self.wv.RunScript("jrg = '%s'" % js_str)
             self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")
             self.wv.RunScript("document.cookie = 'graph=' + my_graph_editor.export_sage()")
         else:
             self.node_num.ChangeValue("Number only")
+
+    def import_from_networkx_to_json(self, G):
+        pos = nx.spring_layout(G)
+        js_data = {}
+        js_data["vertices"] = []
+        js_data["pos"] = {}
+        for n in G.nodes():
+            js_data["vertices"].append(str(n))
+            js_data["pos"][str(n)] = [pos[n][0], pos[n][1]]
+        js_data["edges"] = []
+        for e in G.edges():
+            js_data["edges"].append([str(e[0]), str(e[1]), None])
+        js_data["name"] = "G"
+        js_str = str(js_data)
+        js_str = js_str.replace('None','null')
+        js_str = js_str.replace('\'','\"')
+        return js_str
+
 
 
 class GUI_Editor(wx.Frame):

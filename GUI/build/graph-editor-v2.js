@@ -888,6 +888,7 @@ function create_controls(div) {
 
     $('<div id="result_button" class="graph_editor_button">result</div>').appendTo(buttondiv)
     .toggle(function() {
+        document.getElementById('result_graph_image').src = "result.png?random="+new Date().getTime();
         $(div + ' #result_graph').show();
         $(canvas).hide()
         $(div+' #result_button').toggleClass('graph_editor_button_on');
@@ -934,22 +935,21 @@ function create_controls(div) {
         }
     });
 
-    $('<div id="image_button" class="graph_editor_button">image</div>').appendTo(buttondiv)
-    .click(function() {
-        var img = canvas.toDataURL("image/png");
-        window.open(img, "Graph Editor Image"
-        ,"menubar=false,toolba=false,location=false,width="
-        + SIZE.x + ",height=" + SIZE.y);
-    });
+//    $('<div id="image_button" class="graph_editor_button">image</div>').appendTo(buttondiv)
+//    .click(function() {
+//        var img = canvas.toDataURL("image/png");
+//        window.open(img, "Graph Editor Image"
+//        ,"menubar=false,toolba=false,location=false,width="
+//        + SIZE.x + ",height=" + SIZE.y);
+//    });
 
 
     $(div).append('<div id="result_graph"></div>');
     result_gr = div+' #result_graph';
 
     $(result_gr).append("<table>\
-    <img src='result.png' height='500' width='700' />\
-    </table>").hide();
-
+        <img src='result.png' width='700' height='500' id='result_graph_image' />\
+        </table>").hide();
 
     $(div).append('<div id="graph_editor_tweaks"></div>');
     tweaks = div+' #graph_editor_tweaks';
