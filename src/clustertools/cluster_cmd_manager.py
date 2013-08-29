@@ -1,5 +1,5 @@
-from paramiko import *
-from main import logger_MininetCE
+from paramiko                import *
+from main                    import logger_MininetCE
 from config.config_constants import SRC_SCRIPT_FOLDER, DST_SCRIPT_FOLDER, CLUSTER_NODE_MACHINE_NAME
 
 
@@ -11,10 +11,6 @@ def send_script_to_cluster_node(node_IP, script_filename, node_map):
         script_filename: Name of script file. File on Cluster Manager machine and on cluster node
                          node machine will have the same name.
     '''
-    # find SSH key
-    # privatekeyfile = os.path.expanduser( '~/.ssh/id_rsa')
-    # key = RSAKey.from_private_key_file( privatekeyfile)
-
     # open SFTP session to node
     transport = Transport((node_IP, 22))
     transport.connect(username=node_map[node_IP], password=node_map[node_IP])
@@ -33,6 +29,7 @@ def send_script_to_cluster_node(node_IP, script_filename, node_map):
     transport.close()
     logger_MininetCE.info('close SFTP session to ' + str(node_IP))
 
+
 def send_support_scripts_to_cluster_node(node_IP, node_map):
     '''Send helpful scripts to cluster nodes.
 
@@ -46,6 +43,7 @@ def send_support_scripts_to_cluster_node(node_IP, node_map):
     send_script_to_cluster_node(node_IP, 'scapy_packet_gen.py', node_map)
     send_script_to_cluster_node(node_IP, 'port_sniffer.py', node_map)
 
+
 def send_turn_on_script_to_cluster_node(node_IP, script_filename, node_map):
     '''Send start up script to cluster node.
 
@@ -57,10 +55,6 @@ def send_turn_on_script_to_cluster_node(node_IP, script_filename, node_map):
         script_filename: Name of script file. File on Cluster Manager machine and on cluster node
                          node machine will have the same name.
     '''
-    # find SSH key
-    # privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
-    # key = RSAKey.from_private_key_file(privatekeyfile)
-
     # open SFTP session to node
     transport = Transport((node_IP, 22))
     transport.connect(username=node_map[node_IP], password=node_map[node_IP])
@@ -79,6 +73,7 @@ def send_turn_on_script_to_cluster_node(node_IP, script_filename, node_map):
     transport.close()
     logger_MininetCE.info('close SFTP session to ' + str(node_IP))
 
+
 def send_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map):
     '''Send console command to cluster node.
 
@@ -93,8 +88,8 @@ def send_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map):
         endswith_str = 'root@' + CLUSTER_NODE_MACHINE_NAME + ':~# '
         while not buff.endswith(endswith_str): # Need to change name, or use the variable.
             buff += ssh_chan_map[node_IP].recv(9999)
-        # print('SUCCESS:' + node_IP + ': ' + cmd)
         logger_MininetCE.info('SUCCESS:' + node_IP + ': ' + cmd)
+
 
 def exec_start_up_script(node_IP, node_intf_map, ssh_chan_map):
     '''Send the console command to cluster Node to execute the start up script.
@@ -132,5 +127,4 @@ def send_mn_turn_on_cmd_to_cluster_node(node_IP, ssh_chan_map):
     buff = ""
     while not buff.endswith('mininet> '):
         buff += ssh_chan_map[node_IP].recv(9999)
-    # print("SUCCESS:" + node_IP + ": Mininet turning ON")
     logger_MininetCE.info("SUCCESS:" + node_IP + ": Mininet turning ON")

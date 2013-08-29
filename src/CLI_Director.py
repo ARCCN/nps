@@ -1,11 +1,25 @@
 import cmd
 
-from src.clustertools.cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node, send_mininet_cmd_to_cluster_node
-from config.config_constants import CLI_PROMPT_STRING
+from src.clustertools.cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node, \
+                                                         send_mininet_cmd_to_cluster_node
+from config.config_constants                      import CLI_PROMPT_STRING
 
 class CLI_director(cmd.Cmd):
+    '''Class of CLI Director.
 
+    TODO
+    '''
     def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num, h_and_sw_node_map):
+        '''Cunstructor of CLI Director.
+
+        Args:
+            host_map: Host IP to host name map.
+            host_to_node_map: Host IP to node ID map.
+            host_IP_map: Host name to host IP map.
+            ssh_chan_map: SSH session chan to cluster node map.
+            switch_num: Number of switches (not leave-nodes) in network graph.
+            h_and_sw_node_map:
+        '''
         cmd.Cmd.__init__(self)
         self.prompt = CLI_PROMPT_STRING
         self.intro  = "Welcome to Mininet CE console!"  ## defaults to None
@@ -44,6 +58,7 @@ class CLI_director(cmd.Cmd):
         cmd.Cmd.do_help(self, args)
 
     def do_ping(self, args):
+        """Simple ping command"""
         args = args.split()
         if len(args) != 2:
             print('*** invalid number of arguments')

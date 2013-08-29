@@ -1,5 +1,4 @@
 import sys
-import trace
 import threading
 
 class KThread(threading.Thread):

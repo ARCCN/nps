@@ -1,9 +1,10 @@
-from random import randint
+from random      import randint
 
-from main import logger_MininetCE
+from main        import logger_MininetCE
 from src.KThread import KThread
 
-import networkx as nx
+import networkx  as nx
+
 
 
 def read_nodelist_from_file(nodelist_filepath):
@@ -65,6 +66,7 @@ def get_next_IP_pool(IP, hosts_number):
                        + '.' + str(int(octets[3]) + hosts_number)
     return next_IP_pool
 
+
 def get_next_host_name(host):
     '''Generate the next host name in Mininet network. he next host name is the incremention (+1)
         of current host name.
@@ -117,7 +119,15 @@ def randomize_infected(prob):
     else:
         return False
 
+
 def make_threaded(function, args, node_map):
+    '''Launch fuction in threads. Number of thread equal to number of cluster nodes.
+
+    Args:
+        function: Threaded function.
+        args: Threaded function arguments.
+        node_map: Cluster nodes map.
+    '''
     threads = []
     list_args = list(args)
     for node_IP in node_map.keys():
@@ -130,22 +140,31 @@ def make_threaded(function, args, node_map):
     for thread in threads:
         thread.join()
 
+
 def get_networkX_graph(graph_data):
-        G = nx.Graph()
-        node_counter = 0
-        pos = {}
-        node_num_map = {}
-        for edge in graph_data['edges']:
-            if edge[0] not in node_num_map.keys():
-                G.add_node(node_counter)
-                node_num_map[edge[0]] = node_counter
-                pos[node_counter] = [graph_data['pos'][edge[0]][0], graph_data['pos'][edge[0]][1]]
-                node_counter += 1
-            if edge[1] not in node_num_map.keys():
-                G.add_node(node_counter)
-                node_num_map[edge[1]] = node_counter
-                pos[node_counter] = [graph_data['pos'][edge[1]][0], graph_data['pos'][edge[1]][1]]
-                node_counter += 1
-            G.add_edge(node_num_map[edge[0]], node_num_map[edge[1]])
-        return G, pos
+    '''Generate networkX graph from json string.
+
+    Args:
+        graph_data: Json string, that describes graph.
+
+    Returns:
+        NetworkX graph.
+    '''
+    G = nx.Graph()
+    node_counter = 0
+    pos = {}
+    node_num_map = {}
+    for edge in graph_data['edges']:
+        if edge[0] not in node_num_map.keys():
+            G.add_node(node_counter)
+            node_num_map[edge[0]] = node_counter
+            pos[node_counter] = [graph_data['pos'][edge[0]][0], graph_data['pos'][edge[0]][1]]
+            node_counter += 1
+        if edge[1] not in node_num_map.keys():
+            G.add_node(node_counter)
+            node_num_map[edge[1]] = node_counter
+            pos[node_counter] = [graph_data['pos'][edge[1]][0], graph_data['pos'][edge[1]][1]]
+            node_counter += 1
+        G.add_edge(node_num_map[edge[0]], node_num_map[edge[1]])
+    return G, pos
 

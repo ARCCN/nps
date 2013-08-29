@@ -43,15 +43,3 @@ def send_mininet_ping_to_cluster_node(node_IP, cmd, ssh_chan_map):
     buff_lines = buff.splitlines()
     for line in buff_lines[:-1]:
         print(line)
-        # if 'Destination Host Unreachable' in buff:
-        #     print('FAIL:' + node_IP + ': ' + cmd)
-        #     logger_MininetCE.info('FAIL:' + node_IP + ': ' + cmd)
-        #     return False
-        # elif 'bytes from' in buff and 'icmp_req=' in buff and 'ttl=' in buff and 'time=' in buff:
-        #     print('SUCCESS:' + node_IP + ': ' + cmd)
-        #     logger_MininetCE.info('SUCCESS:' + node_IP + ': ' + cmd)
-        #     return True
-        # # else:
-        # #     print('FAIL:' + node_IP + ': ' + cmd)
-        # #     logger_MininetCE.info('FAIL:' + node_IP + ': ' + cmd)
-        # #     return False

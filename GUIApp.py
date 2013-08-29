@@ -1,80 +1,30 @@
-from config.config_constants import ALPHA_VALUE, RANDOM_GRAPH_SIZE, RESULT_PIC_DPI, CONTROLLER_PATH
-from src.KThread import KThread
+from config.config_constants import ALPHA_VALUE, RESULT_PIC_DPI, CONTROLLER_PATH
+from src.KThread             import KThread
 
-import networkx as nx
+import networkx          as nx
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+import matplotlib        as mpl
+import wx.html2          as webview
+
 import pexpect
 import sys
 import subprocess
-import multiprocessing
-
 import wx
-import wx.html2 as webview
 import os
 
-# def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
-#     mpl.rcParams['toolbar'] = 'None'
-#     mpl.rcParams['font.size'] = 11
-#     mpl.rcParams['font.family'] = 'Candara'
-#
-#     max_pos = 0
-#     for v in pos.values():
-#         if v[0] > max_pos:
-#             max_pos = v[0]
-#         if v[1] > max_pos:
-#             max_pos = v[1]
-#     avr_pos = max_pos / 50
-#
-#     fig = plt.figure(1, figsize=(15, 8))
-#     fig.canvas.set_window_title("Mininet CE Network Graph")
-#     fig.patch.set_facecolor('white')
-#
-#     plt.subplot(121)
-#     frame1 = plt.gca()
-#     frame1.axes.get_xaxis().set_visible(False)
-#     frame1.axes.get_yaxis().set_visible(False)
-#     frame1.patch.set_facecolor((1.0, 0.5, 1.0, 0.1))
-#
-#     nx.draw_networkx_nodes(G, pos, node_size=50)
-#     nx.draw_networkx_edges(G, pos, alpha=ALPHA_VALUE, width=3.0)
-#     label_pos = {k: [v[0],v[1]+ avr_pos] for k, v in pos.items()}
-#     nx.draw_networkx_labels(G, label_pos, font_size=10, font_family='candara')
-#
-#     plt.subplot(122)
-#     frame2 = plt.gca()
-#     frame2.axes.get_xaxis().set_visible(False)
-#     frame2.axes.get_yaxis().set_visible(False)
-#     frame2.patch.set_facecolor((0.0, 0.0, 0.8, 0.1))
-#
-#     colors = ['b','g','r','c','m','y']
-#
-#     labels = {}
-#     for n in G.nodes():
-#         if n in leaves:
-#             labels[n] = 'h' + str(n)
-#         else:
-#             labels[n] = 's' + str(n)
-#
-#     pl_nodes = []
-#     for group in node_groups.keys():
-#         pl_node = nx.draw_networkx_nodes(G, pos, nodelist=node_groups[group], node_color=colors[group], node_size=50)
-#         pl_nodes.append(pl_node)
-#
-#     for group in edge_groups.keys():
-#         if group != 'no_group':
-#             nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group], alpha=ALPHA_VALUE, width=3.0)
-#         else:
-#             nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k', alpha=ALPHA_VALUE, width=3.0)
-#
-#     nx.draw_networkx_labels(G, label_pos, labels, font_size=10, font_family='candara')
-#     leg = plt.legend(pl_nodes, node_map.keys(), prop={'size': 8}, handletextpad=3)
-#     leg.legendPatch.set_alpha(0.77)
-#
-#     plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI)
-#     # plt.show()
+
 
 def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
+    '''Drawing result graph to the file "result.png".
+
+    Args:
+        G: NetworkX graph.
+        node_groups: Group ID to node-list map.
+        edge_groups: Group ID to edge-list map.
+        leaves: List of leave-nodes in network graph.
+        node_map: Cluster node map.
+        pos: Position of nodes in drawing graph.
+    '''
     mpl.rcParams['toolbar'] = 'None'
     mpl.rcParams['font.size'] = 11
     mpl.rcParams['font.family'] = 'Candara'
@@ -122,14 +72,20 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     leg.legendPatch.set_alpha(0.77)
 
     plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI, transparent=True, bbox_inches='tight', pad_inches=0)
-    # plt.show()
 
 
 class WebPanel(wx.Panel):
-    """"""
+    """Class fo WebPanel.
 
-    #----------------------------------------------------------------------
+    TODO
+    """
     def __init__(self, parent):
+        '''Cunstructor of WebPanel.
+
+        Args:
+            parent:
+
+        '''
         self.p = None
         wx.Panel.__init__(self, parent)
 
@@ -277,8 +233,17 @@ class WebPanel(wx.Panel):
                 wx.CallAfter(self.controller.AppendText, out)
 
 class GUI_Editor(wx.Frame):
-    """"""
+    """Class of GUI Editor.
+
+    TODO
+    """
     def __init__(self, parent):
+        '''Cunstructor of GUI Editor.
+
+        Args:
+            parent:
+
+        '''
         self.parent = parent
         """Constructor"""
         # wx.Frame.__init__(self, None, title="Mininet CE Graph Editor")
@@ -298,7 +263,18 @@ class GUI_Editor(wx.Frame):
 
 
 class GUIApp():
+    '''Class of GUI Application.
+
+    TODO
+    '''
     def __init__(self, html_path, width=1075, height=655):
+        '''Cunstructor of GUI Application.
+
+        Args:
+            html_path:
+            width:
+            height:
+        '''
         os.system("cp GUI/res/not_ready.png GUI/result.png")
 
         self.graph_data = {}
@@ -344,7 +320,6 @@ class GUIApp():
                 node_counter += 1
             G.add_edge(self.node_num_map[edge[0]], self.node_num_map[edge[1]])
         return G, pos
-
 
     def delete_gedit(self):
         self.Destroy()

@@ -2,6 +2,7 @@ import logging
 from src.mininettools import mininet_script_generator, mininet_script_operator
 
 
+
 def delete_logs():
     if os.path.isfile(LOG_FILEPATH):
         os.remove(LOG_FILEPATH)
@@ -27,11 +28,12 @@ def config_logger():
 from paramiko import *
 import os
 import sys
-import networkx as nx
 import time
 import pickle
-import subprocess
 import json
+
+import networkx as nx
+
 
 
 from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
@@ -40,13 +42,13 @@ from config.config_constants import MALWARE_PROPAGATION_MODE, CLI_MODE, SEPARATE
 from config.config_constants import HOST_NETMASK, VIEW_PROGRAMM_NAME, GUI_HTML
 from config.config_constants import RANDOM_GRAPH_SIZE, RANDOM_GRAPH_FLAG, LOAD_GRAPH_FLAG, GRAPH_EDITOR_FLAG
 
-from src.clustertools.cluster_cmd_manager import *
-from src.clustertools.cluster_ssh_manager import *
+from src.clustertools.cluster_cmd_manager         import *
+from src.clustertools.cluster_ssh_manager         import *
 from src.clustertools.cluster_mininet_cmd_manager import *
-from src.clustertools.cluster_support import *
-from src.mininettools.host_configurator import *
-from src.clustertools.cluster_manager_modes import *
-from GUIApp import *
+from src.clustertools.cluster_support             import *
+from src.mininettools.host_configurator           import *
+from src.clustertools.cluster_manager_modes       import *
+from GUIApp                                       import *
 
 node_map         = {} # maps node IP to node username
 node_intf_map    = {} # maps node IP to node outbound interface
@@ -65,7 +67,6 @@ if __name__ == '__main__':
     malware_node_list = {}
     pos = None
 
-
     # config logger
     print('Configuring loggers'.ljust(STRING_ALIGNMENT, ' ')),
     delete_logs() # for testing period ONLY
@@ -81,13 +82,6 @@ if __name__ == '__main__':
     if RANDOM_GRAPH_FLAG:
         print('Generating random network graph'.ljust(STRING_ALIGNMENT, ' ')),
         G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
-        pickle.dump(G, open('graph.txt', 'w'))
-        print('DONE!')
-    elif GRAPH_EDITOR_FLAG:
-        print('Waiting for You draw graph'.ljust(STRING_ALIGNMENT, ' ')),
-        GUI = GUIApp(GUI_HTML)
-        GUI.main_loop()
-        G, pos = GUI.get_networkX_graph()
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     elif LOAD_GRAPH_FLAG:
@@ -128,22 +122,13 @@ if __name__ == '__main__':
 
     if DRAWING_FLAG:
         print('Drawing graph'.ljust(STRING_ALIGNMENT, ' ')),
-        # p = Process(target=draw_graph, args=[G, node_groups, edge_groups, leaves, node_map])
-        # p.daemon = True
-        # p.start()
         draw_graph(G, node_groups, edge_groups, leaves, node_map, pos)
-        # view_proc = subprocess.Popen('open GUI/result.png', shell=True,
-        #                stdout=subprocess.PIPE,
-        #                stderr=subprocess.STDOUT)
         print('DONE!')
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
     mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
                                                                       edge_groups, node_ext_intf_group, leaves, node_map)
     print('DONE!')
-
-    # sys.stdin.read(1)
-    # exit(-1)
 
     # send scripts to nodes
     print('Sending scripts to nodes'.ljust(STRING_ALIGNMENT, ' ')),
@@ -201,10 +186,5 @@ if __name__ == '__main__':
     print('Sending CLOSE to all ssh connections'.ljust(STRING_ALIGNMENT, ' ')),
     close_ssh_to_nodes(ssh_map)
     print('DONE!')
-
-    if DRAWING_FLAG:
-        print('Killing viewing results process'.ljust(STRING_ALIGNMENT, ' '))
-        # os.system("ps -A | grep " + VIEW_PROGRAMM_NAME + " | grep -v grep | tail -n 1 | awk '{print $1}' | xargs kill -9")
-        print('DONE!')
 
     print('FINISH')
