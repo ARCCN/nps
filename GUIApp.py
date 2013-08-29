@@ -128,7 +128,9 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
 
         self.cmd_line = wx.TextCtrl(self, wx.ID_ANY, size=(235,-1))
-        self.cmd_line.SetFont(font_console)
+        font_cmd_line = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        self.cmd_line.SetFont(font_cmd_line)
+        self.cmd_line.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
 
         # Add widgets to a sizer
         con_hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -146,6 +148,12 @@ class WebPanel(wx.Panel):
 
         self.SetSizer(glob_sizer)
         self.wv.LoadURL(self.current)
+
+    def onKeyPress(self, event):
+        keycode = event.GetKeyCode()
+        if keycode == 13: # ENTER KEY
+            self.onSendButton(event)
+        event.Skip()
 
     def onSendButton(self, event):
         cmd = self.cmd_line.GetValue()

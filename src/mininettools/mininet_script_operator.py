@@ -2,10 +2,22 @@ import random
 
 import networkx as nx
 
-from src import metis
+from src        import metis
 
 
 def split_graph_on_parts(G, number_pf_parts):
+    '''Split graph on subgraphs.
+
+    Args:
+        G: Entire network graph.
+        number_pf_parts: Number of subgraphs.
+
+    Returns:
+        node_group: Group ID to node-list map.
+        edge_group: Group ID to edge-list map.
+        node_ext_intf_map: Group ID to external (cross-group links interfaces) map.
+
+    '''
     if number_pf_parts == 1:
         (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=True)
     else:
@@ -37,6 +49,7 @@ def split_graph_on_parts(G, number_pf_parts):
             if edge[1] not in node_ext_intf_group:
                 node_ext_intf_group.append(edge[1])
     return node_groups, edge_groups, node_ext_intf_group
+
 
 def standard_mininet_script_parser(filename, G):
     ''' Parse standart Mininet sript.
@@ -73,17 +86,16 @@ def standard_mininet_script_parser(filename, G):
             G.add_edge(string_name_to_ID_map[link_elem_1],string_name_to_ID_map[link_elem_2])
     return G
 
-def custom_mininet_script_parser(filename, G):
-    mininet_sript = open(filename, 'r')
-    lines = mininet_sript.readlines()
-    for i, line in enumerate(lines):
-        if 'class Topology' in line:
-
-            if lines[i+1][0] in [' ', '\t', '\n']:
-                print(lines[i+1][0])
-
 
 def define_leaves_in_graph(G):
+    '''Create list of leave-nodes in network graph.
+
+    Args:
+        G: NetworkX graph.
+
+    Returns:
+        List of leave-nodes.
+    '''
     leaves = []
     for key,value in nx.degree(G).items():
         if value == 1:
@@ -92,6 +104,17 @@ def define_leaves_in_graph(G):
 
 
 def nodes_number_optimization(G, node_map, node_intf_map):
+    '''Optimaze the number of cluster nodes to operate with network graph.
+
+    Args:
+        G: NetworkX graph.
+        node_map: Cluster nodes map.
+        node_intf_map: External network interface name to cluster node map.
+
+    Returns:
+        New cluster nodes map.
+        New external network interface name to cluster node map.
+    '''
     new_nodes_num = len(node_map)
     while len(G.nodes())/new_nodes_num < 2.0:
         new_nodes_num -= 1
