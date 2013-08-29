@@ -37,7 +37,7 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
             max_pos = v[1]
     avr_pos = max_pos / 50
 
-    fig = plt.figure(1, figsize=(15, 8))
+    fig = plt.figure(1, figsize=(15, 8), frameon=False)
     fig.canvas.set_window_title("Mininet CE Network Graph")
 
     frame = plt.gca()
@@ -99,35 +99,34 @@ class WebPanel(wx.Panel):
         self.wv = webview.WebView.New(self)
 
 
-        btn = wx.Button(self, -1, "Simulate", style=wx.BU_EXACTFIT)
+        btn = CustomButton(self, -1, "Simulate")
+        # btn.SetBackgroundColour('#93FF8C')
         self.Bind(wx.EVT_BUTTON, self.OnSimulateButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL, 2)
+        btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
 
-        btn = wx.Button(self, -1, "Random", style=wx.BU_EXACTFIT)
+        btn = CustomButton(self, -1, "Random")
         self.Bind(wx.EVT_BUTTON, self.OnRandomButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL, 2)
+        btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL)
 
-        self.node_num = wx.TextCtrl(self, size=(117, -1))
+        self.node_num = CustomTextCtrl(self, size=(117, -1))
         self.node_num.ChangeValue(str(17))
-        btnSizer.Add(self.node_num, 0, wx.EXPAND|wx.ALL, 2)
+        btnSizer.Add(self.node_num, 0, wx.EXPAND|wx.ALL)
 
         sizer.Add(btnSizer, 0, wx.EXPAND)
         sizer.Add(self.wv, 1, wx.EXPAND)
 
-        self.console = wx.TextCtrl(self, wx.ID_ANY, size=(235,100),
-                          style = wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
+        self.console = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
         font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.console.SetFont(font_console)
 
-        self.controller = wx.TextCtrl(self, wx.ID_ANY, size=(235,100),
-                          style = wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
+        self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
         font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.controller.SetFont(font_controller)
 
-        btn = wx.Button(self, wx.ID_ANY, 'Send')
+        btn = CustomButton(self, wx.ID_ANY, 'Send')
         self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
 
-        self.cmd_line = wx.TextCtrl(self, wx.ID_ANY, size=(235,-1))
+        self.cmd_line = CustomTextCtrl(self, wx.ID_ANY, size=(235,-1))
         font_cmd_line = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.cmd_line.SetFont(font_cmd_line)
         self.cmd_line.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
@@ -138,9 +137,9 @@ class WebPanel(wx.Panel):
         con_hsizer.Add(btn, 1, wx.EXPAND)
 
         con_sizer = wx.BoxSizer(wx.VERTICAL)
-        con_sizer.Add(self.controller, 1, wx.ALL|wx.EXPAND, 5)
-        con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND, 5)
-        con_sizer.Add(con_hsizer, 0, wx.ALL|wx.CENTER, 5)
+        con_sizer.Add(self.controller, 1, wx.BOTTOM|wx.EXPAND, 1)
+        con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND)
+        con_sizer.Add(con_hsizer, 0, wx.ALL|wx.CENTER)
 
         glob_sizer = wx.BoxSizer(wx.HORIZONTAL)
         glob_sizer.Add(con_sizer, 0, wx.EXPAND)
@@ -239,6 +238,30 @@ class WebPanel(wx.Panel):
                 break
             if out != '':
                 wx.CallAfter(self.controller.AppendText, out)
+
+class CustomButton(wx.Button):
+    def __init__(self, *a, **k):
+        style = ( wx.NO_BORDER )
+        wx.Button.__init__(self, style=style, *a, **k)
+
+        self.SetBackgroundColour('#EFE3FC')
+        # more customization here
+
+class CustomTextCtrl_readonly(wx.TextCtrl):
+    def __init__(self, *a, **k):
+        style = ( wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL )
+        wx.TextCtrl.__init__(self, style=style, *a, **k)
+
+        self.SetBackgroundColour('white')
+        # more customization here
+
+class CustomTextCtrl(wx.TextCtrl):
+    def __init__(self, *a, **k):
+        style = ( wx.NO_BORDER )
+        wx.TextCtrl.__init__(self, style=style, *a, **k)
+
+        self.SetBackgroundColour('white')
+        # more customization here
 
 class GUI_Editor(wx.Frame):
     """Class of GUI Editor.
