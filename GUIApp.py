@@ -253,21 +253,17 @@ class GUI_Editor(wx.Frame):
 
         '''
         self.parent = parent
+        style = ( wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX | wx.STAY_ON_TOP |  wx.NO_BORDER |
+                      wx.FRAME_NO_TASKBAR | wx.CLIP_CHILDREN )
         """Constructor"""
-        # wx.Frame.__init__(self, None, title="Mininet CE Graph Editor")
-        wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style= wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX)
+        wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style=style)
         self.SetSize((self.parent.width,self.parent.height)) # (1075,675)
+        self.SetBackgroundColour('#CCCCFF')
+        self.SetTransparent(230)
 
         panel = WebPanel(self)
+
         self.Show()
-
-    def set_graph_data(self, data):
-        self.parent.set_graph_data(data)
-        self.Destroy()
-
-    def set_random_flag(self, flag):
-        self.parent.set_random_flag(flag)
-        self.Destroy()
 
 
 class GUIApp():
@@ -295,21 +291,6 @@ class GUIApp():
         app = wx.App(False)
         frame = GUI_Editor(self)
         app.MainLoop()
-
-    def set_graph_data(self, data):
-        self.graph_data = data
-
-    def set_random_flag(self, flag):
-        self.random_flag = flag
-
-    def get_random_flag(self):
-        return self.random_flag
-
-    def check_graph(self):
-        if self.graph_data == {}:
-            return False
-        else:
-            return True
 
     def get_networkX_graph(self):
         G = nx.Graph()
