@@ -1,17 +1,17 @@
 STRING_ALIGNMENT = 50
 PYTHONPATH = '/Library/Frameworks/Python.framework/Versions/2.7/bin/python'
 
-MININETCE_HOME_FOLDER = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
-CONTROLLER_HOME_FOLDER = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
+MININETCE_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
+CONTROLLER_PATH = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
 GUI_HTML = 'GUI/GUI.html'
 
 
-LOG_FILEPATH      = MININETCE_HOME_FOLDER + '/logs/MininetCluster.log'
-ROOT_LOG_FILEPATH = MININETCE_HOME_FOLDER + '/logs/MininetCluster_root.log'
-MALWARE_LOG_PATH  = MININETCE_HOME_FOLDER + '/logs/MalwarePropagation.log'
-SRC_SCRIPT_FOLDER = MININETCE_HOME_FOLDER + '/scripts/'
+LOG_FILEPATH      = MININETCE_PATH + '/logs/MininetCluster.log'
+ROOT_LOG_FILEPATH = MININETCE_PATH + '/logs/MininetCluster_root.log'
+MALWARE_LOG_PATH  = MININETCE_PATH + '/logs/MalwarePropagation.log'
+SRC_SCRIPT_FOLDER = MININETCE_PATH + '/scripts/'
 DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/'
-NODELIST_FILEPATH = MININETCE_HOME_FOLDER + '/config/nodelist.txt'
+NODELIST_FILEPATH = MININETCE_PATH + '/config/nodelist.txt'
 
 MALWARE_CENTER_IP   = "10.211.55.2"
 MALWARE_CENTER_PORT = 56565

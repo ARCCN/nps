@@ -1,10 +1,13 @@
-from config.config_constants import ALPHA_VALUE, RANDOM_GRAPH_SIZE, RESULT_PIC_DPI
+from config.config_constants import ALPHA_VALUE, RANDOM_GRAPH_SIZE, RESULT_PIC_DPI, CONTROLLER_PATH
+from src.KThread import KThread
 
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pexpect
 import sys
+import subprocess
+import multiprocessing
 
 import wx
 import wx.html2 as webview
@@ -160,6 +163,11 @@ class WebPanel(wx.Panel):
         font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.console.SetFont(font_console)
 
+        self.controller = wx.TextCtrl(self, wx.ID_ANY, size=(235,100),
+                          style = wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
+        font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        self.controller.SetFont(font_controller)
+
         btn = wx.Button(self, wx.ID_ANY, 'Send')
         self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
 
@@ -172,7 +180,8 @@ class WebPanel(wx.Panel):
         con_hsizer.Add(btn, 1, wx.EXPAND)
 
         con_sizer = wx.BoxSizer(wx.VERTICAL)
-        con_sizer.Add(self.console, 1, wx.ALL|wx.EXPAND, 5)
+        con_sizer.Add(self.controller, 1, wx.ALL|wx.EXPAND, 5)
+        con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND, 5)
         con_sizer.Add(con_hsizer, 0, wx.ALL|wx.CENTER, 5)
 
         glob_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -198,10 +207,13 @@ class WebPanel(wx.Panel):
                 if len(s) != 0 and s != '\n':
                     self.console.AppendText(s)
             self.cmd_line.ChangeValue('')
+            self.controller_thread.kill()
+            self.controller_proc.terminate()
 
     def OnSimulateButton(self, event):
         os.system("cp GUI/res/not_ready.png GUI/result.png")
         self.console.ChangeValue('')
+        self.controller.ChangeValue('')
         prev_title = self.wv.GetCurrentTitle()
         self.wv.RunScript("document.title = document.cookie")
         cookies = self.wv.GetCurrentTitle()
@@ -209,6 +221,12 @@ class WebPanel(wx.Panel):
         graph_data = cookies.split('=')[1]
         # p = self.GetParent()
         # p.set_graph_data(graph_data)
+
+        controller_cmd = "java -jar " + CONTROLLER_PATH + "/target/floodlight.jar"
+        self.controller_proc = subprocess.Popen(controller_cmd, stdout=subprocess.PIPE, shell=True)
+        self.controller_thread = KThread(target=self.controller_thread_func)
+        self.controller_thread.setDaemon(True)
+        self.controller_thread.start()
 
         self.p = pexpect.spawn(sys.prefix + '/bin/python main.py \'' + graph_data + '\'')
 
@@ -250,7 +268,13 @@ class WebPanel(wx.Panel):
         js_str = js_str.replace('\'','\"')
         return js_str
 
-
+    def controller_thread_func(self):
+        while True:
+            out = self.controller_proc.stdout.readline()
+            if out == '' and self.controller_proc.poll() != None:
+                break
+            if out != '':
+                wx.CallAfter(self.controller.AppendText, out)
 
 class GUI_Editor(wx.Frame):
     """"""
