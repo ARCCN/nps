@@ -930,9 +930,8 @@ function create_controls(div) {
 
     $('<div id="reset_button" class="graph_editor_button">reset</div>').appendTo(buttondiv)
     .click(function() {
-        if (confirm("The graph will be irreversibly erased. This operation cannot be undone.")) {
-            erase_graph();
-        }
+        my_graph_editor.import_from_JSON(cube)
+        document.cookie = 'graph=' + my_graph_editor.export_sage()
     });
 
 //    $('<div id="image_button" class="graph_editor_button">image</div>').appendTo(buttondiv)
