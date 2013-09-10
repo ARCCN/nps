@@ -104,6 +104,10 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnSimulateButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
 
+        btn = CustomButton(self, -1, "DB:JSON")
+        self.Bind(wx.EVT_BUTTON, self.OnDBJsonButton, btn)
+        btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
+
         btn = CustomButton(self, -1, "Random")
         self.Bind(wx.EVT_BUTTON, self.OnRandomButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND|wx.ALL)
@@ -199,6 +203,16 @@ class WebPanel(wx.Panel):
             if len(s) != 0 and s != '\n':
                 self.console.AppendText(s)
 
+    def OnDBJsonButton(self, event):
+        prev_title = self.wv.GetCurrentTitle()
+        self.wv.RunScript("document.title = document.cookie")
+        cookies = self.wv.GetCurrentTitle()
+        self.wv.RunScript("document.title = %s" % prev_title)
+        graph_data = cookies.split('=')[1]
+        print(graph_data)
+        # p = self.GetParent()
+        # p.set_graph_data(graph_data)
+
     def OnRandomButton(self, event):
         raw_value = self.node_num.GetValue().strip()
         # numeric check
@@ -244,7 +258,7 @@ class CustomButton(wx.Button):
         style = ( wx.NO_BORDER )
         wx.Button.__init__(self, style=style, *a, **k)
 
-        self.SetBackgroundColour('#EFE3FC')
+        self.SetBackgroundColour('#C4C4FF')
         # more customization here
 
 class CustomTextCtrl_readonly(wx.TextCtrl):
@@ -281,7 +295,7 @@ class GUI_Editor(wx.Frame):
         """Constructor"""
         wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style=style, pos=wx.Point(0, 50))
         self.SetSize((self.parent.width,self.parent.height)) # (1075,675)
-        self.SetBackgroundColour('#CCCCFF')
+        self.SetBackgroundColour('#FFFFFF') #CCCCFF
         self.SetTransparent(230)
 
         panel = WebPanel(self)

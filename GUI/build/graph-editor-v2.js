@@ -178,6 +178,7 @@ Vertex = function(pos, label) {
     this.v = Point();
     this.frozen = false;
     this.label = label || next_label();
+    this.service_dhcp = false;
 };
 
 Vertex.prototype = {
@@ -838,12 +839,17 @@ function export_sage() {
         data.pos[nodes[i].label] = [pos.x, pos.y];
     }
     data.name = graph_name;
+    data.services = {};
+    for (i = 0; i < nodes.length; i++) {
+        data.services[nodes[i].label] = {};
+        data.services[nodes[i].label]["dhcp"] = nodes[i].service_dhcp;
+    }
     return JSON.stringify(data);
 }
 var UIside_panel_opened;
 function add_checkbox(name, variable, container_id, onclickf) {
     var s ='<tr><td>'+name+'</td>';
-    s +='<td><input type="checkbox"'; //+' id="'+name+'_check"'
+    s +='<td><input type="checkbox" id="'+name+'_check"';
     s +=' value="'+variable+'"';
     if (variable){
         s+='checked';
@@ -953,11 +959,14 @@ function create_controls(div) {
     $(div).append('<div id="graph_editor_tweaks"></div>');
     tweaks = div+' #graph_editor_tweaks';
 
+    var dhcp_flag = false;
+
     $(tweaks).append("<div class='infobox'><h4 id='title'>Info</h4>\
     <div id='info'>Index: <span id='index'></span><br>\
     <span id='pos'>Position: (<span id='posx'></span>, <span id='posy'></span>)<br></span>\
     <span id='vert'>Vertices: <span id='v1'></span>-><span id='v2'></span><br></span>\
-    Label: <input type='text' id='label'></div>\
+    Label: <input type='text' id='label'>\
+    DHCP: <input type='checkbox' id='dhcp_check'></div>\
     <div id='none_selected'>No node is selected</div></div>");
     $(div + ' .infobox #info').hide();
     $(div + ' .infobox #label').keyup(function() {
@@ -969,6 +978,12 @@ function create_controls(div) {
             edge_list[index].label = $(div + ' .infobox #label').val();
         }
     });
+
+    $(div + ' .infobox #dhcp_check').click(function() {
+        var index = $(div + ' .infobox #index').html();
+        nodes[index].service_dhcp = $(div + ' .infobox #dhcp_check').val();
+    });
+
 
     $(tweaks).append("<h4>Tweaks</h4>");
     add_button('Circular layout', tweaks, function() {
@@ -1025,6 +1040,7 @@ function update_infobox(obj) {
         $(div + ' .infobox #label').val(node.label);
         $(div + ' .infobox #none_selected').hide();
         $(div + ' .infobox #info').show();
+//        $(div + ' .infobox #dhcp_check').show();
     } else if (obj && obj instanceof Edge) {
         edge = obj;
         var enodes = edge.get_nodes();
