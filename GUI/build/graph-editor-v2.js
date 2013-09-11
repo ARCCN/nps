@@ -959,14 +959,14 @@ function create_controls(div) {
     $(div).append('<div id="graph_editor_tweaks"></div>');
     tweaks = div+' #graph_editor_tweaks';
 
-    var dhcp_flag = false;
 
     $(tweaks).append("<div class='infobox'><h4 id='title'>Info</h4>\
     <div id='info'>Index: <span id='index'></span><br>\
     <span id='pos'>Position: (<span id='posx'></span>, <span id='posy'></span>)<br></span>\
     <span id='vert'>Vertices: <span id='v1'></span>-><span id='v2'></span><br></span>\
     Label: <input type='text' id='label'>\
-    DHCP: <input type='checkbox' id='dhcp_check'></div>\
+    <div id='dhcp'>DHCP: <input type='checkbox' id='dhcp_check'></div>\
+    </div>\
     <div id='none_selected'>No node is selected</div></div>");
     $(div + ' .infobox #info').hide();
     $(div + ' .infobox #label').keyup(function() {
@@ -981,7 +981,7 @@ function create_controls(div) {
 
     $(div + ' .infobox #dhcp_check').click(function() {
         var index = $(div + ' .infobox #index').html();
-        nodes[index].service_dhcp = $(div + ' .infobox #dhcp_check').val();
+        nodes[index].service_dhcp = $(div + ' .infobox #dhcp_check').is(":checked");
     });
 
 
@@ -1040,7 +1040,9 @@ function update_infobox(obj) {
         $(div + ' .infobox #label').val(node.label);
         $(div + ' .infobox #none_selected').hide();
         $(div + ' .infobox #info').show();
-//        $(div + ' .infobox #dhcp_check').show();
+
+        $(div + ' .infobox #dhcp_check').prop('checked', node.service_dhcp);
+        $(div + ' .infobox #dhcp').show();
     } else if (obj && obj instanceof Edge) {
         edge = obj;
         var enodes = edge.get_nodes();
@@ -1056,6 +1058,7 @@ function update_infobox(obj) {
         $(div + ' .infobox #label').val(edge.label||"none");
         $(div + ' .infobox #none_selected').hide();
         $(div + ' .infobox #info').show();
+        $(div + ' .infobox #dhcp').hide();
     } else {
         $(div + ' .infobox #title').html('Info');
         $(div + ' .infobox #none_selected').show();

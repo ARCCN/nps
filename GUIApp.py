@@ -100,11 +100,12 @@ class WebPanel(wx.Panel):
 
 
         btn = CustomButton(self, -1, "Simulate")
-        # btn.SetBackgroundColour('#93FF8C')
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
         self.Bind(wx.EVT_BUTTON, self.OnSimulateButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
 
         btn = CustomButton(self, -1, "DB:JSON")
+        btn.SetBackgroundColour('#B2B2B2')
         self.Bind(wx.EVT_BUTTON, self.OnDBJsonButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
 
@@ -258,7 +259,7 @@ class CustomButton(wx.Button):
         style = ( wx.NO_BORDER )
         wx.Button.__init__(self, style=style, *a, **k)
 
-        self.SetBackgroundColour('#C4C4FF')
+        self.SetBackgroundColour('#B2B2B2') #C4C4FF
         # more customization here
 
 class CustomTextCtrl_readonly(wx.TextCtrl):
@@ -266,7 +267,7 @@ class CustomTextCtrl_readonly(wx.TextCtrl):
         style = ( wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL )
         wx.TextCtrl.__init__(self, style=style, *a, **k)
 
-        self.SetBackgroundColour('white')
+        self.SetBackgroundColour('#D8D8D8')
         # more customization here
 
 class CustomTextCtrl(wx.TextCtrl):
@@ -274,7 +275,7 @@ class CustomTextCtrl(wx.TextCtrl):
         style = ( wx.NO_BORDER )
         wx.TextCtrl.__init__(self, style=style, *a, **k)
 
-        self.SetBackgroundColour('white')
+        self.SetBackgroundColour('#D8D8D8')
         # more customization here
 
 class GUI_Editor(wx.Frame):
@@ -295,7 +296,7 @@ class GUI_Editor(wx.Frame):
         """Constructor"""
         wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style=style, pos=wx.Point(0, 50))
         self.SetSize((self.parent.width,self.parent.height)) # (1075,675)
-        self.SetBackgroundColour('#FFFFFF') #CCCCFF
+        self.SetBackgroundColour('#CECECE') #CCCCFF
         self.SetTransparent(230)
 
         panel = WebPanel(self)
