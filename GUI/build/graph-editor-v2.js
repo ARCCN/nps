@@ -966,6 +966,15 @@ function create_controls(div) {
     <span id='vert'>Vertices: <span id='v1'></span>-><span id='v2'></span><br></span>\
     Label: <input type='text' id='label'>\
     <div id='dhcp'>DHCP: <input type='checkbox' id='dhcp_check'></div>\
+    <div id='networkapp'>NetApps:<br>\
+        <select id='networkapp_list' name='networkapp_list' multiple='multiple'>\
+            <option value='1'>WEB</option>\
+            <option value='2'>VIDEO</option>\
+            <option value='3'>FTP</option>\
+            <option value='4'>P2P</option>\
+            <option value='5'>SMTP</option>\
+        </select>\
+    </div>\
     </div>\
     <div id='none_selected'>No node is selected</div></div>");
     $(div + ' .infobox #info').hide();
@@ -1043,6 +1052,7 @@ function update_infobox(obj) {
 
         $(div + ' .infobox #dhcp_check').prop('checked', node.service_dhcp);
         $(div + ' .infobox #dhcp').show();
+        $(div + ' .infobox #networkapp').show();
     } else if (obj && obj instanceof Edge) {
         edge = obj;
         var enodes = edge.get_nodes();
@@ -1059,6 +1069,7 @@ function update_infobox(obj) {
         $(div + ' .infobox #none_selected').hide();
         $(div + ' .infobox #info').show();
         $(div + ' .infobox #dhcp').hide();
+        $(div + ' .infobox #networkapp').hide();
     } else {
         $(div + ' .infobox #title').html('Info');
         $(div + ' .infobox #none_selected').show();
