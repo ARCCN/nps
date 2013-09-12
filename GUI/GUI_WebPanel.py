@@ -3,9 +3,13 @@ import subprocess
 import networkx as nx
 import pexpect
 import wx
+import sys
+
 from wx import html2 as webview
 from config.config_constants import CONTROLLER_PATH
 from src.KThread import KThread
+
+
 
 
 class WebPanel(wx.Panel):
@@ -41,7 +45,7 @@ class WebPanel(wx.Panel):
         btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
 
         btn = CustomButton(self, -1, "DB:JSON")
-        btn.SetBackgroundColour('#B2B2B2')
+        btn.SetBackgroundColour('#B5B5B5')
         self.Bind(wx.EVT_BUTTON, self.OnDBJsonButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
 

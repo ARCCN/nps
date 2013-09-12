@@ -158,12 +158,12 @@ def get_networkX_graph(graph_data):
         if edge[0] not in node_num_map.keys():
             G.add_node(node_counter)
             node_num_map[edge[0]] = node_counter
-            pos[node_counter] = [graph_data['pos'][edge[0]][0], graph_data['pos'][edge[0]][1]]
+            pos[node_counter] = [graph_data['pos'][edge[0]][0], 0 - graph_data['pos'][edge[0]][1]]
             node_counter += 1
         if edge[1] not in node_num_map.keys():
             G.add_node(node_counter)
             node_num_map[edge[1]] = node_counter
-            pos[node_counter] = [graph_data['pos'][edge[1]][0], graph_data['pos'][edge[1]][1]]
+            pos[node_counter] = [graph_data['pos'][edge[1]][0], 0 - graph_data['pos'][edge[1]][1]]
             node_counter += 1
         G.add_edge(node_num_map[edge[0]], node_num_map[edge[1]])
     return G, pos
