@@ -179,6 +179,7 @@ Vertex = function(pos, label) {
     this.frozen = false;
     this.label = label || next_label();
     this.service_dhcp = false;
+    this.netapps = {};
 };
 
 Vertex.prototype = {
@@ -839,10 +840,16 @@ function export_sage() {
         data.pos[nodes[i].label] = [pos.x, pos.y];
     }
     data.name = graph_name;
-    data.services = {};
+    data.netapps = {};
     for (i = 0; i < nodes.length; i++) {
-        data.services[nodes[i].label] = {};
-        data.services[nodes[i].label]["dhcp"] = nodes[i].service_dhcp;
+        data.netapps[nodes[i].label] = {};
+        data.netapps[nodes[i].label]["dhcp"] = nodes[i].service_dhcp;
+        var x = 0;
+        var netapp_list = document.getElementById("networkapp_list");
+        for (x=0;x<netapp_list.length;x++)
+        {
+            data.netapps[nodes[i].label][netapp_list[x].text] = nodes[i].netapps[netapp_list[x].text];
+        }
     }
     return JSON.stringify(data);
 }
@@ -948,7 +955,6 @@ function create_controls(div) {
 //        + SIZE.x + ",height=" + SIZE.y);
 //    });
 
-
     $(div).append('<div id="result_graph"></div>');
     result_gr = div+' #result_graph';
 
@@ -959,20 +965,19 @@ function create_controls(div) {
     $(div).append('<div id="graph_editor_tweaks"></div>');
     tweaks = div+' #graph_editor_tweaks';
 
-
+//    <span id='pos'>Position: (<span id='posx'></span>, <span id='posy'></span>)<br></span>\
     $(tweaks).append("<div class='infobox'><h4 id='title'>Info</h4>\
     <div id='info'>Index: <span id='index'></span><br>\
-    <span id='pos'>Position: (<span id='posx'></span>, <span id='posy'></span>)<br></span>\
     <span id='vert'>Vertices: <span id='v1'></span>-><span id='v2'></span><br></span>\
     Label: <input type='text' id='label'>\
     <div id='dhcp'>DHCP: <input type='checkbox' id='dhcp_check'></div>\
     <div id='networkapp'>NetApps:<br>\
-        <select id='networkapp_list' name='networkapp_list' multiple='multiple'>\
-            <option value='1'>WEB</option>\
-            <option value='2'>VIDEO</option>\
-            <option value='3'>FTP</option>\
-            <option value='4'>P2P</option>\
-            <option value='5'>SMTP</option>\
+        <select id='networkapp_list' multiple='multiple' onchange='testf()'>\
+            <option>WEB</option>\
+            <option>VIDEO</option>\
+            <option>FTP</option>\
+            <option>P2P</option>\
+            <option>SMTP</option>\
         </select>\
     </div>\
     </div>\
@@ -993,13 +998,22 @@ function create_controls(div) {
         nodes[index].service_dhcp = $(div + ' .infobox #dhcp_check').is(":checked");
     });
 
-
-    $(tweaks).append("<h4>Tweaks</h4>");
-    add_button('Circular layout', tweaks, function() {
-        if (confirm("All vertices will be irrevesably moved. This operation cannot be undone.")) {
-            circular_layout();
+    $(div + ' .infobox #networkapp_list').change(function() {
+        var netapp_list = document.getElementById("networkapp_list")
+        var index = $(div + ' .infobox #index').html();
+        var x = 0;
+        for (x=0;x<netapp_list.length;x++) {
+            nodes[index].netapps[netapp_list[x].text] = netapp_list[x].selected;
         }
     });
+
+
+    $(tweaks).append("<h4>Tweaks</h4>");
+//    add_button('Circular layout', tweaks, function() {
+//        if (confirm("All vertices will be irrevesably moved. This operation cannot be undone.")) {
+//            circular_layout();
+//        }
+//    });
 
     $(tweaks).append('<table>');
     add_checkbox('Vertex numbers', NODE_NUMBERS, tweaks, function() {
@@ -1033,6 +1047,11 @@ function create_controls(div) {
     });
 }
 
+function testf(){
+    $(div).append("TestF");
+}
+
+
 function update_infobox(obj) {
     if (!UIside_panel_opened) {
         return;
@@ -1052,6 +1071,11 @@ function update_infobox(obj) {
 
         $(div + ' .infobox #dhcp_check').prop('checked', node.service_dhcp);
         $(div + ' .infobox #dhcp').show();
+
+        var netapp_list = document.getElementById("networkapp_list");
+        for (var i = 0; i <  netapp_list.length; i++) {
+            netapp_list[i].selected = node.netapps[netapp_list[i].text];
+        }
         $(div + ' .infobox #networkapp').show();
     } else if (obj && obj instanceof Edge) {
         edge = obj;
