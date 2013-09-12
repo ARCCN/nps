@@ -152,6 +152,8 @@ class WebPanel(wx.Panel):
 
     def OnSimulateButton(self, event):
         os.system("cp GUI/res/not_ready.png GUI/result.png")
+        # Save current graph
+        self.wv.RunScript("document.cookie = 'graph=' + my_graph_editor.export_sage()")
         self.console.ChangeValue('')
         self.controller.ChangeValue('')
         prev_title = self.wv.GetCurrentTitle()

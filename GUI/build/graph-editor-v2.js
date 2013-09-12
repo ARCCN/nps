@@ -18,7 +18,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     NODE_NUMBERS = true,
     SPRING = 0.999,
     SPEED = 2.0,
-    FIXED_LENGTH = 50.0,
+    FIXED_LENGTH = 100.0,
     ORIENTATION = Math.PI,
     SHOWFPS = false,
     SHIFT = false,
@@ -894,11 +894,6 @@ function create_controls(div) {
 
     $(div).prepend('<div id="graph_editor_button_container"></div>');
 
-    $('<div id="save_button" class="graph_editor_button">save</div>').appendTo(buttondiv)
-    .click(function() {
-        document.cookie = 'graph=' + my_graph_editor.export_sage();
-    });
-
     $('<div id="result_button" class="graph_editor_button">result</div>').appendTo(buttondiv)
     .toggle(function() {
         document.getElementById('result_graph_image').src = "result.png?random="+new Date().getTime();
@@ -913,6 +908,7 @@ function create_controls(div) {
     });
 
     $('<div id="live_button" class="graph_editor_button">live</div>').appendTo(buttondiv).click(toggle_live);
+    toggle_live(); // comment if you dont want to animate graph at start
 
     $('<div id="tweaks_button" class="graph_editor_button">tweaks</div>').appendTo(buttondiv)
     .toggle(function() {
