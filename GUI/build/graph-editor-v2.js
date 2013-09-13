@@ -17,7 +17,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     AUTO_MAXIMIZE = true,
     NODE_NUMBERS = true,
     SPRING = 0.999,
-    SPEED = 2.0,
+    SPEED = 3.0,// 2.0
     FIXED_LENGTH = 100.0,
     ORIENTATION = Math.PI,
     SHOWFPS = false,
@@ -27,6 +27,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     canvastag,
     ctx,
     loop_interval,
+    NETAPPS = ['WEB', 'VIDEO', 'FTP', 'P2P', 'SMTP'],
     last_frame;
 //Miscellaneous functions  
 function rand(a, b) {
@@ -68,6 +69,18 @@ function circle(x,y,r,nofillFlag){
     ctx.beginPath();
     ctx.arc(x,y,r,0,Math.PI*2,true);
     ctx.closePath();
+    if(!nofillFlag){
+        ctx.fill();
+    }
+    ctx.stroke();
+}
+
+function circle_withtip(x,y,w,h,r,nofillFlag){
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2,true);
+    ctx.closePath();
+    ctx.rect(x-(w/2)*r, y-(h+2)*r, w*r, h*r);
+
     if(!nofillFlag){
         ctx.fill();
     }
@@ -180,7 +193,11 @@ Vertex = function(pos, label) {
     this.label = label || next_label();
     this.service_dhcp = false;
     this.netapps = {};
-};
+
+    for (var x=0;x<NETAPPS.length;x++) {
+        this.netapps[NETAPPS[x]] = false;
+    };
+}
 
 Vertex.prototype = {
     node_loop_angle: function() {
@@ -210,7 +227,7 @@ Vertex.prototype = {
         if (this.selected) {
             ctx.fillStyle = "#FF0000";
         } else if (this.closest) {
-            ctx.fillStyle = "#CCC000";
+            ctx.fillStyle = "#ADB3DB"; //CCC000
         } else {
             if (NODE_NUMBERS) {
                 ctx.fillStyle = "#FFFFFF";
@@ -220,7 +237,25 @@ Vertex.prototype = {
                 ctx.fillStyle = "#000000";
             }
         }
-        circle(this.pos.x, this.pos.y, NODE_RADIUS);
+        if (this.closest && !this.selected) {
+            var w = 10;
+            var h = 7;
+            circle_withtip(this.pos.x, this.pos.y, w, h, NODE_RADIUS)
+
+            ctx.fillStyle = "#000000";
+            ctx.fillText(' DHCP = ' + this.service_dhcp.toString(), this.pos.x-(w/2)*NODE_RADIUS,
+                this.pos.y-(h+2)*NODE_RADIUS + NODE_RADIUS);
+
+            var count = 3;
+            for (netapp in this.netapps) {
+                ctx.fillText(' ' + netapp.toString() + ' = ' + this.netapps[netapp].toString(),
+                    this.pos.x-(w/2)*NODE_RADIUS, this.pos.y-(h+2)*NODE_RADIUS + count *NODE_RADIUS);
+                count++;
+            }
+        }
+        else {
+            circle(this.pos.x, this.pos.y, NODE_RADIUS);
+        }
         if (NODE_NUMBERS) {
             ctx.fillStyle = "#000000";
             node_number = nodes.indexOf(this).toString();
@@ -770,7 +805,9 @@ function import_from_JSON(JSONdata) {
     for (i = 0; i < data.edges.length; i += 1) {
         edge_list.push(new Edge(dict[data.edges[i][0]], dict[data.edges[i][1]], 1, dict[data.edges[i][2]]));
     }
+
     graph_name = data.name;
+
     draw();
 }
 
@@ -938,10 +975,9 @@ function create_controls(div) {
     .click(undo_remove).toggleClass('graph_editor_undo_disabled');
 
     $('<div id="reset_button" class="graph_editor_button">reset</div>').appendTo(buttondiv)
-    .click(function() {
-        my_graph_editor.import_from_JSON(cube)
-        document.cookie = 'graph=' + my_graph_editor.export_sage()
-    });
+//    .bubbletip(document.getElementById('tip1_up'))
+//    .mouseover(function() {$(div).append('kasjdhkasjdh!')})
+//    .mouseout(function() {$(div).append('123123123!')})
 
 //    $('<div id="image_button" class="graph_editor_button">image</div>').appendTo(buttondiv)
 //    .click(function() {
@@ -968,7 +1004,7 @@ function create_controls(div) {
     Label: <input type='text' id='label'>\
     <div id='dhcp'>DHCP: <input type='checkbox' id='dhcp_check'></div>\
     <div id='networkapp'>NetApps:<br>\
-        <select id='networkapp_list' multiple='multiple' onchange='testf()'>\
+        <select id='networkapp_list' multiple='multiple'>\
             <option>WEB</option>\
             <option>VIDEO</option>\
             <option>FTP</option>\
@@ -978,6 +1014,7 @@ function create_controls(div) {
     </div>\
     </div>\
     <div id='none_selected'>No node is selected</div></div>");
+
     $(div + ' .infobox #info').hide();
     $(div + ' .infobox #label').keyup(function() {
         var index = $(div + ' .infobox #index').html(),
@@ -1002,7 +1039,6 @@ function create_controls(div) {
             nodes[index].netapps[netapp_list[x].text] = netapp_list[x].selected;
         }
     });
-
 
     $(tweaks).append("<h4>Tweaks</h4>");
 //    add_button('Circular layout', tweaks, function() {
@@ -1041,10 +1077,7 @@ function create_controls(div) {
         title : "Graph Editor Help",
         modal : true
     });
-}
 
-function testf(){
-    $(div).append("TestF");
 }
 
 
@@ -1144,7 +1177,6 @@ function toggle_live() {
         $(div+' #live_button').toggleClass('graph_editor_button_on');
     }
 
-
 function init() {
     //construction of GraphEditor
     controller = Controller();
@@ -1172,6 +1204,12 @@ function init() {
     if (options.controls !== false){
         create_controls(div);
     }
+
+//    var netapp_list = document.getElementById("networkapp_list")
+//    for (var x=0; x < NETAPPS.length; x++) {
+//        netapp_list.options[netapp_list.options.length] = new Option(NETAPPS[x], NETAPPS[x]);
+//
+//    }
     //$(div).dblclick(function (){return false;});
 }
 

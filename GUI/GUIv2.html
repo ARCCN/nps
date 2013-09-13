@@ -5,7 +5,6 @@
     <link type="text/css" href="css/graph-editor-v2.css" rel="Stylesheet" />
     <!--<script src="build/graph-editor.min.js"></script>-->
     <script src="build/graph-editor-v2.js"></script>
-    <script src="build/create-controls.js"></script>
 
     <link type="text/css" href="lib/jquery-ui/css/ui-lightness/jquery-ui-1.8.20.custom.css" rel="Stylesheet" />
     <link type="text/css" href="lib/highlight/styles/github.css" rel="Stylesheet" />
@@ -13,7 +12,7 @@
     <script src="lib/jquery-ui/js/jquery-1.7.2.min.js"></script>
     <script src="lib/jquery-ui/js/jquery-ui-1.8.20.custom.min.js"></script>
 
-    <style>
+<style>
       body {
         width: 800px;
         width: auto;
@@ -22,17 +21,14 @@
         font-size:10px;
 
         background: #CECECE;
-
-        /*background: #9191ff; *//* Old browsers */
-/*background: -moz-radial-gradient(center, ellipse cover,  #9191ff 0%, #ffffff 51%); *//* FF3.6+ */
-/*background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#9191ff), color-stop(51%,#ffffff)); *//* Chrome,Safari4+ */
-/*background: -webkit-radial-gradient(center, ellipse cover,  #9191ff 0%,#ffffff 51%); *//* Chrome10+,Safari5.1+ */
-/*background: -o-radial-gradient(center, ellipse cover,  #9191ff 0%,#ffffff 51%); *//* Opera 12+ */
-/*background: -ms-radial-gradient(center, ellipse cover,  #9191ff 0%,#ffffff 51%); *//* IE10+ */
-/*background: radial-gradient(ellipse at center,  #9191ff 0%,#ffffff 51%); *//* W3C */
-/*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9191ff', endColorstr='#ffffff',GradientType=1 ); *//* IE6-9 fallback on horizontal gradient */
-
        }
+
+      PRE.tip
+		{
+			margin: 0px;
+			padding: 5px;
+			font-size: 0.9em;
+		}
 
       TABLE {
             width: 100%; /* Ширина таблицы */
@@ -49,8 +45,8 @@
             padding: 5px; /* Поля вокруг содержимого ячеек */
 
             }
-    </style>
-    <script>
+</style>
+<script>
 var K4_graph = JSON.stringify(
                {"vertices": ["0", "1", "2", "3"],
                 "edges": [["0", "1"], ["0", "2"], ["0", "3"], ["1", "2"], ["1", "3"], ["2", "3"]],
@@ -61,29 +57,6 @@ var cube = '{"edges": [["000", "001", null], ["000", "010", null], ["000", "100"
 
 $(function() {
     hljs.initHighlightingOnLoad();
-//    my_graph_editor1 = new GraphEditor('#graph_ed1', {
-//        JSONdata : K4_graph
-//    });
-//    my_graph_editor2 = new GraphEditor('#graph_ed2', {
-//        JSONdata : K4_graph,
-//        width : 100,
-//        height : 100,
-//        node_radius : 5,
-//        controls : false
-//    });
-    /* See comment below. 
-    my_graph_editor3 = new GraphEditor('#graph_ed3', {
-        JSONdata: K4_graph,
-        width : 300,
-        height : 300,
-        directed : true
-    });*/
-//    my_graph_editor4 = new GraphEditor('#graph_ed4', {
-//        JSONdata: K4_graph,
-//        width : 300,
-//        height : 300,
-//        multigraph : true,
-//    });
 
     my_graph_editor = new GraphEditor('#graph_ed', { JSONdata: cube,
       width : 700,
@@ -93,20 +66,8 @@ $(function() {
 
     document.cookie = 'graph=' + my_graph_editor.export_sage();
 
-
-//    $('#set_json').click(function() {
-//        my_graph_editor.import_from_JSON($('#json').val());
-//    });
-//    $('#get_sage').click(function() {
-////        $('#sage').val(my_graph_editor.export_sage);
-//        document.cookie = 'graph=' + my_graph_editor.export_sage();
-//    });
-//    $('#get_latex').click(function() {
-//        $('#latex').val(my_graph_editor.export_tkz);
-//    });
 });
-    </script>
-
+</script>
 </head>
 <body>
 <!--<input type="button" id="get_sage" value="Save Graph"><br>-->
@@ -121,12 +82,6 @@ $(function() {
         </logo>
     </td>
    </tr>
-  </table>
-<!--<div id="logo">-->
-<!--<logo href="/">-->
-        <!--<img src="res/logo-eng.gif" />-->
-<!--</logo>-->
-<!--</div>-->
-<!--<div id='graph_ed'></div>-->
+</table>
 </body>
 </html>
