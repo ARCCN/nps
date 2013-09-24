@@ -107,15 +107,15 @@ function Draw_vizualization(div){
 
     RGraph.AddCustomEventListener(bar2, 'ontooltip', CreateTooltipGraph);
 
-    d1  = [];
-    l   = 0; // The letter 'L' - NOT a one
-
-    // Pre-pad the arrays with 250 null values
-    for (var i=0; i<1000; ++i) {
-        d1.push(null);
-    }
-
-    drawGraph();
+//    d1  = [];
+//    l   = 0; // The letter 'L' - NOT a one
+//
+//    // Pre-pad the arrays with 250 null values
+//    for (var i=0; i<1000; ++i) {
+//        d1.push(null);
+//    }
+//
+//    drawGraph();
 
 
 }

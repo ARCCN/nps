@@ -1207,6 +1207,18 @@ function init() {
     canvastag.mouseup(function (e){controller.mouseup(e);});
     canvastag.mousemove(function (e){controller.mousemove(e);});
     canvastag.mouseleave(function (e){controller.mouseleave(e);});
+
+    //ZOOM
+    var handleScroll = function(e) {
+            var delta = e.wheelDelta ? e.wheelDelta/40 : e.detail ? -e.detail : 0;
+            if (delta) {
+                if ((FIXED_LENGTH+delta)/10 >=7 && (FIXED_LENGTH+delta)/10 <=15) NODE_RADIUS = (FIXED_LENGTH+delta)/10;
+                if (FIXED_LENGTH+delta >= 10) FIXED_LENGTH += delta;
+            }
+        }
+    canvastag[0].addEventListener('DOMMouseScroll', handleScroll,false);
+    canvastag[0].addEventListener('mousewheel',handleScroll,false);
+
     //fixes a problem where double clicking causes text to get selected on the canvas
     canvastag[0].onselectstart = function () { return false; }
     if(options.JSONdata){
