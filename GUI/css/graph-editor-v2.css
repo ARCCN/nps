@@ -132,7 +132,7 @@ div.graph_editor_undo_disabled{
 }
 
 div.slider{
-    width: 125px;
+    width: 100px;
 
     background: #68a1d6;
     height: 10px;
@@ -154,10 +154,17 @@ canvas.graph_editor_canvas{
     tabindex: 0;
 }
 
+div#viz_test{
+    border: 1px solid #000000;
+    float: left;
+    tabindex: 0;
+}
+
+
 div#graph_editor_tweaks{
     overflow: auto;
     font-family:candara;
-    font-size:10px;
+    font-size:9px;
     padding: 0px 15px;
 }
 div h4{

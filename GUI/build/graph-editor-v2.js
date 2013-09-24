@@ -29,6 +29,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     loop_interval,
     NETAPPS = ['WEB', 'VIDEO', 'FTP', 'P2P', 'SMTP'],
     last_frame;
+
 //Miscellaneous functions  
 function rand(a, b) {
     return a + Math.floor(Math.random() * (b - a));
@@ -86,6 +87,8 @@ function circle_withtip(x,y,w,h,r,nofillFlag){
     }
     ctx.stroke();
 }
+
+    
 
 function line(x1,y1,x2,y2){
     ctx.lineWidth = 1;
@@ -924,13 +927,17 @@ function add_slider(name, variable, container_id, min, max, onchangef) {
     });
 }
 
+
 function create_controls(div) {
     //Create controls and attach click functions
-    var result_gr, tweaks, canvaspos = $(div +' canvas').offset(), buttondiv = div + ' #graph_editor_button_container',
+    var result_gr, vizualizer, tweaks, canvaspos = $(div +' canvas').offset(), buttondiv = div + ' #graph_editor_button_container',
     canvas = $(div +' canvas')[0];
 
+
+    // Create graph editor buttons tab
     $(div).prepend('<div id="graph_editor_button_container"></div>');
 
+    // Rusult button controller
     $('<div id="result_button" class="graph_editor_button">result</div>').appendTo(buttondiv)
     .toggle(function() {
         document.getElementById('result_graph_image').src = "result.png?random="+new Date().getTime();
@@ -943,11 +950,19 @@ function create_controls(div) {
         $(div + ' #result_graph').hide();
         $(div+' #result_button').toggleClass('graph_editor_button_on');
     });
+    // Create result tab html code
+    $(div).append('<div id="result_graph"></div>');
+    result_gr = div+' #result_graph';
+    $(result_gr).append("<table>\
+        <img src='result.png' width='700' height='500' id='result_graph_image' />\
+        </table>").hide();
 
+    // Tougle physics button controller
     $('<div id="live_button" class="graph_editor_button">live</div>').appendTo(buttondiv).click(toggle_live);
     toggle_live(); // comment if you dont want to animate graph at start
 
-    $('<div id="tweaks_button" class="graph_editor_button">tweaks</div>').appendTo(buttondiv)
+    // Show options button controller
+    $('<div id="tweaks_button" class="graph_editor_button">options</div>').appendTo(buttondiv)
     .toggle(function() {
         $(div).animate({'width': SIZE.x + 185 + 'px'},
             {queue: true, duration: 'fast', easing: 'linear', complete: function (){
@@ -965,38 +980,9 @@ function create_controls(div) {
         });
         $(div+' #tweaks_button').toggleClass('graph_editor_button_on');
     });
-
-    $('<div id="help_button" class="graph_editor_button">?</div>').appendTo(buttondiv)
-    .click(function() {
-        $('#help_dialog').dialog('open');
-    });
-
-    $('<div id="undo_button" class="graph_editor_button">undo</div>').appendTo(buttondiv)
-    .click(undo_remove).toggleClass('graph_editor_undo_disabled');
-
-    $('<div id="reset_button" class="graph_editor_button">reset</div>').appendTo(buttondiv)
-//    .bubbletip(document.getElementById('tip1_up'))
-//    .mouseover(function() {$(div).append('kasjdhkasjdh!')})
-//    .mouseout(function() {$(div).append('123123123!')})
-
-//    $('<div id="image_button" class="graph_editor_button">image</div>').appendTo(buttondiv)
-//    .click(function() {
-//        var img = canvas.toDataURL("image/png");
-//        window.open(img, "Graph Editor Image"
-//        ,"menubar=false,toolba=false,location=false,width="
-//        + SIZE.x + ",height=" + SIZE.y);
-//    });
-
-    $(div).append('<div id="result_graph"></div>');
-    result_gr = div+' #result_graph';
-
-    $(result_gr).append("<table>\
-        <img src='result.png' width='700' height='500' id='result_graph_image' />\
-        </table>").hide();
-
+    // Create options button html code
     $(div).append('<div id="graph_editor_tweaks"></div>');
     tweaks = div+' #graph_editor_tweaks';
-
 //    <span id='pos'>Position: (<span id='posx'></span>, <span id='posy'></span>)<br></span>\
     $(tweaks).append("<div class='infobox'><h4 id='title'>Info</h4>\
     <div id='info'>Index: <span id='index'></span><br>\
@@ -1015,6 +1001,51 @@ function create_controls(div) {
     </div>\
     <div id='none_selected'>No node is selected</div></div>");
 
+    // Help button controller
+    $('<div id="help_button" class="graph_editor_button">?</div>').appendTo(buttondiv)
+    .click(function() {
+        $('#help_dialog').dialog('open');
+    });
+    // Create help dialog html code
+    $(div).append("<div id='help_dialog'> <ul><li><h3>create vertex</h3>Click on empty space not too close to existing vertices. <li><h3>create/erase edge</h3>Select the first vertex. Click on another vertex (different than the selected one) to turn on/off (toggle) the edge between them. <li><h3>increase/decrease multiplicity</h3> Use +/-. When multiplicity is 0 the edge disappears.<li><h3>remove a vertex</h3>Press '-' when vertex is selected.<li><h3>keep the selected vertex after edge toggle</h3>Hold 'SHIFT' to preserve the selected vertex after creating/erasing an edge.<li><h3>split an edge</h3> press 's' when esge is selected<li><h3>freeze a vertex</h3> pressing 'r' freezes the selected vertex (it will not move in live mode)<li><h3>add/remove loop</h3> press 'o'<li><h3>undo vertex deletion</h3>Click on the Undo button. Only the last deleted vertex can be recovered.  <li><h3>turn on realtime spring-charge model</h3>Press 'l' or click on the live checkbox.  </ul> </div>");
+    $('#help_dialog').dialog({
+        autoOpen : false,
+        width : 700,
+        title : "Graph Editor Help",
+        modal : true
+    });
+
+    // Undo button controller
+    $('<div id="undo_button" class="graph_editor_button">undo</div>').appendTo(buttondiv)
+    .click(undo_remove).toggleClass('graph_editor_undo_disabled');
+
+    // Erase graph button controller
+    $('<div id="reset_button" class="graph_editor_button">reset</div>').appendTo(buttondiv)
+    .click(function() {
+        erase_graph();
+     });
+
+    // Togle vizualizer button controller
+    $('<div id="viz_button" class="graph_editor_button">vizualization</div>').appendTo(buttondiv)
+    .toggle(function() {
+        $(div + ' #vizualizer').show();
+        $(canvas).hide()
+        $(div+' #viz_button').toggleClass('graph_editor_button_on');
+    },
+    function() {
+        $(canvas).show()
+        $(div + ' #vizualizer').hide();
+        $(div+' #viz_button').toggleClass('graph_editor_button_on');
+    });
+    // Create Visualizer tab html code
+    $(div).append('<div class="graph_editor_canvas" id="vizualizer"></div>');
+    // Include Rgraph lib
+    $(div).append('<script src="build/vizualization.js" ></script>');
+    Draw_vizualization(div);
+
+
+
+    // Create Options tab code and controllers - create "INFOBOX"
     $(div + ' .infobox #info').hide();
     $(div + ' .infobox #label').keyup(function() {
         var index = $(div + ' .infobox #index').html(),
@@ -1025,12 +1056,10 @@ function create_controls(div) {
             edge_list[index].label = $(div + ' .infobox #label').val();
         }
     });
-
     $(div + ' .infobox #dhcp_check').click(function() {
         var index = $(div + ' .infobox #index').html();
         nodes[index].service_dhcp = $(div + ' .infobox #dhcp_check').is(":checked");
     });
-
     $(div + ' .infobox #networkapp_list').change(function() {
         var netapp_list = document.getElementById("networkapp_list")
         var index = $(div + ' .infobox #index').html();
@@ -1039,25 +1068,16 @@ function create_controls(div) {
             nodes[index].netapps[netapp_list[x].text] = netapp_list[x].selected;
         }
     });
-
     $(tweaks).append("<h4>Tweaks</h4>");
-//    add_button('Circular layout', tweaks, function() {
-//        if (confirm("All vertices will be irrevesably moved. This operation cannot be undone.")) {
-//            circular_layout();
-//        }
-//    });
-
     $(tweaks).append('<table>');
     add_checkbox('Vertex numbers', NODE_NUMBERS, tweaks, function() {
                 NODE_NUMBERS = !NODE_NUMBERS;
                 draw();
                 });
-
     add_slider('Vertex Size', NODE_RADIUS, tweaks, 0, 30, function(newval) {
         NODE_RADIUS = newval;
         draw();
         });
-
     add_slider('Edge Strength', 50, tweaks, 0, 100, function(newval) {
         SPRING = (1 - 1e-2) + 1e-4 * (100 - newval);
         SPEED = newval / 50.0;
@@ -1066,17 +1086,8 @@ function create_controls(div) {
     add_slider('Edge Length', FIXED_LENGTH, tweaks, 0, 200, function (newval){
         FIXED_LENGTH = newval;
     });
-
     add_slider('Orientation', 0, tweaks, 0, 360, change_orientation);
     $(tweaks).append('</table>').hide();
-
-    $(div).append("<div id='help_dialog'> <ul><li><h3>create vertex</h3>Click on empty space not too close to existing vertices. <li><h3>create/erase edge</h3>Select the first vertex. Click on another vertex (different than the selected one) to turn on/off (toggle) the edge between them. <li><h3>increase/decrease multiplicity</h3> Use +/-. When multiplicity is 0 the edge disappears.<li><h3>remove a vertex</h3>Press '-' when vertex is selected.<li><h3>keep the selected vertex after edge toggle</h3>Hold 'SHIFT' to preserve the selected vertex after creating/erasing an edge.<li><h3>split an edge</h3> press 's' when esge is selected<li><h3>freeze a vertex</h3> pressing 'r' freezes the selected vertex (it will not move in live mode)<li><h3>add/remove loop</h3> press 'o'<li><h3>undo vertex deletion</h3>Click on the Undo button. Only the last deleted vertex can be recovered.  <li><h3>turn on realtime spring-charge model</h3>Press 'l' or click on the live checkbox.  </ul> </div>");
-    $('#help_dialog').dialog({
-        autoOpen : false,
-        width : 700,
-        title : "Graph Editor Help",
-        modal : true
-    });
 
 }
 
@@ -1166,6 +1177,7 @@ function draw() {
     //}
 }
 
+
 function toggle_live() {
         if (LIVE) {
             LIVE = false;
@@ -1181,8 +1193,8 @@ function init() {
     //construction of GraphEditor
     controller = Controller();
     $(div).addClass('graph_editor_container');
-    $(div).append('<canvas class="graph_editor_canvas" width = "'+SIZE.x+'" height = "'+SIZE.y+'" >Your browser does not support canvas.</canvas>');
-    canvastag = $(div+' canvas');
+    $(div).append('<canvas id="main_canvas" class="graph_editor_canvas" width = "'+SIZE.x+'" height = "'+SIZE.y+'" >Your browser does not support canvas.</canvas>');
+    canvastag = $(div+' #main_canvas');
     $(div).css({'width' : SIZE.x+'px'});
     ctx = canvastag[0].getContext('2d');
     ctx.translate(0.5,0.5); //makes everything prettier
@@ -1205,15 +1217,11 @@ function init() {
         create_controls(div);
     }
 
-//    var netapp_list = document.getElementById("networkapp_list")
-//    for (var x=0; x < NETAPPS.length; x++) {
-//        netapp_list.options[netapp_list.options.length] = new Option(NETAPPS[x], NETAPPS[x]);
-//
-//    }
     //$(div).dblclick(function (){return false;});
 }
 
 init();
+
 
 //an global object graph_editor is created containing all global functions
 return {
@@ -1262,4 +1270,6 @@ return {
 	    circular_layout();
     }
 };
+
+
 };
