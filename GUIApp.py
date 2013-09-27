@@ -33,8 +33,8 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
             max_pos = v[1]
     avr_pos = max_pos / 50
 
-    fig = plt.figure(1, figsize=(15, 8), frameon=False)
-    fig.canvas.set_window_title("Mininet CE Network Graph")
+    # fig = plt.figure(1, figsize=(15, 8), frameon=False)
+    # fig.canvas.set_window_title("Mininet CE Network Graph")
 
     frame = plt.gca()
     frame.axes.get_xaxis().set_visible(False)
@@ -68,6 +68,7 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     leg.legendPatch.set_alpha(0.77)
 
     plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI, transparent=True, bbox_inches='tight', pad_inches=0)
+
 
 
 class GUI_Editor(wx.Frame):

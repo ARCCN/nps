@@ -108,20 +108,30 @@ class WebPanel(wx.Panel):
         event.Skip()
 
     def onSendButton(self, event):
+        # cmd = self.cmd_line.GetValue()
+        # if cmd != 'exit':
+        #     self.p.sendline(cmd)
+        #     self.p.expect('mininet CE> ')
+        #     for s in self.p.before:
+        #         if len(s) != 0 and s != '\n':
+        #             self.console.AppendText(s)
+        #     self.cmd_line.ChangeValue('')
+        # else:
+        #     self.p.sendline(cmd)
+        #     self.p.expect(pexpect.EOF)
+        #     for s in self.p.before:
+        #         if len(s) != 0 and s != '\n':
+        #             self.console.AppendText(s)
+        #     self.cmd_line.ChangeValue('')
+        #     self.controller_thread.kill()
+        #     self.controller_proc.terminate()
+
         cmd = self.cmd_line.GetValue()
         if cmd != 'exit':
-            self.p.sendline(cmd)
-            self.p.expect('mininet CE> ')
-            for s in self.p.before:
-                if len(s) != 0 and s != '\n':
-                    self.console.AppendText(s)
+            self.console_proc.stdin.write(cmd + '\n')
             self.cmd_line.ChangeValue('')
         else:
-            self.p.sendline(cmd)
-            self.p.expect(pexpect.EOF)
-            for s in self.p.before:
-                if len(s) != 0 and s != '\n':
-                    self.console.AppendText(s)
+            self.console_proc.stdin.write(cmd + '\n')
             self.cmd_line.ChangeValue('')
             self.controller_thread.kill()
             self.controller_proc.terminate()
@@ -153,37 +163,43 @@ class WebPanel(wx.Panel):
     def OnSimulateButton(self, event):
         os.system("cp GUI/res/not_ready.png GUI/result.png")
         # Save current graph
-        self.wv.RunScript("document.cookie = 'graph=' + my_graph_editor.export_sage()")
         self.console.ChangeValue('')
         self.controller.ChangeValue('')
         prev_title = self.wv.GetCurrentTitle()
-        self.wv.RunScript("document.title = document.cookie")
-        cookies = self.wv.GetCurrentTitle()
+        self.wv.RunScript("document.title = my_graph_editor.export_sage()")
+        graph_data = self.wv.GetCurrentTitle()
         self.wv.RunScript("document.title = %s" % prev_title)
-        graph_data = cookies.split('=')[1]
         # p = self.GetParent()
         # p.set_graph_data(graph_data)
 
         controller_cmd = "java -jar " + CONTROLLER_PATH + "/target/floodlight.jar"
         self.controller_proc = subprocess.Popen(controller_cmd, stdout=subprocess.PIPE, shell=True)
-        self.controller_thread = KThread(target=self.controller_thread_func)
-        self.controller_thread.setDaemon(True)
-        self.controller_thread.start()
+        # self.controller_thread = KThread(target=self.controller_thread_func)
+        # self.controller_thread.setDaemon(True)
+        # self.controller_thread.start()
+        self.controller.AppendText("CONTROLLER ON")
 
-        self.p = pexpect.spawn(sys.prefix + '/bin/python main.py \'' + graph_data + '\'')
+        # self.p = pexpect.spawn(sys.prefix + '/bin/python main.py \'' + graph_data + '\'', timeout=777)
+        #
+        # self.p.expect('mininet CE> ') #mininet CE>
+        # for s in self.p.before:
+        #     if len(s) != 0 and s != '\n':
+        #         self.console.AppendText(s)
 
-        self.p.expect('mininet CE> ')
-        # self.p.expect(pexpect.EOF)
-        for s in self.p.before:
-            if len(s) != 0 and s != '\n':
-                self.console.AppendText(s)
+        console_cmd = sys.prefix + '/bin/python main.py \'' + graph_data + '\''
+        self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+        self.console_thread = KThread(target=self.console_thread_func)
+        self.console_thread.setDaemon(True)
+        self.console_thread.start()
+
 
     def OnDBJsonButton(self, event):
         prev_title = self.wv.GetCurrentTitle()
-        self.wv.RunScript("document.title = document.cookie")
-        cookies = self.wv.GetCurrentTitle()
+        self.wv.RunScript("document.title = my_graph_editor.export_sage()")
+        graph_data = self.wv.GetCurrentTitle()
         self.wv.RunScript("document.title = %s" % prev_title)
-        graph_data = cookies.split('=')[1]
+        # graph_data = cookies.split('=')[1]
+        # print(graph_data)
         print(graph_data)
         # p = self.GetParent()
         # p.set_graph_data(graph_data)
@@ -199,7 +215,6 @@ class WebPanel(wx.Panel):
             js_str = self.import_from_networkx_to_json(G)
             self.wv.RunScript("jrg = '%s'" % js_str)
             self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")
-            self.wv.RunScript("document.cookie = 'graph=' + my_graph_editor.export_sage()")
         else:
             self.node_num.ChangeValue("Number only")
 
@@ -227,6 +242,14 @@ class WebPanel(wx.Panel):
                 break
             if out != '':
                 wx.CallAfter(self.controller.AppendText, out)
+
+    def console_thread_func(self):
+        while True:
+            out = self.console_proc.stdout.readline()
+            if out == '' and self.console_proc.poll() != None:
+                break
+            if out != '':
+                wx.CallAfter(self.console.AppendText, out)
 
 
 class CustomButton(wx.Button):

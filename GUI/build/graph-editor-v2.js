@@ -17,7 +17,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     AUTO_MAXIMIZE = true,
     NODE_NUMBERS = true,
     SPRING = 0.999,
-    SPEED = 3.0,// 2.0
+    SPEED = 1.5,// 2.0
     FIXED_LENGTH = 100.0,
     ORIENTATION = Math.PI,
     SHOWFPS = false,
@@ -1044,6 +1044,25 @@ function create_controls(div) {
     Draw_vizualization(div);
 
 
+//    // Togle world map button controller
+//    $('<div id="worldmap_button" class="graph_editor_button">world map</div>').appendTo(buttondiv)
+//    .toggle(function() {
+//        $(div + ' #worldmap').show();
+//        $(canvas).hide()
+//        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
+//    },
+//    function() {
+//        $(canvas).show()
+//        $(div + ' #worldmap').hide();
+//        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
+//    });
+//    // Create World map tab html code
+//    $(div).append('<div class="graph_editor_canvas" id="worldmap"></div>');
+//    // Include
+//    $(div).append('<script src="build/worldmap.js" ></script>');
+//    Draw_worldmap(div);
+
+
 
     // Create Options tab code and controllers - create "INFOBOX"
     $(div + ' .infobox #info').hide();
@@ -1212,8 +1231,10 @@ function init() {
     var handleScroll = function(e) {
             var delta = e.wheelDelta ? e.wheelDelta/40 : e.detail ? -e.detail : 0;
             if (delta) {
-                if ((FIXED_LENGTH+delta)/10 >=7 && (FIXED_LENGTH+delta)/10 <=15) NODE_RADIUS = (FIXED_LENGTH+delta)/10;
+                if ((FIXED_LENGTH+delta)/10 >=5 && (FIXED_LENGTH+delta)/10 <=15) NODE_RADIUS = (FIXED_LENGTH+delta)/10;
                 if (FIXED_LENGTH+delta >= 10) FIXED_LENGTH += delta;
+                if ((FIXED_LENGTH+delta)*8/100 >= 1 && (FIXED_LENGTH+delta)*8/100 <= 15)
+                    ctx.font = str((FIXED_LENGTH+delta)*8/100) + 'pt Candara';
             }
         }
     canvastag[0].addEventListener('DOMMouseScroll', handleScroll,false);
@@ -1231,6 +1252,7 @@ function init() {
 
     //$(div).dblclick(function (){return false;});
 }
+
 
 init();
 
