@@ -1044,23 +1044,24 @@ function create_controls(div) {
     Draw_vizualization(div);
 
 
-//    // Togle world map button controller
-//    $('<div id="worldmap_button" class="graph_editor_button">world map</div>').appendTo(buttondiv)
-//    .toggle(function() {
-//        $(div + ' #worldmap').show();
-//        $(canvas).hide()
-//        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
-//    },
-//    function() {
-//        $(canvas).show()
-//        $(div + ' #worldmap').hide();
-//        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
-//    });
-//    // Create World map tab html code
-//    $(div).append('<div class="graph_editor_canvas" id="worldmap"></div>');
-//    // Include
-//    $(div).append('<script src="build/worldmap.js" ></script>');
-//    Draw_worldmap(div);
+    // Togle world map button controller
+    $('<div id="worldmap_button" class="graph_editor_button">world map</div>').appendTo(buttondiv)
+    .toggle(function() {
+        $(div + ' #worldmap').show();
+        $(div + ' #worldmap').fadeIn().resize();
+        $(canvas).hide()
+        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
+    },
+    function() {
+        $(canvas).show()
+        $(div + ' #worldmap').hide();
+        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
+    });
+    // Create World map tab html code
+    $(div).append('<div class="graph_editor_canvas" id="worldmap" ></div>');
+    // Include
+    $(div).append('<script src="build/worldmap.js" ></script>');
+    Draw_worldmap(div);
 
 
 

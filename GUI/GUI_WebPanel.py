@@ -132,6 +132,7 @@ class WebPanel(wx.Panel):
             self.cmd_line.ChangeValue('')
         else:
             self.console_proc.stdin.write(cmd + '\n')
+            self.console_thread.kill()
             self.cmd_line.ChangeValue('')
             self.controller_thread.kill()
             self.controller_proc.terminate()
