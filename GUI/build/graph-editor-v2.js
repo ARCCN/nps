@@ -30,6 +30,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     NETAPPS = ['WEB', 'VIDEO', 'FTP', 'P2P', 'SMTP'],
     last_frame;
 
+
 //Miscellaneous functions  
 function rand(a, b) {
     return a + Math.floor(Math.random() * (b - a));
@@ -942,11 +943,11 @@ function create_controls(div) {
     .toggle(function() {
         document.getElementById('result_graph_image').src = "result.png?random="+new Date().getTime();
         $(div + ' #result_graph').show();
-        $(canvas).hide()
+        $(canvas).hide();
         $(div+' #result_button').toggleClass('graph_editor_button_on');
     },
     function() {
-        $(canvas).show()
+        $(canvas).show();
         $(div + ' #result_graph').hide();
         $(div+' #result_button').toggleClass('graph_editor_button_on');
     });
@@ -1029,11 +1030,11 @@ function create_controls(div) {
     $('<div id="viz_button" class="graph_editor_button">vizualization</div>').appendTo(buttondiv)
     .toggle(function() {
         $(div + ' #vizualizer').show();
-        $(canvas).hide()
+        $(canvas).hide();
         $(div+' #viz_button').toggleClass('graph_editor_button_on');
     },
     function() {
-        $(canvas).show()
+        $(canvas).show();
         $(div + ' #vizualizer').hide();
         $(div+' #viz_button').toggleClass('graph_editor_button_on');
     });
@@ -1049,11 +1050,11 @@ function create_controls(div) {
     .toggle(function() {
         $(div + ' #worldmap').show();
         $(div + ' #worldmap').fadeIn().resize();
-        $(canvas).hide()
+        $(canvas).hide();
         $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
     },
     function() {
-        $(canvas).show()
+        $(canvas).show();
         $(div + ' #worldmap').hide();
         $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
     });
