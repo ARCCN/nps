@@ -30,6 +30,20 @@ var edge_list = [], nodes = [], removed_edges = [],
     NETAPPS = ['WEB', 'VIDEO', 'FTP', 'P2P', 'SMTP'],
     last_frame;
 
+var tabs = {'vizualizer': false, 'result': false, 'worldmap': false};
+
+function hide_tabs(tabname) {
+    for (var i in tabs) {
+        if (i != tabname) {
+            if (tabs[i] == true){
+                $(div + ' #' + tabname).hide();
+                $(div+' #'+tabname+'_button').toggleClass('graph_editor_button_on');
+                tabs[i] = false;
+            }
+        }
+    }
+}
+
 
 //Miscellaneous functions  
 function rand(a, b) {
@@ -938,26 +952,6 @@ function create_controls(div) {
     // Create graph editor buttons tab
     $(div).prepend('<div id="graph_editor_button_container"></div>');
 
-    // Rusult button controller
-    $('<div id="result_button" class="graph_editor_button">result</div>').appendTo(buttondiv)
-    .toggle(function() {
-        document.getElementById('result_graph_image').src = "result.png?random="+new Date().getTime();
-        $(div + ' #result_graph').show();
-        $(canvas).hide();
-        $(div+' #result_button').toggleClass('graph_editor_button_on');
-    },
-    function() {
-        $(canvas).show();
-        $(div + ' #result_graph').hide();
-        $(div+' #result_button').toggleClass('graph_editor_button_on');
-    });
-    // Create result tab html code
-    $(div).append('<div id="result_graph"></div>');
-    result_gr = div+' #result_graph';
-    $(result_gr).append("<table>\
-        <img src='result.png' width='700' height='500' id='result_graph_image' />\
-        </table>").hide();
-
     // Tougle physics button controller
     $('<div id="live_button" class="graph_editor_button">live</div>').appendTo(buttondiv).click(toggle_live);
     toggle_live(); // comment if you dont want to animate graph at start
@@ -1027,16 +1021,18 @@ function create_controls(div) {
      });
 
     // Togle vizualizer button controller
-    $('<div id="viz_button" class="graph_editor_button">vizualization</div>').appendTo(buttondiv)
+    $('<div id="vizualizer_button" class="graph_editor_button">vizualization</div>').appendTo(buttondiv)
     .toggle(function() {
         $(div + ' #vizualizer').show();
         $(canvas).hide();
-        $(div+' #viz_button').toggleClass('graph_editor_button_on');
+//        hide_tabs('vizualizer');
+//        tabs['vizualizer'] = true;
+        $(div+' #vizualizer_button').toggleClass('graph_editor_button_on');
     },
     function() {
         $(canvas).show();
         $(div + ' #vizualizer').hide();
-        $(div+' #viz_button').toggleClass('graph_editor_button_on');
+        $(div+' #vizualizer_button').toggleClass('graph_editor_button_on');
     });
     // Create Visualizer tab html code
     $(div).append('<div class="graph_editor_canvas" id="vizualizer"></div>');
@@ -1050,6 +1046,8 @@ function create_controls(div) {
     .toggle(function() {
         $(div + ' #worldmap').show();
         $(div + ' #worldmap').fadeIn().resize();
+//        hide_tabs('worldmap');
+//        tabs['worldmap'] = true;
         $(canvas).hide();
         $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
     },
@@ -1064,6 +1062,28 @@ function create_controls(div) {
     $(div).append('<script src="build/worldmap.js" ></script>');
     Draw_worldmap(div);
 
+
+    // Rusult button controller
+    $('<div id="result_button" class="graph_editor_button">result</div>').appendTo(buttondiv)
+    .toggle(function() {
+        document.getElementById('result_image').src = "result.png?random="+new Date().getTime();
+        $(div + ' #result').show();
+//        hide_tabs('result');
+//        tabs['result'] = true;
+        $(canvas).hide();
+        $(div+' #result_button').toggleClass('graph_editor_button_on');
+    },
+    function() {
+        $(canvas).show();
+        $(div + ' #result').hide();
+        $(div+' #result_button').toggleClass('graph_editor_button_on');
+    });
+    // Create result tab html code
+    $(div).append('<div id="result"></div>');
+    result_gr = div+' #result';
+    $(result_gr).append("<table>\
+        <img src='result.png' width='700' height='500' id='result_image' />\
+        </table>").hide();
 
 
     // Create Options tab code and controllers - create "INFOBOX"

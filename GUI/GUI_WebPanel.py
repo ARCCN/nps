@@ -99,7 +99,7 @@ class WebPanel(wx.Panel):
         glob_sizer.Add(sizer, 1, wx.EXPAND)
 
         self.SetSizer(glob_sizer)
-        self.wv.LoadURL(self.current)
+        self.wv.LoadURL('file://' + self.current)
 
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()
@@ -132,7 +132,7 @@ class WebPanel(wx.Panel):
             self.cmd_line.ChangeValue('')
         else:
             self.console_proc.stdin.write(cmd + '\n')
-            self.console_thread.kill()
+            #self.console_thread.kill()
             self.cmd_line.ChangeValue('')
             self.controller_thread.kill()
             self.controller_proc.terminate()
@@ -175,9 +175,9 @@ class WebPanel(wx.Panel):
 
         controller_cmd = "java -jar " + CONTROLLER_PATH + "/target/floodlight.jar"
         self.controller_proc = subprocess.Popen(controller_cmd, stdout=subprocess.PIPE, shell=True)
-        # self.controller_thread = KThread(target=self.controller_thread_func)
-        # self.controller_thread.setDaemon(True)
-        # self.controller_thread.start()
+        #self.controller_thread = KThread(target=self.controller_thread_func)
+        #self.controller_thread.setDaemon(True)
+        #self.controller_thread.start()
         self.controller.AppendText("CONTROLLER ON")
 
         # self.p = pexpect.spawn(sys.prefix + '/bin/python main.py \'' + graph_data + '\'', timeout=777)
