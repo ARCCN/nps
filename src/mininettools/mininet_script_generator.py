@@ -2,7 +2,7 @@ from config.config_constants import SCRIPT_FOLDER, REMOTE_CONTROLLER_IP, REMOTE_
 
 
 
-def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group, node_ext_intf, leaves):
+def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group, node_ext_intf, leaves, node_ctrl_map):
     '''Generate turn on script for Cluster node.
 
     Args:
@@ -92,9 +92,9 @@ def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group,
     file.write('\n')
     file.write('    info( \'*** Creating network\\n\' )\n')
     file.write('    net = Mininet( topo=MyTopo(), controller=lambda name: RemoteController( name,ip=\'')
-    file.write(REMOTE_CONTROLLER_IP)
+    file.write(node_ctrl_map[0])
     file.write('\',port=int(\'')
-    file.write(REMOTE_CONTROLLER_PORT)
+    file.write(node_ctrl_map[1])
     file.write('\') ) )\n')
     file.write('\n')
     file.write('    for sw in net.switches:\n')
@@ -111,7 +111,8 @@ def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group,
     file.write('    net.stop()\n')
 
 
-def generate_mininet_turn_on_script_auto(node_intf_map, node_groups, edge_groups, node_ext_intf_group, leaves, node_map):
+def generate_mininet_turn_on_script_auto(node_intf_map, node_groups, edge_groups, node_ext_intf_group, leaves,
+                                         node_map, node_ctrl_map):
     '''Generate turn on script for Cluster node.
 
     Args:
@@ -129,8 +130,8 @@ def generate_mininet_turn_on_script_auto(node_intf_map, node_groups, edge_groups
             filepath = SCRIPT_FOLDER + filename
 
             file = open(filepath, 'w')
-            gen_turn_on_script_by_template(file, node_intf_map[node_IP],
-                                           node_groups[group], edge_groups[group], node_ext_intf_group, leaves)
+            gen_turn_on_script_by_template(file, node_intf_map[node_IP], node_groups[group], edge_groups[group],
+                                           node_ext_intf_group, leaves, node_ctrl_map[node_IP])
             file.close()
 
 

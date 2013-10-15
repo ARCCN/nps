@@ -15,6 +15,7 @@ def read_nodelist_from_file(nodelist_filepath):
     '''
     node_map = {}
     node_intf_map = {}
+    node_ctrl_map = {}
     # open nodelist file
     logger_MininetCE.info('Reading nodelist from file')
     nodelist_file = open(nodelist_filepath, 'r')
@@ -22,10 +23,12 @@ def read_nodelist_from_file(nodelist_filepath):
     for file_line in file_lines:
         splitted_line = file_line.split(' ')
         node_map[splitted_line[0]]      = splitted_line[1]
-        node_intf_map[splitted_line[0]] = splitted_line[2][:-1]
+        node_intf_map[splitted_line[0]] = splitted_line[2]
+        node_ctrl_map[splitted_line[0]] = (splitted_line[3], splitted_line[4][:-1])
+
     logger_MininetCE.info('DONE!')
 
-    return node_map, node_intf_map
+    return node_map, node_intf_map, node_ctrl_map
 
 
 def get_next_IP(IP):

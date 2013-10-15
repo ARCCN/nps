@@ -59,6 +59,7 @@ host_to_node_map = {} # maps host IP to node IP
 ssh_map          = {} # maps node IP to ssh session object
 ssh_chan_map     = {} # maps node IP to ssh chan objects
 node_IP_pool_map = {} # maps node IP to host IP pool
+node_ctrl_map    = {} # maps node IP to pair <controller IP, controller port>
 
 
 if __name__ == '__main__':
@@ -75,7 +76,8 @@ if __name__ == '__main__':
 
     # take nodelist from file
     print('Taking nodelist from config file'.ljust(STRING_ALIGNMENT, ' ')),
-    node_map, node_intf_map = read_nodelist_from_file(NODELIST_FILEPATH)
+    node_map, node_intf_map, node_ctrl_map = read_nodelist_from_file(NODELIST_FILEPATH)
+    print(node_ctrl_map)
     print('DONE!')
 
     # prepare scripts to nodes
@@ -127,7 +129,8 @@ if __name__ == '__main__':
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
     mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
-                                                                      edge_groups, node_ext_intf_group, leaves, node_map)
+                                                                      edge_groups, node_ext_intf_group, leaves,
+                                                                      node_map, node_ctrl_map)
     print('DONE!')
 
     # send scripts to nodes
