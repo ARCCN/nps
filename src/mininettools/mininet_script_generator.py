@@ -130,6 +130,7 @@ def generate_mininet_turn_on_script_auto(node_intf_map, node_groups, edge_groups
             filepath = SCRIPT_FOLDER + filename
 
             file = open(filepath, 'w')
+
             gen_turn_on_script_by_template(file, node_intf_map[node_IP], node_groups[group], edge_groups[group],
                                            node_ext_intf_group, leaves, node_ctrl_map[node_IP])
             file.close()
