@@ -91,6 +91,7 @@ def get_random_IP():
         The random IP address.
     '''
     IP = str(randint(1,255)) + '.' + str(randint(0,255)) + '.' + str(randint(0,255)) + '.' + str(randint(0,255))
+
     return IP
 
 
