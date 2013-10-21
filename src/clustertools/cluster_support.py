@@ -81,6 +81,7 @@ def get_next_host_name(host):
         The next host incremented name.
     '''
     next_nost = 'h' + str(int(host[1:]) + 1)
+
     return next_nost
 
 
