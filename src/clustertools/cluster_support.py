@@ -81,7 +81,6 @@ def get_next_host_name(host):
         The next host incremented name.
     '''
     next_nost = 'h' + str(int(host[1:]) + 1)
-
     return next_nost
 
 
@@ -92,7 +91,6 @@ def get_random_IP():
         The random IP address.
     '''
     IP = str(randint(1,255)) + '.' + str(randint(0,255)) + '.' + str(randint(0,255)) + '.' + str(randint(0,255))
-
     return IP
 
 
