@@ -175,10 +175,10 @@ class WebPanel(wx.Panel):
 
         controller_cmd = "java -jar " + CONTROLLER_PATH + "/target/floodlight.jar"
         self.controller_proc = subprocess.Popen(controller_cmd, stdout=subprocess.PIPE, shell=True)
-        #self.controller_thread = KThread(target=self.controller_thread_func)
-        #self.controller_thread.setDaemon(True)
-        #self.controller_thread.start()
-        self.controller.AppendText("CONTROLLER ON")
+        self.controller_thread = KThread(target=self.controller_thread_func)
+        self.controller_thread.setDaemon(True)
+        self.controller_thread.start()
+        #self.controller.AppendText("CONTROLLER ON")
 
         # self.p = pexpect.spawn(sys.prefix + '/bin/python main.py \'' + graph_data + '\'', timeout=777)
         #

@@ -1,6 +1,6 @@
 from paramiko                import *
 from main                    import logger_MininetCE
-from config.config_constants import SRC_SCRIPT_FOLDER, DST_SCRIPT_FOLDER, CLUSTER_NODE_MACHINE_NAME
+from config.config_constants import SRC_SCRIPT_FOLDER, DST_SCRIPT_FOLDER
 
 
 def send_script_to_cluster_node(node_IP, script_filename, node_map):
@@ -74,7 +74,7 @@ def send_turn_on_script_to_cluster_node(node_IP, script_filename, node_map):
     logger_MininetCE.info('close SFTP session to ' + str(node_IP))
 
 
-def send_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map):
+def send_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, node_mname_map):
     '''Send console command to cluster node.
 
     Args:
@@ -85,13 +85,14 @@ def send_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map):
     ssh_chan_map[node_IP].send(cmd)
     if cmd != 'exit\n':
         buff = ''
-        endswith_str = 'root@' + CLUSTER_NODE_MACHINE_NAME + ':~# '
+        #endswith_str = 'root@' + CLUSTER_NODE_MACHINE_NAME + ':~# '
+        endswith_str = 'root@' + node_mname_map[node_IP] + ':~# '
         while not buff.endswith(endswith_str): # Need to change name, or use the variable.
             buff += ssh_chan_map[node_IP].recv(9999)
         logger_MininetCE.info('SUCCESS:' + node_IP + ': ' + cmd)
 
 
-def exec_start_up_script(node_IP, node_intf_map, ssh_chan_map):
+def exec_start_up_script(node_IP, node_intf_map, ssh_chan_map, node_mname_map):
     '''Send the console command to cluster Node to execute the start up script.
 
     Args:
@@ -99,16 +100,16 @@ def exec_start_up_script(node_IP, node_intf_map, ssh_chan_map):
     '''
 
     reset_vs_db_cmd = 'ovs-vsctl list-br | xargs -L1 ovs-vsctl del-br'
-    send_cmd_to_cluster_node(node_IP, reset_vs_db_cmd, ssh_chan_map)
+    send_cmd_to_cluster_node(node_IP, reset_vs_db_cmd, ssh_chan_map, node_mname_map)
 
     # Flush options on eth1 interface on nodes in cluster. This interface will be use for inter
     # Mininet instances communications
     reset_intf_cmd = 'ifconfig ' + node_intf_map[node_IP] + ' 0'
-    send_cmd_to_cluster_node(node_IP, reset_intf_cmd, ssh_chan_map)
+    send_cmd_to_cluster_node(node_IP, reset_intf_cmd, ssh_chan_map, node_mname_map)
 
     split_IP = node_IP.split('.')
     reset_vs_cmd = 'ovs-vsctl del-br s' + split_IP[3]
-    send_cmd_to_cluster_node(node_IP, reset_vs_cmd, ssh_chan_map)
+    send_cmd_to_cluster_node(node_IP, reset_vs_cmd, ssh_chan_map, node_mname_map)
 
     # Turn On Mininet instance on nodes in cluster
     send_mn_turn_on_cmd_to_cluster_node(node_IP, ssh_chan_map)

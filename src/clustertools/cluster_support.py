@@ -14,6 +14,7 @@ def read_nodelist_from_file(nodelist_filepath):
         nodelist_file: Name of file with list of cluster nodes.
     '''
     node_map = {}
+    node_mname_map = {}
     node_intf_map = {}
     node_ctrl_map = {}
     # open nodelist file
@@ -22,13 +23,14 @@ def read_nodelist_from_file(nodelist_filepath):
     file_lines = nodelist_file.readlines()
     for file_line in file_lines:
         splitted_line = file_line.split(' ')
-        node_map[splitted_line[0]]      = splitted_line[1]
-        node_intf_map[splitted_line[0]] = splitted_line[2]
-        node_ctrl_map[splitted_line[0]] = (splitted_line[3], splitted_line[4][:-1])
+        node_mname_map[splitted_line[0]] = splitted_line[1]
+        node_map[splitted_line[0]]             = splitted_line[2]
+        node_intf_map[splitted_line[0]]        = splitted_line[3]
+        node_ctrl_map[splitted_line[0]]        = (splitted_line[4], splitted_line[5][:-1])
 
     logger_MininetCE.info('DONE!')
 
-    return node_map, node_intf_map, node_ctrl_map
+    return node_map, node_intf_map, node_ctrl_map, node_mname_map
 
 
 def get_next_IP(IP):

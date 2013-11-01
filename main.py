@@ -51,6 +51,7 @@ from src.clustertools.cluster_manager_modes       import *
 from GUIApp                                       import *
 
 node_map         = {} # maps node IP to node username
+node_mname_map   = {} # maps node IP to node machine name
 node_intf_map    = {} # maps node IP to node outbound interface
 node_IP_gr_map   = {} # maps node IP to node group
 host_map         = {} # maps host IP to host name
@@ -76,8 +77,7 @@ if __name__ == '__main__':
 
     # take nodelist from file
     print('Taking nodelist from config file'.ljust(STRING_ALIGNMENT, ' ')),
-    node_map, node_intf_map, node_ctrl_map = read_nodelist_from_file(NODELIST_FILEPATH)
-    print(node_ctrl_map)
+    node_map, node_intf_map, node_ctrl_map, node_mname_map = read_nodelist_from_file(NODELIST_FILEPATH)
     print('DONE!')
 
     # prepare scripts to nodes
@@ -140,7 +140,7 @@ if __name__ == '__main__':
 
     # STAGE 1. Execute start-up scripts on nodes
     print('Executing start up scripts on nodes'.ljust(STRING_ALIGNMENT, ' ')),
-    make_threaded(exec_start_up_script, [node_intf_map, ssh_chan_map], node_map)
+    make_threaded(exec_start_up_script, [node_intf_map, ssh_chan_map, node_mname_map], node_map)
     print('DONE!')
 
     print('Configuring host-processes eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
@@ -178,12 +178,13 @@ if __name__ == '__main__':
 
     # Deleting ovs bridges from nodes
     print('Deleting ovs bridges from cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
-    make_threaded(send_cmd_to_cluster_node, ['ovs-vsctl list-br | xargs -L1 ovs-vsctl del-br', ssh_chan_map], node_map)
+    make_threaded(send_cmd_to_cluster_node, ['ovs-vsctl list-br | xargs -L1 ovs-vsctl del-br', ssh_chan_map],
+                            node_map, node_mname_map)
     print('DONE!')
 
     # close ssh sessions to nodes
     print('Sending exit to cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
-    make_threaded(send_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map)
+    make_threaded(send_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map, node_mname_map)
     print('DONE!')
 
     print('Sending CLOSE to all ssh connections'.ljust(STRING_ALIGNMENT, ' ')),
