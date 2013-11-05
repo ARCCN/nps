@@ -178,13 +178,13 @@ if __name__ == '__main__':
 
     # Deleting ovs bridges from nodes
     print('Deleting ovs bridges from cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
-    make_threaded(send_cmd_to_cluster_node, ['ovs-vsctl list-br | xargs -L1 ovs-vsctl del-br', ssh_chan_map, node_mname_map],
-                            node_map)
+    make_threaded(send_cmd_to_cluster_node, ['ovs-vsctl list-br | xargs -L1 ovs-vsctl del-br', ssh_chan_map,
+                            node_mname_map], node_map)
     print('DONE!')
 
     # close ssh sessions to nodes
     print('Sending exit to cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
-    make_threaded(send_cmd_to_cluster_node, ['exit', ssh_chan_map], node_map, node_mname_map)
+    make_threaded(send_cmd_to_cluster_node, ['exit', ssh_chan_map, node_mname_map], node_map)
     print('DONE!')
 
     print('Sending CLOSE to all ssh connections'.ljust(STRING_ALIGNMENT, ' ')),
