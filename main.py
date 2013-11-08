@@ -64,6 +64,7 @@ node_ctrl_map    = {} # maps node IP to pair <controller IP, controller port>
 
 
 if __name__ == '__main__':
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     begin_config_timestamp = time.time()
     util.log_to_file('paramiko.log')
     malware_node_list = {}
