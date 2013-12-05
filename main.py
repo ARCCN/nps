@@ -92,7 +92,7 @@ if __name__ == '__main__':
     elif SEPARATE_GUI_FLAG:
         print('Preparing graph'.ljust(STRING_ALIGNMENT, ' ')),
         graph_data = json.loads(str(sys.argv[1]))
-        G, pos = get_networkX_graph(graph_data)
+        G, pos, node_services = get_networkX_graph(graph_data)
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     else:

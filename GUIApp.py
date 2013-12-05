@@ -87,7 +87,7 @@ class GUI_Editor(wx.Frame):
         style = ( wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX |  wx.NO_BORDER |
                       wx.FRAME_NO_TASKBAR | wx.CLIP_CHILDREN ) # wx.STAY_ON_TOP
         """Constructor"""
-        wx.Frame.__init__(self, None, -1, 'Mininet CE Graph Editor', style=style, pos=wx.Point(0, 50))
+        wx.Frame.__init__(self, None, -1, 'NPS Graph Editor', style=style, pos=wx.Point(0, 50))
         self.SetSize((self.parent.width,self.parent.height)) # (1075,675)
         self.SetBackgroundColour('#CECECE') #CCCCFF
         self.SetTransparent(230)

@@ -72,6 +72,7 @@ class WebPanel(wx.Panel):
         font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.console.SetFont(font_console)
 
+
         self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
         font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.controller.SetFont(font_controller)
@@ -278,3 +279,21 @@ class CustomTextCtrl(wx.TextCtrl):
 
         self.SetBackgroundColour('#D8D8D8')
         # more customization here
+
+class TabPanel(wx.Panel):
+    """
+    This will be the first notebook tab
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, parent):
+        """"""
+        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+
+        text_tab = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
+        font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        text_tab.SetFont(font_console)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(text_tab, 0, wx.ALL, 5)
+
+        self.SetSizer(sizer)

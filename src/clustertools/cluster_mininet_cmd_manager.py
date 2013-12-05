@@ -43,3 +43,18 @@ def send_mininet_ping_to_cluster_node(node_IP, cmd, ssh_chan_map):
     buff_lines = buff.splitlines()
     for line in buff_lines[:-1]:
         print(line)
+
+def test_delay_between_mn_hosts(node_IP, src_host_IP, dst_host_IP, threshold, ssh_chan_map):
+    '''Send Mininet console command to test delay between hosts and compare to threshold.
+
+    Args:
+        node_IP: IP address of cluster node.
+        src_host_IP: IP address of source host.
+        dst_host_IP: IP address of destination host.
+        threshold: Needed threshold of link delay.
+
+    Returns:
+        True: If link delay less then threshold.
+        False: Of link delay overcome the threshold.
+    '''
+    pass

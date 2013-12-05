@@ -1,8 +1,9 @@
 from config.config_constants import SCRIPT_FOLDER, REMOTE_CONTROLLER_IP, REMOTE_CONTROLLER_PORT
+from mininet_ns_script_template import gen_mn_ns_script_by_template
 
 
 
-def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group, node_ext_intf, leaves, node_ctrl_map):
+def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group, ext_intf_list, leaves, node_ctrl_map):
     '''Generate turn on script for Cluster node.
 
     Args:
@@ -10,7 +11,7 @@ def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group,
         nodes_ext_intf: Cluster node external network interface name.
         node_group: Group ID to node-list map.
         edge_group: Group ID to edge-list map.
-        node_ext_intf: External network insterface name to the node group.
+        ext_intf_list: External network insterface name to the node group.
         leaves: List of leave-node in network graph.
     '''
     file.write('import re\n')
@@ -24,11 +25,11 @@ def gen_turn_on_script_by_template(file, nodes_ext_intf, node_group, edge_group,
     file.write('from mininet.node import RemoteController\n')
     file.write('\n')
     file.write('sw_ext_intf = [')
-    for i, node in enumerate(node_ext_intf):
+    for i, node in enumerate(ext_intf_list):
         file.write('\'s')
         file.write(str(node))
         file.write('\'')
-        if i != len(node_ext_intf)-1:
+        if i != len(ext_intf_list)-1:
             file.write(',')
     file.write(']')
     file.write('\n')
@@ -133,6 +134,33 @@ def generate_mininet_turn_on_script_auto(node_intf_map, node_groups, edge_groups
 
             gen_turn_on_script_by_template(file, node_intf_map[node_IP], node_groups[group], edge_groups[group],
                                            node_ext_intf_group, leaves, node_ctrl_map[node_IP])
+            file.close()
+
+
+
+
+def generate_mn_ns_script_auto(node_intf_map, node_groups, edge_groups, node_ext_intf_group, leaves,
+                                         node_map, node_ctrl_map, hosts_net_services):
+    '''Generate turn on script for Cluster node.
+
+    Args:
+        node_ext_intf: External network insterface name to the node.
+        node_group: Group ID to node-list map.
+        edge_group: Group ID to edge-list map.
+        node_ext_insf_group: External network insterface name to the node group.
+        leaves: List of leave-node in network graph.
+        node_map: Cluster node map.
+    '''
+    for group in node_groups.keys():
+        if group != 'ext_intf':
+            node_IP = node_map.keys()[group]
+            filename = 'turn_on_script_for_' + node_IP + '.py'
+            filepath = SCRIPT_FOLDER + filename
+
+            file = open(filepath, 'w')
+
+            gen_mn_ns_script_by_template(file, node_intf_map[node_IP], node_groups[group], edge_groups[group],
+                                        node_ext_intf_group, leaves, node_ctrl_map[node_IP], hosts_net_services)
             file.close()
 
 

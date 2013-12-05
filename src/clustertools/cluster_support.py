@@ -171,5 +171,5 @@ def get_networkX_graph(graph_data):
             pos[node_counter] = [graph_data['pos'][edge[1]][0], 0 - graph_data['pos'][edge[1]][1]]
             node_counter += 1
         G.add_edge(node_num_map[edge[0]], node_num_map[edge[1]])
-    return G, pos
+    return G, pos, graph_data['netapps']
 
