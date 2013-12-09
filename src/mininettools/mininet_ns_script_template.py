@@ -35,7 +35,7 @@ def gen_mn_ns_script_by_template(file, nodes_ext_intf, node_group, edge_group,
     file.write("from mininet.node import ( Host, CPULimitedHost, Controller, OVSController,\n")
     file.write("                           NOX, RemoteController, UserSwitch, OVSKernelSwitch,\n")
     file.write("                           OVSLegacyKernelSwitch )\n")
-    file.write("from mininet.link import Link, TCLink\n")
+    file.write("from mininet.link import Link, TCLink, Intf\n")
     file.write("from mininet.topo import Topo, SingleSwitchTopo, LinearTopo, SingleSwitchReversedTopo\n")
     file.write("from mininet.topolib import TreeTopo\n")
     file.write("from mininet.util import custom, customConstructor, quietRun\n")
@@ -345,7 +345,7 @@ def gen_mn_ns_script_by_template(file, nodes_ext_intf, node_group, edge_group,
     file.write("#navy\n")
     file.write("#Add services here\n")
     for host in hosts_net_services.keys():
-        if int(host) in leaves:
+        if (int(host) in leaves) and (int(host) in node_group):
             for net_service, status in hosts_net_services[host].items():
                 if status == True:
                     if net_service == 'dhcp':
