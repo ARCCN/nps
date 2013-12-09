@@ -129,13 +129,13 @@ if __name__ == '__main__':
         print('DONE!')
 
     print('Generating start up scripts for nodes Mininet'.ljust(STRING_ALIGNMENT, ' ')),
-    mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
-                                                                      edge_groups, node_ext_intf_group, leaves,
-                                                                      node_map, node_ctrl_map)
-    # USE WITH NSP with net apps
-    #mininet_script_generator.generate_mn_ns_script_auto(node_intf_map, node_groups,
+    #mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
     #                                                                  edge_groups, node_ext_intf_group, leaves,
-    #                                                                  node_map, node_ctrl_map, node_services)
+    #                                                                  node_map, node_ctrl_map)
+    # USE WITH NSP with net apps
+    mininet_script_generator.generate_mn_ns_script_auto(node_intf_map, node_groups,
+                                                                      edge_groups, node_ext_intf_group, leaves,
+                                                                      node_map, node_ctrl_map, node_services)
     print('DONE!')
 
     # send scripts to nodes
