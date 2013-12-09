@@ -27,7 +27,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     canvastag,
     ctx,
     loop_interval,
-    NETAPPS = ['WEB', 'VIDEO', 'FTP', 'P2P', 'SMTP'],
+    NETAPPS = ['WEB', 'VIDEO', 'FTP', 'P2P', 'SMTP', 'dhcpd'],
     last_frame;
 
 var tabs = {'vizualizer': false, 'result': false, 'worldmap': false};
@@ -991,6 +991,7 @@ function create_controls(div) {
             <option>FTP</option>\
             <option>P2P</option>\
             <option>SMTP</option>\
+            <option>dhcpd</option>\
         </select>\
     </div>\
     </div>\
