@@ -349,11 +349,11 @@ def gen_mn_ns_script_by_template(file, nodes_ext_intf, node_group, edge_group,
             for net_service, status in hosts_net_services[host].items():
                 if status == True:
                     if net_service == 'dhcp':
-                        file.write("            mn.add_preconf_service( 'h" + host +"', 2 , '" + net_service +"' )\n")
+                        file.write("        mn.add_preconf_service( 'h" + host +"', 2 , '" + net_service +"' )\n")
                     elif net_service == 'dhcpd':
-                        file.write("            mn.add_preconf_service( 'h" + host +"', 1 , '" + net_service +"' )\n")
+                        file.write("        mn.add_preconf_service( 'h" + host +"', 1 , '" + net_service +"' )\n")
                     else:
-                        file.write("            mn.add_preconf_service( 'h" + host +"', 3 , '" + net_service +"' )\n")
+                        file.write("        mn.add_preconf_service( 'h" + host +"', 3 , '" + net_service +"' )\n")
     file.write("#-----------------\n")
     file.write("\n")
     file.write("\n")
