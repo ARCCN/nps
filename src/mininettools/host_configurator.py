@@ -46,7 +46,8 @@ def host_process_configurator_nodegroup(node_IP, node_groups, node_IP_gr_map, no
             curr_host_ip = get_next_IP(curr_host_ip)
 
 
-def define_node_ip_pool(node_groups, node_IP_gr_map, leaves, node_map):
+
+def define_node_ip_pool(node_groups, leaves, node_map):
     '''Defines the cluster node pool based on number of hosts and switches on conctere cluster node.
 
     Args:
@@ -58,6 +59,10 @@ def define_node_ip_pool(node_groups, node_IP_gr_map, leaves, node_map):
     Returns:
         Cluster Node IP address pool.
     '''
+    node_IP_gr_map = {}
+    for gr_number in node_groups.keys():
+        node_IP_gr_map[node_map.keys()[gr_number]] = gr_number
+
     node_IP_pool_map = {}
     next_IP_pool = FIRST_HOST_IP
     for node_IP in node_map.keys():
@@ -67,4 +72,4 @@ def define_node_ip_pool(node_groups, node_IP_gr_map, leaves, node_map):
                 host_num -= 1
         node_IP_pool_map[node_IP] = next_IP_pool
         next_IP_pool = get_next_IP_pool(next_IP_pool, host_num) # make not execute on last iteration
-    return node_IP_pool_map
+    return node_IP_pool_map, node_IP_gr_map

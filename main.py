@@ -1,4 +1,4 @@
-import logging
+#import logging
 from src.mininettools import mininet_script_generator, mininet_script_operator
 
 
@@ -11,19 +11,19 @@ def delete_logs():
     if os.path.isfile(MALWARE_LOG_PATH):
         os.remove(MALWARE_LOG_PATH)
 
-logger_MininetCE   = logging.getLogger("MininetCE")
-logger_MalwareProp = logging.getLogger("MalwareProp")
-
-def config_logger():
-    '''Create loggers. Setting up the format of log files.
-    '''
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                        datefmt='%m-%d %H:%M',
-                        filename= ROOT_LOG_FILEPATH,
-                        filemode='w')
-    logger_MininetCE.addHandler(logging.FileHandler(LOG_FILEPATH))
-    logger_MalwareProp.addHandler(logging.FileHandler(MALWARE_LOG_PATH))
+#logger_MininetCE   = logging.getLogger("MininetCE")
+#logger_MalwareProp = logging.getLogger("MalwareProp")
+#
+#def config_logger():
+#    '''Create loggers. Setting up the format of log files.
+#    '''
+#    logging.basicConfig(level=logging.DEBUG,
+#                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+#                        datefmt='%m-%d %H:%M',
+#                        filename= ROOT_LOG_FILEPATH,
+#                        filemode='w')
+#    logger_MininetCE.addHandler(logging.FileHandler(LOG_FILEPATH))
+#    logger_MalwareProp.addHandler(logging.FileHandler(MALWARE_LOG_PATH))
 
 from paramiko import *
 import os
@@ -53,7 +53,6 @@ from GUIApp                                       import *
 node_map         = {} # maps node IP to node username
 node_mname_map   = {} # maps node IP to node machine name
 node_intf_map    = {} # maps node IP to node outbound interface
-node_IP_gr_map   = {} # maps node IP to node group
 host_map         = {} # maps host IP to host name
 host_IP_map      = {} # maps host name to host IP
 host_to_node_map = {} # maps host IP to node IP
@@ -70,11 +69,11 @@ if __name__ == '__main__':
     malware_node_list = {}
     pos = None
 
-    # config logger
-    print('Configuring loggers'.ljust(STRING_ALIGNMENT, ' ')),
-    delete_logs() # for testing period ONLY
-    config_logger()
-    print('DONE!')
+    ## config logger
+    #print('Configuring loggers'.ljust(STRING_ALIGNMENT, ' ')),
+    #delete_logs() # for testing period ONLY
+    #config_logger()
+    #print('DONE!')
 
     # take nodelist from file
     print('Taking nodelist from config file'.ljust(STRING_ALIGNMENT, ' ')),
@@ -119,8 +118,6 @@ if __name__ == '__main__':
         node_groups = {0: node_groups[1]}
         edge_groups = {0: edge_groups[1]}
 
-    for gr_number in node_groups.keys():
-        node_IP_gr_map[node_map.keys()[gr_number]] = gr_number
     print('DONE!')
 
     if DRAWING_FLAG:
@@ -132,10 +129,16 @@ if __name__ == '__main__':
     #mininet_script_generator.generate_mininet_turn_on_script_auto(node_intf_map, node_groups,
     #                                                                  edge_groups, node_ext_intf_group, leaves,
     #                                                                  node_map, node_ctrl_map)
-    # USE WITH NSP with net apps
-    mininet_script_generator.generate_mn_ns_script_auto(node_intf_map, node_groups,
+    ## USE WITH NSP with net apps
+    #mininet_script_generator.generate_mn_ns_script_auto(node_intf_map, node_groups,
+    #                                                                  edge_groups, node_ext_intf_group, leaves,
+    #                                                                  node_map, node_ctrl_map, node_services)
+    # USE WITH NSP with net apps with custom host IP
+    host_to_node_map, host_map, host_IP_map = \
+        mininet_script_generator.generate_mn_ns_script_with_custom_host_ip_auto(node_intf_map, node_groups,
                                                                       edge_groups, node_ext_intf_group, leaves,
                                                                       node_map, node_ctrl_map, node_services)
+    print(host_to_node_map, host_map, host_IP_map)
     print('DONE!')
 
     # send scripts to nodes
@@ -149,8 +152,7 @@ if __name__ == '__main__':
     print('DONE!')
 
     print('Configuring host-processes eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
-    node_IP_pool_map = define_node_ip_pool(node_groups, node_IP_gr_map, leaves, node_map)
-
+    node_IP_pool_map, node_IP_gr_map = define_node_ip_pool(node_groups, leaves, node_map)
     make_threaded(host_process_configurator_nodegroup,
                         [node_groups, node_IP_gr_map, node_IP_pool_map, str(HOST_NETMASK),
                             leaves, host_to_node_map, host_map, host_IP_map, ssh_chan_map],

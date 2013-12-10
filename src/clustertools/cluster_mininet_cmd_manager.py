@@ -1,4 +1,4 @@
-from main import logger_MininetCE
+#from main import logger_MininetCE
 
 
 def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, quite=True):
@@ -20,7 +20,7 @@ def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, quite=True):
             buff_lines = buff.splitlines()
             for line in buff_lines[:-1]:
                 print(line)
-        logger_MininetCE.info("SUCCESS:" + node_IP + ": " + cmd)
+        #logger_MininetCE.info("SUCCESS:" + node_IP + ": " + cmd)
 
 
 def send_mininet_ping_to_cluster_node(node_IP, cmd, ssh_chan_map):

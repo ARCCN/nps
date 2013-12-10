@@ -1,6 +1,6 @@
 from random      import randint
 
-from main        import logger_MininetCE
+#from main        import logger_MininetCE
 from src.KThread import KThread
 
 import networkx  as nx
@@ -18,7 +18,7 @@ def read_nodelist_from_file(nodelist_filepath):
     node_intf_map = {}
     node_ctrl_map = {}
     # open nodelist file
-    logger_MininetCE.info('Reading nodelist from file')
+    #logger_MininetCE.info('Reading nodelist from file')
     nodelist_file = open(nodelist_filepath, 'r')
     file_lines = nodelist_file.readlines()
     for file_line in file_lines:
@@ -28,7 +28,7 @@ def read_nodelist_from_file(nodelist_filepath):
         node_intf_map[splitted_line[0]]        = splitted_line[3]
         node_ctrl_map[splitted_line[0]]        = (splitted_line[4], splitted_line[5][:-1])
 
-    logger_MininetCE.info('DONE!')
+    #logger_MininetCE.info('DONE!')
 
     return node_map, node_intf_map, node_ctrl_map, node_mname_map
 
