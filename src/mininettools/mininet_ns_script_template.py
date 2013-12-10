@@ -460,7 +460,7 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
             file.write(host_IP_map['h'+str(node)])
             file.write('/')
             file.write(str(HOST_NETMASK))
-            file.write('\')\n')
+            file.write('\' )\n')
             #curr_host_ip = get_next_IP(curr_host_ip)
         else:
             file.write('        s')
