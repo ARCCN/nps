@@ -529,7 +529,7 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
     file.write("               'none': lambda name: None }\n")
     file.write("\n")
     file.write("LINKDEF = 'default'\n")
-    file.write("LINKS = { 'default': Link,\n")
+    file.write("LINKS = { 'default': TCLink,\n")
     file.write("          'tc': TCLink }\n")
     file.write("\n")
     file.write("\n")
