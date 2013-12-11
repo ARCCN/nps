@@ -149,13 +149,13 @@ if __name__ == '__main__':
     make_threaded(exec_start_up_script, [node_intf_map, ssh_chan_map, node_mname_map], node_map)
     print('DONE!')
 
-    print('Configuring host-processes eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
-    node_IP_pool_map, node_IP_gr_map = define_node_ip_pool(node_groups, leaves, node_map)
-    make_threaded(host_process_configurator_nodegroup,
-                        [node_groups, node_IP_gr_map, node_IP_pool_map, str(HOST_NETMASK),
-                            leaves, host_to_node_map, host_map, host_IP_map, ssh_chan_map],
-                        node_map)
-    print('DONE!')
+    #print('Configuring host-processes eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
+    #node_IP_pool_map, node_IP_gr_map = define_node_ip_pool(node_groups, leaves, node_map)
+    #make_threaded(host_process_configurator_nodegroup,
+    #                    [node_groups, node_IP_gr_map, node_IP_pool_map, str(HOST_NETMASK),
+    #                        leaves, host_to_node_map, host_map, host_IP_map, ssh_chan_map],
+    #                    node_map)
+    #print('DONE!')
 
     end_config_timestamp = time.time()
     print('Setting up cluster for ' + str(end_config_timestamp-begin_config_timestamp) + ' sec.')
