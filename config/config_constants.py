@@ -31,6 +31,7 @@ CLI_MODE                 = True
 
 
 HOST_NETMASK = 16 # mask of host intf on mininet cluster node
+LINK_DELAY = 5 # default link delay in ms
 
 ALPHA_VALUE = 0.33
 

@@ -209,7 +209,8 @@ Vertex = function(pos, label) {
     this.v = Point();
     this.frozen = false;
     this.label = label || next_label();
-    this.service_dhcp = false;
+//    this.service_dhcp = false;
+    this.service_dhcp = true;
     this.netapps = {};
 
     for (var x=0;x<NETAPPS.length;x++) {

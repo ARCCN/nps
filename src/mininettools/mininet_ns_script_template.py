@@ -1,6 +1,7 @@
 __author__ = 'vitalyantonenko'
 
-from config.config_constants import SCRIPT_FOLDER, REMOTE_CONTROLLER_IP, REMOTE_CONTROLLER_PORT, HOST_NETMASK
+from config.config_constants import SCRIPT_FOLDER, REMOTE_CONTROLLER_IP, REMOTE_CONTROLLER_PORT, \
+    HOST_NETMASK, LINK_DELAY
 #from host_configurator           import get_next_IP
 
 
@@ -483,7 +484,9 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
         else:
             file.write('s')
         file.write(str(edge[1]))
-        file.write(' )\n')
+        file.write(', delay=\'')
+        file.write(str(LINK_DELAY))
+        file.write('ms\')\n')
     file.write('\n')
     file.write('\n')
     file.write('def checkIntf( intf ):\n')
