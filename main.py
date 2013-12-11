@@ -117,7 +117,6 @@ if __name__ == '__main__':
     if len(node_groups.keys()) == 1:
         node_groups = {0: node_groups[1]}
         edge_groups = {0: edge_groups[1]}
-
     print('DONE!')
 
     if DRAWING_FLAG:
@@ -138,7 +137,6 @@ if __name__ == '__main__':
         mininet_script_generator.generate_mn_ns_script_with_custom_host_ip_auto(node_intf_map, node_groups,
                                                                       edge_groups, node_ext_intf_group, leaves,
                                                                       node_map, node_ctrl_map, node_services)
-    print(host_to_node_map, host_map, host_IP_map)
     print('DONE!')
 
     # send scripts to nodes

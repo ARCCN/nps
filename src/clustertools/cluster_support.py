@@ -156,20 +156,20 @@ def get_networkX_graph(graph_data):
         NetworkX graph.
     '''
     G = nx.Graph()
-    node_counter = 0
     pos = {}
-    node_num_map = {}
     for edge in graph_data['edges']:
-        if edge[0] not in node_num_map.keys():
-            G.add_node(node_counter)
-            node_num_map[edge[0]] = node_counter
-            pos[node_counter] = [graph_data['pos'][edge[0]][0], 0 - graph_data['pos'][edge[0]][1]]
-            node_counter += 1
-        if edge[1] not in node_num_map.keys():
-            G.add_node(node_counter)
-            node_num_map[edge[1]] = node_counter
-            pos[node_counter] = [graph_data['pos'][edge[1]][0], 0 - graph_data['pos'][edge[1]][1]]
-            node_counter += 1
-        G.add_edge(node_num_map[edge[0]], node_num_map[edge[1]])
+        if int(edge[0]) not in G.nodes():
+            #G.add_node(node_counter)
+            #node_num_map[edge[0]] = node_counter
+            #pos[node_counter] = [graph_data['pos'][edge[0]][0], 0 - graph_data['pos'][edge[0]][1]]
+            G.add_node(int(edge[0]))
+            pos[int(edge[0])] = [graph_data['pos'][edge[0]][0], 0 - graph_data['pos'][edge[0]][1]]
+        if int(edge[1]) not in G.nodes():
+            #G.add_node(node_counter)
+            #node_num_map[edge[1]] = node_counter
+            #pos[node_counter] = [graph_data['pos'][edge[1]][0], 0 - graph_data['pos'][edge[1]][1]]
+            G.add_node(int(edge[1]))
+            pos[int(edge[1])] = [graph_data['pos'][edge[1]][0], 0 - graph_data['pos'][edge[1]][1]]
+        G.add_edge(int(edge[0]), int(edge[1]))
     return G, pos, graph_data['netapps']
 
