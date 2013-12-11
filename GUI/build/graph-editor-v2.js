@@ -1254,8 +1254,8 @@ function init() {
     var handleScroll = function(e) {
             var delta = e.wheelDelta ? e.wheelDelta/40 : e.detail ? -e.detail : 0;
             if (delta) {
-                if ((FIXED_LENGTH+delta)/10 >=5 && (FIXED_LENGTH+delta)/10 <=15) NODE_RADIUS = (FIXED_LENGTH+delta)/10;
-                if (FIXED_LENGTH+delta >= 10) FIXED_LENGTH += delta;
+                if ((FIXED_LENGTH+delta)/10 >=10 && (FIXED_LENGTH+delta)/10 <=15) NODE_RADIUS = (FIXED_LENGTH+delta)/10;
+                if (FIXED_LENGTH+delta >= 15) FIXED_LENGTH += delta;
                 if ((FIXED_LENGTH+delta)*8/100 >= 1 && (FIXED_LENGTH+delta)*8/100 <= 15)
                     ctx.font = str((FIXED_LENGTH+delta)*8/100) + 'pt Candara';
             }
