@@ -53,6 +53,10 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnRandomButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND)
 
+        btn = CustomButton(self, -1, "Linear")
+        self.Bind(wx.EVT_BUTTON, self.OnLinearButton, btn)
+        btnSizer.Add(btn, 0, wx.EXPAND)
+
         self.node_num = CustomTextCtrl(self, size=(117, -1))
         self.node_num.ChangeValue(str(17))
         btnSizer.Add(self.node_num, 0, wx.EXPAND)
@@ -214,6 +218,20 @@ class WebPanel(wx.Panel):
             value = round(float(raw_value), 2)
             self.node_num.ChangeValue(str(value))
             G = nx.barabasi_albert_graph(value, 1, 777)
+            js_str = self.import_from_networkx_to_json(G)
+            self.wv.RunScript("jrg = '%s'" % js_str)
+            self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")
+        else:
+            self.node_num.ChangeValue("Number only")
+
+    def OnLinearButton(self, event):
+        raw_value = self.node_num.GetValue().strip()
+        # numeric check
+        if all(x in '0123456789.' for x in raw_value):
+            # convert to float and limit to 2 decimals
+            value = round(float(raw_value), 2)
+            self.node_num.ChangeValue(str(value))
+            G = nx.path_graph(int(value))
             js_str = self.import_from_networkx_to_json(G)
             self.wv.RunScript("jrg = '%s'" % js_str)
             self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")
