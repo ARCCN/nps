@@ -11,7 +11,6 @@ from src.KThread import KThread
 
 
 
-
 class WebPanel(wx.Panel):
     """Class fo WebPanel.
 
@@ -53,7 +52,7 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnRandomButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND)
 
-        btn = CustomButton(self, -1, "Linear")
+        btn = CustomButton(self, -1, "LinearX")
         self.Bind(wx.EVT_BUTTON, self.OnLinearButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND)
 
@@ -232,6 +231,12 @@ class WebPanel(wx.Panel):
             value = round(float(raw_value), 2)
             self.node_num.ChangeValue(str(value))
             G = nx.path_graph(int(value))
+            new_node_num = int(value)
+            for node_num,deg in nx.degree(G).items():
+                if deg > 1:
+                    G.add_node(new_node_num)
+                    G.add_edge(new_node_num, node_num)
+                    new_node_num += 1
             js_str = self.import_from_networkx_to_json(G)
             self.wv.RunScript("jrg = '%s'" % js_str)
             self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")

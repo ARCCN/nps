@@ -87,12 +87,11 @@ if __name__ == '__main__':
         pickle.dump(G, open('graph.txt', 'w'))
         print('DONE!')
     elif LOAD_GRAPH_FLAG:
-        G = pickle.load(open('graph.txt'))
+        graph_data = pickle.load(open('graph.txt'))
     elif SEPARATE_GUI_FLAG:
         print('Preparing graph'.ljust(STRING_ALIGNMENT, ' ')),
         graph_data = json.loads(str(sys.argv[1]))
-        G, pos, node_services = get_networkX_graph(graph_data)
-        pickle.dump(G, open('graph.txt', 'w'))
+        pickle.dump(graph_data, open('graph.txt', 'w'))
         print('DONE!')
     else:
         print('Parsing network graph'.ljust(STRING_ALIGNMENT, ' ')),
@@ -102,6 +101,8 @@ if __name__ == '__main__':
         else:
             G = mininet_script_operator.standard_mininet_script_parser('test_script', G)
         print('DONE!')
+
+    G, pos, node_services = get_networkX_graph(graph_data)
     ## this function will not use cluster nodes if there is less then 2 graph nodes to cluster node
     node_map, node_intf_map = mininet_script_operator.nodes_number_optimization(G, node_map, node_intf_map)
 
