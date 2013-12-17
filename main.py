@@ -102,16 +102,9 @@ if __name__ == '__main__':
             G = mininet_script_operator.standard_mininet_script_parser('test_script', G)
         print('DONE!')
 
-
     G, pos, node_services = get_networkX_graph(graph_data)
     ## this function will not use cluster nodes if there is less then 2 graph nodes to cluster node
     node_map, node_intf_map = mininet_script_operator.nodes_number_optimization(G, node_map, node_intf_map)
-
-
-    # open ssh sessions to nodes
-    print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
-    ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
-    print('DONE!')
 
     print('Splitting network graph for nodes'.ljust(STRING_ALIGNMENT, ' ')),
     leaves = mininet_script_operator.define_leaves_in_graph(G)
@@ -139,6 +132,11 @@ if __name__ == '__main__':
         mininet_script_generator.generate_mn_ns_script_with_custom_host_ip_auto(node_intf_map, node_groups,
                                                                       edge_groups, node_ext_intf_group, leaves,
                                                                       node_map, node_ctrl_map, node_services)
+    print('DONE!')
+
+    # open ssh sessions to nodes
+    print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
+    ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
     print('DONE!')
 
     # send scripts to nodes

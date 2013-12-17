@@ -744,7 +744,7 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
     file.write('\n')
     file.write("#navy\n")
     file.write("#Add services here\n")
-    for host in hosts_net_services.keys():
+    for host in sorted(hosts_net_services.keys()):
         if (int(host) in leaves) and (int(host) in node_group):
             for net_service, status in hosts_net_services[host].items():
                 if status == True:
