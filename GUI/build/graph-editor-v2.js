@@ -32,6 +32,13 @@ var edge_list = [], nodes = [], removed_edges = [],
 
 var tabs = {'vizualizer': false, 'result': false, 'worldmap': false};
 
+$(window).bind('resize', function() {
+    SIZE.x = $(window).width();
+    SIZE.y = $(window).height()
+    center = {x: SIZE.x/2, y: SIZE.y/2};
+});
+
+
 function hide_tabs(tabname) {
     for (var i in tabs) {
         if (i != tabname) {

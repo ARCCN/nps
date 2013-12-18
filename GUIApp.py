@@ -84,8 +84,7 @@ class GUI_Editor(wx.Frame):
 
         '''
         self.parent = parent
-        style = ( wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX |  wx.NO_BORDER |
-                      wx.FRAME_NO_TASKBAR | wx.CLIP_CHILDREN ) # wx.STAY_ON_TOP
+        style = (wx.DEFAULT_FRAME_STYLE) # wx.STAY_ON_TOP | wx.CLOSE_BOX | wx.FRAME_NO_TASKBAR | wx.SYSTEM_MENU | wx.CAPTION | wx.NO_BORDER | wx.CLIP_CHILDREN
         """Constructor"""
         wx.Frame.__init__(self, None, -1, 'NPS Graph Editor', style=style, pos=wx.Point(0, 50))
         self.SetSize((self.parent.width,self.parent.height)) # (1075,675)

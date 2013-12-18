@@ -6,9 +6,76 @@ import wx
 import sys
 
 from wx import html2 as webview
+
 from config.config_constants import CONTROLLER_PATH
 from src.KThread import KThread
 
+class TabPanel(wx.Panel):
+    """
+    This will be the first notebook tab
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, parent):
+        """"""
+
+        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+
+        self.console = CustomTextCtrl_readonly(self, wx.ID_ANY | wx.EXPAND) #size=(235,100)
+        font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        self.console.SetFont(font_console)
+
+    def get_console(self):
+        return self.console
+
+
+class ConsoleTabPanel(wx.Panel):
+    """
+    Notebook class
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent, id=wx.ID_ANY, style=
+                             wx.BK_DEFAULT
+                             #wx.BK_TOP
+                             #wx.BK_BOTTOM
+                             #wx.BK_LEFT
+                             #wx.BK_RIGHT
+                             ) #size=(235,100)
+        vbox    = wx.BoxSizer(wx.VERTICAL)
+        hbox    = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.buttonRemove = CustomButton(self, id=wx.ID_ANY, label="DEL CONSOLE") #size=(80, 25)
+        self.buttonRemove.Bind(wx.EVT_BUTTON, self.onButtonRemove)
+        hbox.Add(self.buttonRemove, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        self.buttonInsert = CustomButton(self, id=wx.ID_ANY, label="NEW CONSOLE") #size=(80, 25)
+        self.buttonInsert.Bind(wx.EVT_BUTTON, self.onButtonInsert)
+        hbox.Add(self.buttonInsert, 1, wx.EXPAND)
+
+        vbox.Add(hbox, 0, wx.EXPAND)
+
+        self.Notebook3 = wx.Notebook(self)
+        vbox.Add(self.Notebook3, 2, flag=wx.EXPAND)
+
+        self.SetSizer(vbox)
+
+        self.pageCounter = 0
+        self.addPage()
+
+    def addPage(self):
+        self.pageCounter += 1
+        page      = TabPanel(self.Notebook3)
+        pageTitle = "Con: {0}".format(str(self.pageCounter))
+        self.Notebook3.AddPage(page, pageTitle)
+
+    def onButtonRemove(self, event):
+        self.Notebook3.DeletePage(0)
+
+    def onButtonInsert(self, event):
+        self.addPage()
+    
+    def get_console(self):
+        return self.Notebook3.GetCurrentPage().get_console()
 
 
 class WebPanel(wx.Panel):
@@ -56,53 +123,56 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnLinearButton, btn)
         btnSizer.Add(btn, 0, wx.EXPAND)
 
-        self.node_num = CustomTextCtrl(self, size=(117, -1))
+        self.node_num = CustomTextCtrl(self) #size=(117, -1)
         self.node_num.ChangeValue(str(17))
         btnSizer.Add(self.node_num, 0, wx.EXPAND)
 
         btn = CustomButton(self, -1, "Save")
         self.Bind(wx.EVT_BUTTON, self.OnSaveButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND|wx.LEFT, 420)
+        btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT,1)
 
         btn = CustomButton(self, -1, "Load")
         self.Bind(wx.EVT_BUTTON, self.OnLoadButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND|wx.LEFT, 1)
+        btnSizer.Add(btn, 0, wx.ALIGN_RIGHT)
 
         sizer.Add(btnSizer, 0, wx.EXPAND)
         sizer.Add(self.wv, 1, wx.EXPAND)
 
-        self.console = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
-        font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-        self.console.SetFont(font_console)
+        #self.console = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
+        #font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        #self.console.SetFont(font_console)
+        notebook = ConsoleTabPanel(self)
+        self.console = notebook.get_console()
 
-
-        self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
+        self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY) #size=(235,100)
         font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.controller.SetFont(font_controller)
 
         btn = CustomButton(self, wx.ID_ANY, 'Send')
         self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
 
-        self.cmd_line = CustomTextCtrl(self, wx.ID_ANY, size=(235,-1))
+        self.cmd_line = CustomTextCtrl(self, wx.ID_ANY) #size=(235,-1)
         font_cmd_line = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         self.cmd_line.SetFont(font_cmd_line)
         self.cmd_line.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
 
         # Add widgets to a sizer
         con_hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        con_hsizer.Add(self.cmd_line, 0, wx.EXPAND)
+        con_hsizer.Add(self.cmd_line, 3, wx.EXPAND)
         con_hsizer.Add(btn, 1, wx.EXPAND)
 
         con_sizer = wx.BoxSizer(wx.VERTICAL)
         con_sizer.Add(self.controller, 1, wx.BOTTOM|wx.EXPAND, 1)
-        con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND)
-        con_sizer.Add(con_hsizer, 0, wx.ALL|wx.CENTER)
+        #con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND)
+        con_sizer.Add(notebook, 2, wx.ALL|wx.EXPAND)
+        con_sizer.Add(con_hsizer, 0, wx.ALL|wx.EXPAND)
 
         glob_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        glob_sizer.Add(con_sizer, 0, wx.EXPAND)
-        glob_sizer.Add(sizer, 1, wx.EXPAND)
+        glob_sizer.Add(con_sizer, 1, wx.EXPAND)
+        glob_sizer.Add(sizer, 3, wx.EXPAND)
 
         self.SetSizer(glob_sizer)
+        self.Layout()
         self.wv.LoadURL('file://' + self.current)
 
     def onKeyPress(self, event):
@@ -112,24 +182,6 @@ class WebPanel(wx.Panel):
         event.Skip()
 
     def onSendButton(self, event):
-        # cmd = self.cmd_line.GetValue()
-        # if cmd != 'exit':
-        #     self.p.sendline(cmd)
-        #     self.p.expect('mininet CE> ')
-        #     for s in self.p.before:
-        #         if len(s) != 0 and s != '\n':
-        #             self.console.AppendText(s)
-        #     self.cmd_line.ChangeValue('')
-        # else:
-        #     self.p.sendline(cmd)
-        #     self.p.expect(pexpect.EOF)
-        #     for s in self.p.before:
-        #         if len(s) != 0 and s != '\n':
-        #             self.console.AppendText(s)
-        #     self.cmd_line.ChangeValue('')
-        #     self.controller_thread.kill()
-        #     self.controller_proc.terminate()
-
         cmd = self.cmd_line.GetValue()
         if cmd != 'exit':
             self.console_proc.stdin.write(cmd + '\n')
@@ -302,21 +354,3 @@ class CustomTextCtrl(wx.TextCtrl):
 
         self.SetBackgroundColour('#D8D8D8')
         # more customization here
-
-class TabPanel(wx.Panel):
-    """
-    This will be the first notebook tab
-    """
-    #----------------------------------------------------------------------
-    def __init__(self, parent):
-        """"""
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
-
-        text_tab = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
-        font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-        text_tab.SetFont(font_console)
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(text_tab, 0, wx.ALL, 5)
-
-        self.SetSizer(sizer)

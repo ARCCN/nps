@@ -62,12 +62,14 @@ $(function() {
     hljs.initHighlightingOnLoad();
 
     my_graph_editor = new GraphEditor('#graph_ed', { JSONdata: cube,
-      width : 700,
-      height : 500,
+      width : 0.7*$(window).width(),
+      height : 0.85*$(window).height(),
       multigraph: true,
       node_radius: 8.0});
 
 });
+
+
 </script>
 </head>
 <body>
