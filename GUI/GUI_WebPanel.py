@@ -5,7 +5,7 @@ from wx import html2 as webview
 
 import networkx as nx
 import wx
-from GUI.GUI_Elements import CustomButton, CustomTextCtrl
+from GUI.GUI_Elements import CustomButton, CustomTextCtrl, NodeStatusPanel
 
 from GUI.GUI_Tabs import ControllerTabPanel, ConsoleTabPanel
 from config.config_constants import CONTROLLER_PATH
@@ -268,49 +268,4 @@ class WebPanel(wx.Panel):
             if out != '':
                 wx.CallAfter(self.console.AppendText, out)
 
-
-class NodeStatusPanel(wx.Panel):
-    """
-    """
-    #----------------------------------------------------------------------
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent, id=wx.ID_ANY, style=
-                             wx.BK_DEFAULT
-                             #wx.BK_TOP
-                             #wx.BK_BOTTOM
-                             #wx.BK_LEFT
-                             #wx.BK_RIGHT
-                             ) #size=(235,100)
-
-        node_map = self.read_nodelist_from_file('config/nodelist.txt')
-        #print(node_map)
-
-
-        hbox    = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.buttonRemove = CustomButton(self, id=wx.ID_ANY, label="DEL ") #size=(80, 25)
-        #self.buttonRemove.Bind(wx.EVT_BUTTON, self.onButtonRemove)
-        hbox.Add(self.buttonRemove, 1, wx.EXPAND|wx.RIGHT, 1)
-
-        self.buttonInsert = CustomButton(self, id=wx.ID_ANY, label="NEW ") #size=(80, 25)
-        #self.buttonInsert.Bind(wx.EVT_BUTTON, self.onButtonInsert)
-        hbox.Add(self.buttonInsert, 1, wx.EXPAND)
-
-        self.SetSizer(hbox)
-
-    def read_nodelist_from_file(self, nodelist_filepath):
-        '''Read list of cluster nodes from file.
-
-        Args:
-            nodelist_file: Name of file with list of cluster nodes.
-        '''
-        node_map = {}
-        # open nodelist file
-        #logger_MininetCE.info('Reading nodelist from file')
-        nodelist_file = open(nodelist_filepath, 'r')
-        file_lines = nodelist_file.readlines()
-        for file_line in file_lines:
-            splitted_line = file_line.split(' ')
-            node_map[splitted_line[0]]             = splitted_line[2]
-        return node_map
 
