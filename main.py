@@ -81,17 +81,19 @@ if __name__ == '__main__':
     print('DONE!')
 
     # prepare scripts to nodes
-    if RANDOM_GRAPH_FLAG:
-        print('Generating random network graph'.ljust(STRING_ALIGNMENT, ' ')),
-        G = nx.barabasi_albert_graph(RANDOM_GRAPH_SIZE, 1, 777)
-        pickle.dump(G, open('graph.txt', 'w'))
-        print('DONE!')
-    elif LOAD_GRAPH_FLAG:
-        graph_data = pickle.load(open('graph.txt'))
+    if LOAD_GRAPH_FLAG:
+        #graph_data = pickle.load(open('graph.txt'))
+        graph_file = open('graph.txt', 'r')
+        graph_data = json.loads(graph_file.read())
+        graph_file.close()
     elif SEPARATE_GUI_FLAG:
         print('Preparing graph'.ljust(STRING_ALIGNMENT, ' ')),
+        graph_file = open('graph.txt', 'w')
+        graph_file.write(str(sys.argv[1]))
+        graph_file.close()
+
         graph_data = json.loads(str(sys.argv[1]))
-        pickle.dump(graph_data, open('graph.txt', 'w'))
+        #pickle.dump(graph_data, open('graph.txt', 'w'))
         print('DONE!')
     else:
         print('Parsing network graph'.ljust(STRING_ALIGNMENT, ' ')),
