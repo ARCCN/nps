@@ -10,7 +10,7 @@ __author__ = 'vitalyantonenko'
 class CustomButton(wx.Button):
     def __init__(self, *a, **k):
         style = ( wx.NO_BORDER )
-        wx.Button.__init__(self, style=style, *a, **k)
+        wx.Button.__init__(self,  style=style, *a, **k)
 
         self.SetBackgroundColour('#B2B2B2') #C4C4FF
         # more customization here
@@ -27,7 +27,7 @@ class CustomTextCtrl_readonly(wx.TextCtrl):
 
 class CustomTextCtrl(wx.TextCtrl):
     def __init__(self, *a, **k):
-        style = ( wx.NO_BORDER )
+        style = ( wx.NO_BORDER | wx.TE_CENTRE )
         wx.TextCtrl.__init__(self, style=style, *a, **k)
 
         self.SetBackgroundColour('#D8D8D8')
@@ -49,6 +49,11 @@ class NodeStatusPanel(wx.Panel):
 
         self.node_map = self.read_nodelist_from_file(NODELIST_FILEPATH)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        label = wx.StaticText(self, -1, 'Cluster nodes status:')
+        hbox.Add(label, 0, wx.EXPAND|wx.RIGHT, 1)
+
+
         self.node_labels = []
         for node in self.node_map.keys():
             #response = os.system("ping -c 1 " + node)
@@ -72,9 +77,9 @@ class NodeStatusPanel(wx.Panel):
                 ping = subprocess.Popen(["ping", "-c", "1", node_label.GetLabel()], stdout=subprocess.PIPE, shell=False)
                 ping.wait()
                 if ping.returncode != 0:
-                    node_label.SetForegroundColour('red')
+                    node_label.SetBackgroundColour('#F79C94')
                 else:
-                    node_label.SetForegroundColour('green')
+                    node_label.SetBackgroundColour('#A3F291')
             time.sleep(CHECK_PING_TIME_PERIOD)
 
 

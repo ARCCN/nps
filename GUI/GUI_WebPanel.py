@@ -42,20 +42,20 @@ class WebPanel(wx.Panel):
         btn = CustomButton(self, -1, "Simulate")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
         self.Bind(wx.EVT_BUTTON, self.OnSimulateButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
+        btnSizer.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
         btn = CustomButton(self, -1, "DB:JSON")
         btn.SetBackgroundColour('#B5B5B5')
         self.Bind(wx.EVT_BUTTON, self.OnDBJsonButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT, 1)
+        btnSizer.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
         btn = CustomButton(self, -1, "Random")
         self.Bind(wx.EVT_BUTTON, self.OnRandomButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND)
+        btnSizer.Add(btn, 1, wx.EXPAND)
 
         btn = CustomButton(self, -1, "LinearX")
         self.Bind(wx.EVT_BUTTON, self.OnLinearButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND)
+        btnSizer.Add(btn, 1, wx.EXPAND)
 
         self.node_num = CustomTextCtrl(self) #size=(117, -1)
         self.node_num.ChangeValue(str(17))
@@ -63,11 +63,11 @@ class WebPanel(wx.Panel):
 
         btn = CustomButton(self, -1, "Save")
         self.Bind(wx.EVT_BUTTON, self.OnSaveButton, btn)
-        btnSizer.Add(btn, 0, wx.EXPAND|wx.RIGHT,1)
+        btnSizer.Add(btn, 1, wx.EXPAND|wx.RIGHT,1)
 
         btn = CustomButton(self, -1, "Load")
         self.Bind(wx.EVT_BUTTON, self.OnLoadButton, btn)
-        btnSizer.Add(btn, 0, wx.ALIGN_RIGHT)
+        btnSizer.Add(btn, 1, wx.ALIGN_RIGHT)
 
         node_status_panel = NodeStatusPanel(self)
 
@@ -108,12 +108,15 @@ class WebPanel(wx.Panel):
         con_sizer.Add(con_hsizer, 0, wx.ALL|wx.EXPAND)
 
         glob_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        glob_sizer.Add(con_sizer, 1, wx.EXPAND)
+        glob_sizer.Add(con_sizer, 1, wx.EXPAND|wx.RIGHT, 1)
         glob_sizer.Add(sizer, 3, wx.EXPAND)
 
         self.SetSizer(glob_sizer)
         self.Layout()
         self.wv.LoadURL('file://' + self.current)
+
+    def OnDropFiles(self, x, y, filenames):
+        print('FILE!!!')
 
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()
