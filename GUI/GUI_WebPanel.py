@@ -1,81 +1,15 @@
 import os
 import subprocess
-import networkx as nx
-import pexpect
-import wx
 import sys
-
 from wx import html2 as webview
 
+import networkx as nx
+import wx
+from GUI.GUI_Elements import CustomButton, CustomTextCtrl
+
+from GUI.GUI_Tabs import ControllerTabPanel, ConsoleTabPanel
 from config.config_constants import CONTROLLER_PATH
 from src.KThread import KThread
-
-class TabPanel(wx.Panel):
-    """
-    This will be the first notebook tab
-    """
-    #----------------------------------------------------------------------
-    def __init__(self, parent):
-        """"""
-
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
-
-        self.console = CustomTextCtrl_readonly(self, wx.ID_ANY | wx.EXPAND) #size=(235,100)
-        font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-        self.console.SetFont(font_console)
-
-    def get_console(self):
-        return self.console
-
-
-class ConsoleTabPanel(wx.Panel):
-    """
-    Notebook class
-    """
-    #----------------------------------------------------------------------
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent, id=wx.ID_ANY, style=
-                             wx.BK_DEFAULT
-                             #wx.BK_TOP
-                             #wx.BK_BOTTOM
-                             #wx.BK_LEFT
-                             #wx.BK_RIGHT
-                             ) #size=(235,100)
-        vbox    = wx.BoxSizer(wx.VERTICAL)
-        hbox    = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.buttonRemove = CustomButton(self, id=wx.ID_ANY, label="DEL CONSOLE") #size=(80, 25)
-        self.buttonRemove.Bind(wx.EVT_BUTTON, self.onButtonRemove)
-        hbox.Add(self.buttonRemove, 1, wx.EXPAND|wx.RIGHT, 1)
-
-        self.buttonInsert = CustomButton(self, id=wx.ID_ANY, label="NEW CONSOLE") #size=(80, 25)
-        self.buttonInsert.Bind(wx.EVT_BUTTON, self.onButtonInsert)
-        hbox.Add(self.buttonInsert, 1, wx.EXPAND)
-
-        vbox.Add(hbox, 0, wx.EXPAND)
-
-        self.Notebook3 = wx.Notebook(self)
-        vbox.Add(self.Notebook3, 2, flag=wx.EXPAND)
-
-        self.SetSizer(vbox)
-
-        self.pageCounter = 0
-        self.addPage()
-
-    def addPage(self):
-        self.pageCounter += 1
-        page      = TabPanel(self.Notebook3)
-        pageTitle = "Con: {0}".format(str(self.pageCounter))
-        self.Notebook3.AddPage(page, pageTitle)
-
-    def onButtonRemove(self, event):
-        self.Notebook3.DeletePage(0)
-
-    def onButtonInsert(self, event):
-        self.addPage()
-    
-    def get_console(self):
-        return self.Notebook3.GetCurrentPage().get_console()
 
 
 class WebPanel(wx.Panel):
@@ -135,18 +69,23 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnLoadButton, btn)
         btnSizer.Add(btn, 0, wx.ALIGN_RIGHT)
 
+        node_status_panel = NodeStatusPanel(self)
+
         sizer.Add(btnSizer, 0, wx.EXPAND)
+        sizer.Add(node_status_panel, 0, wx.EXPAND)
         sizer.Add(self.wv, 1, wx.EXPAND)
 
         #self.console = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
         #font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         #self.console.SetFont(font_console)
-        notebook = ConsoleTabPanel(self)
-        self.console = notebook.get_console()
+        console_tabs = ConsoleTabPanel(self)
+        self.console = console_tabs.get_console()
 
-        self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY) #size=(235,100)
-        font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-        self.controller.SetFont(font_controller)
+        #self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY) #size=(235,100)
+        #font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        #self.controller.SetFont(font_controller)
+        controller_tabs = ControllerTabPanel(self)
+        self.controller = controller_tabs.get_console()
 
         btn = CustomButton(self, wx.ID_ANY, 'Send')
         self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
@@ -162,9 +101,10 @@ class WebPanel(wx.Panel):
         con_hsizer.Add(btn, 1, wx.EXPAND)
 
         con_sizer = wx.BoxSizer(wx.VERTICAL)
-        con_sizer.Add(self.controller, 1, wx.BOTTOM|wx.EXPAND, 1)
+        #con_sizer.Add(self.controller, 1, wx.BOTTOM|wx.EXPAND, 1)
+        con_sizer.Add(controller_tabs, 1, wx.BOTTOM|wx.EXPAND, 1)
         #con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND)
-        con_sizer.Add(notebook, 2, wx.ALL|wx.EXPAND)
+        con_sizer.Add(console_tabs, 3, wx.ALL|wx.EXPAND)
         con_sizer.Add(con_hsizer, 0, wx.ALL|wx.EXPAND)
 
         glob_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -329,28 +269,48 @@ class WebPanel(wx.Panel):
                 wx.CallAfter(self.console.AppendText, out)
 
 
-class CustomButton(wx.Button):
-    def __init__(self, *a, **k):
-        style = ( wx.NO_BORDER )
-        wx.Button.__init__(self, style=style, *a, **k)
+class NodeStatusPanel(wx.Panel):
+    """
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent, id=wx.ID_ANY, style=
+                             wx.BK_DEFAULT
+                             #wx.BK_TOP
+                             #wx.BK_BOTTOM
+                             #wx.BK_LEFT
+                             #wx.BK_RIGHT
+                             ) #size=(235,100)
 
-        self.SetBackgroundColour('#B2B2B2') #C4C4FF
-        # more customization here
+        node_map = self.read_nodelist_from_file('config/nodelist.txt')
+        #print(node_map)
 
 
-class CustomTextCtrl_readonly(wx.TextCtrl):
-    def __init__(self, *a, **k):
-        style = ( wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL )
-        wx.TextCtrl.__init__(self, style=style, *a, **k)
+        hbox    = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.SetBackgroundColour('#D8D8D8')
-        # more customization here
+        self.buttonRemove = CustomButton(self, id=wx.ID_ANY, label="DEL ") #size=(80, 25)
+        #self.buttonRemove.Bind(wx.EVT_BUTTON, self.onButtonRemove)
+        hbox.Add(self.buttonRemove, 1, wx.EXPAND|wx.RIGHT, 1)
 
+        self.buttonInsert = CustomButton(self, id=wx.ID_ANY, label="NEW ") #size=(80, 25)
+        #self.buttonInsert.Bind(wx.EVT_BUTTON, self.onButtonInsert)
+        hbox.Add(self.buttonInsert, 1, wx.EXPAND)
 
-class CustomTextCtrl(wx.TextCtrl):
-    def __init__(self, *a, **k):
-        style = ( wx.NO_BORDER )
-        wx.TextCtrl.__init__(self, style=style, *a, **k)
+        self.SetSizer(hbox)
 
-        self.SetBackgroundColour('#D8D8D8')
-        # more customization here
+    def read_nodelist_from_file(self, nodelist_filepath):
+        '''Read list of cluster nodes from file.
+
+        Args:
+            nodelist_file: Name of file with list of cluster nodes.
+        '''
+        node_map = {}
+        # open nodelist file
+        #logger_MininetCE.info('Reading nodelist from file')
+        nodelist_file = open(nodelist_filepath, 'r')
+        file_lines = nodelist_file.readlines()
+        for file_line in file_lines:
+            splitted_line = file_line.split(' ')
+            node_map[splitted_line[0]]             = splitted_line[2]
+        return node_map
+
