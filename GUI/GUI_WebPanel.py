@@ -154,6 +154,7 @@ class WebPanel(wx.Panel):
         self.wv.RunScript("jrg = '%s'" % graph_data)
         self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")
 
+
         load_file.close()
 
 
