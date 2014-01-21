@@ -141,24 +141,44 @@ class WebPanel(wx.Panel):
             if wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
                              wx.ICON_QUESTION | wx.YES_NO, self) == wx.NO:
                 return
-        openFileDialog = wx.FileDialog(self, "Open MNCE Graph file", "", "",
-                                       "MNCE Graph files (*.mnce)|*.mnce", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        openFileDialog = wx.FileDialog(self, "Open NPS Graph file", "", "",
+                                       "NPS Graph files (*.nps)|*.nps", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if openFileDialog.ShowModal() == wx.ID_CANCEL:
             return
-        input_stream = wx.FileInputStream(openFileDialog.GetPath())
-        if not input_stream.IsOk():
-            wx.LogError("Cannot open file '%s'."%openFileDialog.GetPath())
-            return
+        #input_stream = wx.FileInputStream(openFileDialog.GetPath())
+
+        load_file = open(openFileDialog.GetPath(), 'r')
+        graph_data = load_file.read()
+        print graph_data
+
+        self.wv.RunScript("jrg = '%s'" % graph_data)
+        self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")
+
+        load_file.close()
+
+
+
+        #if not input_stream.IsOk():
+        #    wx.LogError("Cannot open file '%s'."%openFileDialog.GetPath())
+        #    return
 
     def OnSaveButton(self, event):
-        saveFileDialog = wx.FileDialog(self, "Save MNCE Graph file", "", "",
-                                   "MNCE Graph files (*.mnce)|*.mnce", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        saveFileDialog = wx.FileDialog(self, "Save NPS Graph file", "", "",
+                                   "NPS Graph files (*.nps)|*.nps", wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if saveFileDialog.ShowModal() == wx.ID_CANCEL:
             return
-        output_stream = wx.FileOutputStream(saveFileDialog.GetPath())
-        if not output_stream.IsOk():
-            wx.LogError("Cannot save current contents in file '%s'."%saveFileDialog.GetPath())
-            return
+        #output_stream = wx.FileOutputStream(saveFileDialog.GetPath())
+        prev_title = self.wv.GetCurrentTitle()
+        self.wv.RunScript("document.title = my_graph_editor.export_sage()")
+        graph_data = self.wv.GetCurrentTitle()
+        self.wv.RunScript("document.title = %s" % prev_title)
+
+        save_file = open(saveFileDialog.GetPath(), 'w')
+        save_file.write(graph_data)
+        save_file.close()
+        #if not output_stream.IsOk():
+        #    wx.LogError("Cannot save current contents in file '%s'."%saveFileDialog.GetPath())
+        #    return
 
     def OnSimulateButton(self, event):
         os.system("cp GUI/res/not_ready.png GUI/result.png")
