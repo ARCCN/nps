@@ -110,8 +110,6 @@ function circle_withtip(x,y,w,h,r,nofillFlag){
     ctx.stroke();
 }
 
-    
-
 function line(x1,y1,x2,y2){
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -837,58 +835,6 @@ function import_from_JSON(JSONdata) {
     draw();
 }
 
-function positions_dict() {
-    var i, out, pos;
-    out = "{";
-    out += nodes.map(function(n,i) {
-        var pos = n.get_pos();
-        return i + ":[" + [pos.x, (SIZE.y - pos.y)].join(',') + "]";
-    }).join(',');
-    return out + "}";
-}
-
-function adjacency_lists_dict() {
-    var edge, empty, i, j, node, out;
-    out = "{";
-    out += nodes.map( function(node,i) {
-        return i + ":[" + edge_list.map(function(e) {
-            var enodes = e.get_nodes();
-            if (enodes.node1 === node) {
-                return nodes.indexOf(enodes.node2);
-            }
-            if (enodes.node2 === node) {
-                return nodes.indexOf(enodes.node1);
-            }
-            }).filter(nonundef).join(',')+']';
-            // add filter i>j to only get neighbors with smaller index. which was the old functionality.
-        });
-    return out + "}";
-}
-
-function export_tkz() {
-    var pos, edge, i, j, out, px2pt;
-    px2pt = 0.75;
-    out = "";
-    out += "\\begin{tikzpicture}\n\n";
-    for (i = 0; i<nodes.length; i++) {
-        out += "\\Vertex";
-        pos = nodes[i].get_pos();
-        out += "[x=" + px2pt*pos.x + "pt,y=" + px2pt*(SIZE.y-pos.y) + "pt]";
-        out += "{" + i + "};\n";
-    }
-    out += "\n";
-    for (j = 0; j<edge_list.length; j++){
-        out += "\\Edge";
-        edge = edge_list[j].get_nodes();
-        out += "("+nodes.indexOf(edge.node1)+")";
-        out += "("+nodes.indexOf(edge.node2)+")";
-        out += "\n";
-    }
-    out+="\n";
-    out+="\\end{tikzpicture}\n";
-    return out;
-}
-
 function export_sage() {
     var data = {}, pos, i, exec = '';
     data.vertices = nodes.map(function(n) {
@@ -916,6 +862,14 @@ function export_sage() {
     }
     return JSON.stringify(data);
 }
+
+function get_LIVE(){
+    return LIVE;
+}
+function set_LIVE(new_val){
+    LIVE = new_val;
+}
+
 var UIside_panel_opened;
 function add_checkbox(name, variable, container_id, onclickf) {
     var s ='<tr><td>'+name+'</td>';
@@ -957,36 +911,12 @@ function create_controls(div) {
     canvas = $(div +' canvas')[0];
 
 
-    // Create graph editor buttons tab
-    $(div).prepend('<div id="graph_editor_button_container"></div>');
+//    // Create graph editor buttons tab
+//    $(div).prepend('<div id="graph_editor_button_container"></div>');
 
-    // Tougle physics button controller
-    $('<div id="live_button" class="graph_editor_button">live</div>').appendTo(buttondiv).click(toggle_live);
-    toggle_live(); // comment if you dont want to animate graph at start
-
-    // Show options button controller
-    $('<div id="tweaks_button" class="graph_editor_button">options</div>').appendTo(buttondiv)
-    .toggle(function() {
-        $(div).animate({'width': SIZE.x + 185 + 'px'},
-            {queue: true, duration: 'fast', easing: 'linear', complete: function (){
-                $(div + ' #graph_editor_tweaks').slideToggle('fast');
-                UIside_panel_opened = true;
-            }
-        });
-        $(div+' #tweaks_button').toggleClass('graph_editor_button_on');
-    },
-    function() {
-        $(div + ' #graph_editor_tweaks').slideToggle('fast', function (){
-            $(div).animate({'width': SIZE.x +'px'},
-            {queue: true, duration: 'fast', easing: 'linear'});
-            UIside_panel_opened = undefined;
-        });
-        $(div+' #tweaks_button').toggleClass('graph_editor_button_on');
-    });
     // Create options button html code
     $(div).append('<div id="graph_editor_tweaks"></div>');
     tweaks = div+' #graph_editor_tweaks';
-//    <span id='pos'>Position: (<span id='posx'></span>, <span id='posy'></span>)<br></span>\
     $(tweaks).append("<div class='infobox'><h4 id='title'>Info</h4>\
     <div id='info'>Index: <span id='index'></span><br>\
     <span id='vert'>Vertices: <span id='v1'></span>-><span id='v2'></span><br></span>\
@@ -1005,11 +935,6 @@ function create_controls(div) {
     </div>\
     <div id='none_selected'>No node is selected</div></div>");
 
-    // Help button controller
-    $('<div id="help_button" class="graph_editor_button">?</div>').appendTo(buttondiv)
-    .click(function() {
-        $('#help_dialog').dialog('open');
-    });
     // Create help dialog html code
     $(div).append("<div id='help_dialog'> <ul><li><h3>create vertex</h3>Click on empty space not too close to existing vertices. <li><h3>create/erase edge</h3>Select the first vertex. Click on another vertex (different than the selected one) to turn on/off (toggle) the edge between them. <li><h3>increase/decrease multiplicity</h3> Use +/-. When multiplicity is 0 the edge disappears.<li><h3>remove a vertex</h3>Press '-' when vertex is selected.<li><h3>keep the selected vertex after edge toggle</h3>Hold 'SHIFT' to preserve the selected vertex after creating/erasing an edge.<li><h3>split an edge</h3> press 's' when esge is selected<li><h3>freeze a vertex</h3> pressing 'r' freezes the selected vertex (it will not move in live mode)<li><h3>add/remove loop</h3> press 'o'<li><h3>undo vertex deletion</h3>Click on the Undo button. Only the last deleted vertex can be recovered.  <li><h3>turn on realtime spring-charge model</h3>Press 'l' or click on the live checkbox.  </ul> </div>");
     $('#help_dialog').dialog({
@@ -1018,16 +943,6 @@ function create_controls(div) {
         title : "Graph Editor Help",
         modal : true
     });
-
-    // Undo button controller
-    $('<div id="undo_button" class="graph_editor_button">undo</div>').appendTo(buttondiv)
-    .click(undo_remove).toggleClass('graph_editor_undo_disabled');
-
-    // Erase graph button controller
-    $('<div id="reset_button" class="graph_editor_button">reset</div>').appendTo(buttondiv)
-    .click(function() {
-        erase_graph();
-     });
 
 //    // Togle vizualizer button controller
 //    $('<div id="vizualizer_button" class="graph_editor_button">vizualization</div>').appendTo(buttondiv)
@@ -1071,29 +986,12 @@ function create_controls(div) {
 //    $(div).append('<script src="build/worldmap.js" ></script>');
 //    Draw_worldmap(div);
 
-
-    // Rusult button controller
-    $('<div id="result_button" class="graph_editor_button">result</div>').appendTo(buttondiv)
-    .toggle(function() {
-        document.getElementById('result_image').src = "result.png?random="+new Date().getTime();
-        $(div + ' #result').show();
-//        hide_tabs('result');
-//        tabs['result'] = true;
-        $(canvas).hide();
-        $(div+' #result_button').toggleClass('graph_editor_button_on');
-    },
-    function() {
-        $(canvas).show();
-        $(div + ' #result').hide();
-        $(div+' #result_button').toggleClass('graph_editor_button_on');
-    });
     // Create result tab html code
     $(div).append('<div id="result"></div>');
     result_gr = div+' #result';
     $(result_gr).append("<table>\
         <img src='result.png' width='700' height='500' id='result_image' />\
         </table>").hide();
-
 
     // Create Options tab code and controllers - create "INFOBOX"
     $(div + ' .infobox #info').hide();
@@ -1227,7 +1125,6 @@ function draw() {
     //}
 }
 
-
 function toggle_live() {
         if (LIVE) {
             LIVE = false;
@@ -1285,14 +1182,32 @@ function init() {
 }
 
 
+function set_UIside_panel_opened(new_val){
+    UIside_panel_opened = new_val;
+}
+
+function get_UIside_panel_opened(){
+    return UIside_panel_opened;
+}
+
+function get_SIZE_x(){
+    return SIZE.x
+}
+
+
 init();
 
 
 //an global object graph_editor is created containing all global functions
 return {
     import_from_JSON: import_from_JSON,
-    export_tkz: export_tkz,
     export_sage: export_sage,
+    toggle_live: toggle_live,
+    erase_graph: erase_graph,
+    get_SIZE_x:get_SIZE_x,
+    set_UIside_panel_opened: set_UIside_panel_opened,
+    get_UIside_panel_opened: get_UIside_panel_opened,
+    undo_remove: undo_remove,
     get_raw_data: function() {
         return {
             nodes: nodes,

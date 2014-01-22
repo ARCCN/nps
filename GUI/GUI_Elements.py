@@ -98,3 +98,113 @@ class NodeStatusPanel(wx.Panel):
             splitted_line = file_line.split(' ')
             node_map[splitted_line[0]]             = splitted_line[2]
         return node_map
+
+class GraphEditorPanel(wx.Panel):
+    """
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, parent, wv):
+        wx.Panel.__init__(self, parent, id=wx.ID_ANY, style=
+                             wx.BK_DEFAULT
+                             #wx.BK_TOP
+                             #wx.BK_BOTTOM
+                             #wx.BK_LEFT
+                             #wx.BK_RIGHT
+                             ) #size=(235,100)
+
+        self.wv = wv
+
+        self.live_button_status = True
+        self.options_button_status = False
+        self.result_button_status = False
+        self.help_button_status = False
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        btn = CustomButton(self, -1, "Live")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnLiveButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        btn = CustomButton(self, -1, "Options")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnOptionsButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        btn = CustomButton(self, -1, "Result")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnResultButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        btn = CustomButton(self, -1, "Undo")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnUndoButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        btn = CustomButton(self, -1, "Reset")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnResetButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        btn = CustomButton(self, -1, "Help")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnHelpButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        self.SetSizer(hbox)
+
+    def OnLiveButton(self, event):
+        self.wv.RunScript("my_graph_editor.toggle_live();")
+        self.live_button_status = self.change_status(self.result_button_status)
+
+    def OnOptionsButton(self, event):
+        if not self.options_button_status:
+            self.wv.RunScript("$('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() + 185 + 'px'}, "
+                              "{queue: true, duration: 'fast', easing: 'linear', complete: function (){ "
+                              " $('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast'); "
+                              "     my_graph_editor.set_UIside_panel_opened(true);}});")
+            self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
+        else:
+            self.wv.RunScript("$('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast', function ()"
+                              " {$('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() +'px'},"
+                              " {queue: true, duration: 'fast', easing: 'linear'}); "
+                              "     my_graph_editor.set_UIside_panel_opened(false);});")
+            self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
+
+        self.options_button_status = self.change_status(self.options_button_status)
+
+
+    def OnResultButton(self, event):
+        if not self.result_button_status:
+            self.wv.RunScript("document.getElementById('result_image').src = \"result.png?random=\"+new Date().getTime();")
+            self.wv.RunScript("$('#graph_ed' + ' #result').show();")
+            self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+            self.wv.RunScript("$(canvas).hide();")
+            self.wv.RunScript("$('#graph_ed'+' #result_button').toggleClass('graph_editor_button_on');")
+        else:
+            self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+            self.wv.RunScript("$(canvas).show();")
+            self.wv.RunScript("$('#graph_ed' + ' #result').hide();")
+            self.wv.RunScript("$('#graph_ed' + ' #result_button').toggleClass('graph_editor_button_on');")
+
+        self.result_button_status = self.change_status(self.result_button_status)
+
+    def OnUndoButton(self, event):
+        self.wv.RunScript("my_graph_editor.undo_remove();")
+
+    def OnResetButton(self, event):
+        self.wv.RunScript("my_graph_editor.erase_graph();")
+
+    def OnHelpButton(self, event):
+        self.wv.RunScript("$('#help_dialog').dialog('open');")
+
+
+
+
+    def change_status(self, elem_status):
+        if elem_status:
+            elem_status = False
+        else:
+            elem_status = True
+
+        return elem_status

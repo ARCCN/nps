@@ -5,7 +5,7 @@ from wx import html2 as webview
 
 import networkx as nx
 import wx
-from GUI.GUI_Elements import CustomButton, CustomTextCtrl, NodeStatusPanel
+from GUI.GUI_Elements import CustomButton, CustomTextCtrl, NodeStatusPanel, GraphEditorPanel
 
 from GUI.GUI_Tabs import ControllerTabPanel, ConsoleTabPanel
 from config.config_constants import CONTROLLER_PATH
@@ -35,10 +35,12 @@ class WebPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.wv = webview.WebView.New(self)
+        self.wv.LoadURL('file://' + self.current)
+
 
         self.contentNotSaved = True
 
-
+        ## Main function buttons row
         btn = CustomButton(self, -1, "Simulate")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
         self.Bind(wx.EVT_BUTTON, self.OnSimulateButton, btn)
@@ -69,24 +71,36 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnLoadButton, btn)
         btnSizer.Add(btn, 1, wx.ALIGN_RIGHT)
 
-        node_status_panel = NodeStatusPanel(self)
-
         sizer.Add(btnSizer, 0, wx.EXPAND)
+
+        ## Panel that shows the availability of cluster nodes
+        node_status_panel = NodeStatusPanel(self)
         sizer.Add(node_status_panel, 0, wx.EXPAND)
+
+        ## Graph editor control panel
+        graph_editor_panel = GraphEditorPanel(self, self.wv)
+        sizer.Add(graph_editor_panel, 0, wx.EXPAND)
+
+
         sizer.Add(self.wv, 1, wx.EXPAND)
 
         #self.console = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
         #font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         #self.console.SetFont(font_console)
+
+        ## Console tab panel
         console_tabs = ConsoleTabPanel(self)
         self.console = console_tabs.get_console()
 
         #self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY) #size=(235,100)
         #font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         #self.controller.SetFont(font_controller)
+
+        ## Controller tab panel
         controller_tabs = ControllerTabPanel(self)
         self.controller = controller_tabs.get_console()
 
+        ## Send command row
         btn = CustomButton(self, wx.ID_ANY, 'Send')
         self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
 
@@ -113,7 +127,7 @@ class WebPanel(wx.Panel):
 
         self.SetSizer(glob_sizer)
         self.Layout()
-        self.wv.LoadURL('file://' + self.current)
+        #self.wv.LoadURL('file://' + self.current)
 
     def OnDropFiles(self, x, y, filenames):
         print('FILE!!!')
