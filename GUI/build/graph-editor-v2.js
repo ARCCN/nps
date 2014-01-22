@@ -907,12 +907,8 @@ function add_slider(name, variable, container_id, min, max, onchangef) {
 
 function create_controls(div) {
     //Create controls and attach click functions
-    var result_gr, vizualizer, tweaks, canvaspos = $(div +' canvas').offset(), buttondiv = div + ' #graph_editor_button_container',
+    var result_gr, vizualizer, tweaks, canvaspos = $(div +' canvas').offset(),
     canvas = $(div +' canvas')[0];
-
-
-//    // Create graph editor buttons tab
-//    $(div).prepend('<div id="graph_editor_button_container"></div>');
 
     // Create options button html code
     $(div).append('<div id="graph_editor_tweaks"></div>');
@@ -944,47 +940,17 @@ function create_controls(div) {
         modal : true
     });
 
-//    // Togle vizualizer button controller
-//    $('<div id="vizualizer_button" class="graph_editor_button">vizualization</div>').appendTo(buttondiv)
-//    .toggle(function() {
-//        $(div + ' #vizualizer').show();
-//        $(canvas).hide();
-////        hide_tabs('vizualizer');
-////        tabs['vizualizer'] = true;
-//        $(div+' #vizualizer_button').toggleClass('graph_editor_button_on');
-//    },
-//    function() {
-//        $(canvas).show();
-//        $(div + ' #vizualizer').hide();
-//        $(div+' #vizualizer_button').toggleClass('graph_editor_button_on');
-//    });
-//    // Create Visualizer tab html code
-//    $(div).append('<div class="graph_editor_canvas" id="vizualizer"></div>');
-//    // Include Rgraph lib
-//    $(div).append('<script src="build/vizualization.js" ></script>');
-//    Draw_vizualization(div);
-//
-//
-//    // Togle world map button controller
-//    $('<div id="worldmap_button" class="graph_editor_button">world map</div>').appendTo(buttondiv)
-//    .toggle(function() {
-//        $(div + ' #worldmap').show();
-//        $(div + ' #worldmap').fadeIn().resize();
-////        hide_tabs('worldmap');
-////        tabs['worldmap'] = true;
-//        $(canvas).hide();
-//        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
-//    },
-//    function() {
-//        $(canvas).show();
-//        $(div + ' #worldmap').hide();
-//        $(div+' #worldmap_button').toggleClass('graph_editor_button_on');
-//    });
-//    // Create World map tab html code
-//    $(div).append('<div class="graph_editor_canvas" id="worldmap" ></div>');
-//    // Include
-//    $(div).append('<script src="build/worldmap.js" ></script>');
-//    Draw_worldmap(div);
+    // Create Visualizer tab html code
+    $(div).append('<div class="graph_editor_canvas" id="vizualizer"></div>');
+    // Include Rgraph lib
+    $(div).append('<script src="build/vizualization.js" ></script>');
+    Draw_vizualization(div);
+
+    // Create World map tab html code
+    $(div).append('<div class="graph_editor_canvas" id="worldmap" ></div>');
+    // Include
+    $(div).append('<script src="build/worldmap.js" ></script>');
+    Draw_worldmap(div);
 
     // Create result tab html code
     $(div).append('<div id="result"></div>');

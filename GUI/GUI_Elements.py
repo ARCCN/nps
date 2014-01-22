@@ -112,12 +112,12 @@ class GraphEditorPanel(wx.Panel):
                              #wx.BK_RIGHT
                              ) #size=(235,100)
 
+        self.tabs = {'Result', 'Visualizer', 'WorldMap'}
+
         self.wv = wv
 
-        self.live_button_status = True
-        self.options_button_status = False
-        self.result_button_status = False
-        self.help_button_status = False
+        self.current_tab = 'Editor'
+        self.options_status = False
 
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -131,9 +131,24 @@ class GraphEditorPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnOptionsButton, btn)
         hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
+        btn = CustomButton(self, -1, "Editor")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnEditorButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
         btn = CustomButton(self, -1, "Result")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
         self.Bind(wx.EVT_BUTTON, self.OnResultButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        btn = CustomButton(self, -1, "Visualiser")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnVisualiserButton, btn)
+        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        btn = CustomButton(self, -1, "World Map")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnWorldMapButton, btn)
         hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
         btn = CustomButton(self, -1, "Undo")
@@ -153,58 +168,119 @@ class GraphEditorPanel(wx.Panel):
 
         self.SetSizer(hbox)
 
-    def OnLiveButton(self, event):
-        self.wv.RunScript("my_graph_editor.toggle_live();")
-        self.live_button_status = self.change_status(self.result_button_status)
-
-    def OnOptionsButton(self, event):
-        if not self.options_button_status:
-            self.wv.RunScript("$('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() + 185 + 'px'}, "
+    def show_options(self):
+        self.wv.RunScript("$('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() + 185 + 'px'}, "
                               "{queue: true, duration: 'fast', easing: 'linear', complete: function (){ "
                               " $('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast'); "
                               "     my_graph_editor.set_UIside_panel_opened(true);}});")
-            self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
-        else:
-            self.wv.RunScript("$('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast', function ()"
+        self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
+        self.options_status = True
+
+    def hide_options(self):
+        self.wv.RunScript("$('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast', function ()"
                               " {$('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() +'px'},"
                               " {queue: true, duration: 'fast', easing: 'linear'}); "
                               "     my_graph_editor.set_UIside_panel_opened(false);});")
-            self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
+        self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
+        self.options_status = False
 
-        self.options_button_status = self.change_status(self.options_button_status)
+    def show_result(self):
+        self.wv.RunScript("document.getElementById('result_image').src = \"result.png?random=\"+new Date().getTime();")
+        self.wv.RunScript("$('#graph_ed' + ' #result').show();")
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).hide();")
+        self.wv.RunScript("$('#graph_ed'+' #result_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'Result'
 
+    def hide_result(self):
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).show();")
+        self.wv.RunScript("$('#graph_ed' + ' #result').hide();")
+        self.wv.RunScript("$('#graph_ed' + ' #result_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'Editor'
+
+    def show_visualiser(self):
+        self.wv.RunScript("$('#graph_ed' + ' #vizualizer').show();")
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).hide();")
+        self.wv.RunScript("$('#graph_ed'+' #vizualizer_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'Visualiser'
+
+    def hide_visualiser(self):
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).show();")
+        self.wv.RunScript("$('#graph_ed' + ' #vizualizer').hide();")
+        self.wv.RunScript("$('#graph_ed' +' #vizualizer_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'Editor'
+
+    def show_worldmap(self):
+        self.wv.RunScript("$('#graph_ed' + ' #worldmap').show();")
+        self.wv.RunScript("$('#graph_ed' + ' #worldmap').fadeIn().resize();")
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).hide();")
+        self.wv.RunScript("$('#graph_ed'+' #worldmap_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'WorldMap'
+
+    def hide_worldmap(self):
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).show();")
+        self.wv.RunScript("$('#graph_ed' + ' #worldmap').hide();")
+        self.wv.RunScript("$('#graph_ed' +' #worldmap_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'Editor'
+
+    def go_to_editor_tab(self):
+        if self.current_tab == 'Editor' and self.options_status == True:
+            self.hide_options()
+        if self.current_tab == 'Result':
+            self.hide_result()
+        if self.current_tab == 'Visualiser':
+            self.hide_visualiser()
+        if self.current_tab == 'WorldMap':
+            self.hide_worldmap()
+
+    def OnLiveButton(self, event):
+        if self.current_tab == 'Editor':
+            self.wv.RunScript("my_graph_editor.toggle_live();")
+
+    def OnOptionsButton(self, event):
+        if not self.options_status and self.current_tab == 'Editor':
+            self.show_options()
+        elif self.options_status and self.current_tab == 'Editor':
+            self.hide_options()
+
+    def OnEditorButton(self, event):
+        self.go_to_editor_tab()
 
     def OnResultButton(self, event):
-        if not self.result_button_status:
-            self.wv.RunScript("document.getElementById('result_image').src = \"result.png?random=\"+new Date().getTime();")
-            self.wv.RunScript("$('#graph_ed' + ' #result').show();")
-            self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
-            self.wv.RunScript("$(canvas).hide();")
-            self.wv.RunScript("$('#graph_ed'+' #result_button').toggleClass('graph_editor_button_on');")
+        if self.current_tab == 'Result':
+            self.go_to_editor_tab()
         else:
-            self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
-            self.wv.RunScript("$(canvas).show();")
-            self.wv.RunScript("$('#graph_ed' + ' #result').hide();")
-            self.wv.RunScript("$('#graph_ed' + ' #result_button').toggleClass('graph_editor_button_on');")
+            self.go_to_editor_tab()
+            self.show_result()
 
-        self.result_button_status = self.change_status(self.result_button_status)
+    def OnVisualiserButton(self, event):
+        if self.current_tab == 'Visualiser':
+            self.go_to_editor_tab()
+        else:
+            self.go_to_editor_tab()
+            self.show_visualiser()
+
+    def OnWorldMapButton(self, event):
+        if self.current_tab == 'WorldMap':
+            self.go_to_editor_tab()
+        else:
+            self.go_to_editor_tab()
+            self.show_worldmap()
 
     def OnUndoButton(self, event):
-        self.wv.RunScript("my_graph_editor.undo_remove();")
+        if self.current_tab == 'Editor':
+            self.wv.RunScript("my_graph_editor.undo_remove();")
 
     def OnResetButton(self, event):
-        self.wv.RunScript("my_graph_editor.erase_graph();")
+        if self.current_tab == 'Editor':
+            self.wv.RunScript("my_graph_editor.erase_graph();")
 
     def OnHelpButton(self, event):
         self.wv.RunScript("$('#help_dialog').dialog('open');")
 
 
-
-
-    def change_status(self, elem_status):
-        if elem_status:
-            elem_status = False
-        else:
-            elem_status = True
-
-        return elem_status
