@@ -5,11 +5,14 @@ from wx import html2 as webview
 
 import networkx as nx
 import wx
-from GUI.GUI_Elements import CustomButton, CustomTextCtrl, NodeStatusPanel, GraphEditorPanel
+from GUI.GUI_Elements import CustomButton, CustomTextCtrl, NodeStatusPanel, GraphEditorPanel,CustomTextCtrl_readonly
 
 from GUI.GUI_Tabs import ControllerTabPanel, ConsoleTabPanel
-from config.config_constants import CONTROLLER_PATH
+from config.config_constants import CONTROLLER_PATH, MALWARE_CENTER_IP, MALWARE_CENTER_PORT, \
+    MALWARE_MODE_ON, MALWARE_CENTER_PATH
 from src.KThread import KThread
+
+from src.malwaretools.malware_center import start_malware_center
 
 
 class WebPanel(wx.Panel):
@@ -96,6 +99,12 @@ class WebPanel(wx.Panel):
         #font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
         #self.controller.SetFont(font_controller)
 
+        if MALWARE_MODE_ON:
+            ## Malware center panel
+            self.malware_center = CustomTextCtrl_readonly(self, wx.ID_ANY)
+            font_malware_center = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+            self.malware_center.SetFont(font_malware_center)
+
         ## Controller tab panel
         controller_tabs = ControllerTabPanel(self)
         self.controller = controller_tabs.get_console()
@@ -116,6 +125,9 @@ class WebPanel(wx.Panel):
 
         con_sizer = wx.BoxSizer(wx.VERTICAL)
         #con_sizer.Add(self.controller, 1, wx.BOTTOM|wx.EXPAND, 1)
+        if MALWARE_MODE_ON:
+            con_sizer.Add(wx.StaticText(self, -1, 'Malware center output:'), 0, wx.BOTTOM|wx.EXPAND, 1)
+            con_sizer.Add(self.malware_center, 1, wx.BOTTOM|wx.EXPAND, 1)
         con_sizer.Add(controller_tabs, 1, wx.BOTTOM|wx.EXPAND, 1)
         #con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND)
         con_sizer.Add(console_tabs, 3, wx.ALL|wx.EXPAND)
@@ -149,6 +161,9 @@ class WebPanel(wx.Panel):
             self.cmd_line.ChangeValue('')
             self.controller_thread.kill()
             self.controller_proc.terminate()
+            self.malware_center_thread.kill()
+            self.malware_center_proc.terminate()
+
 
     def OnLoadButton(self, event):
         if self.contentNotSaved:
@@ -206,6 +221,14 @@ class WebPanel(wx.Panel):
         self.wv.RunScript("document.title = %s" % prev_title)
         # p = self.GetParent()
         # p.set_graph_data(graph_data)
+
+        if MALWARE_MODE_ON:
+            malware_center_cmd = "python " + MALWARE_CENTER_PATH + "/malware_center.py " + \
+                                 MALWARE_CENTER_IP + ' ' + str(MALWARE_CENTER_PORT)
+            self.malware_center_proc = subprocess.Popen(malware_center_cmd, stdout=subprocess.PIPE, shell=True)
+            self.malware_center_thread = KThread(target=self.malware_center_thread_func)
+            self.malware_center_thread.setDaemon(True)
+            self.malware_center_thread.start()
 
         controller_cmd = "java -jar " + CONTROLLER_PATH + "/target/floodlight.jar"
         self.controller_proc = subprocess.Popen(controller_cmd, stdout=subprocess.PIPE, shell=True)
@@ -289,6 +312,14 @@ class WebPanel(wx.Panel):
         js_str = js_str.replace('None','null')
         js_str = js_str.replace('\'','\"')
         return js_str
+
+    def malware_center_thread_func(self):
+        while True:
+            out = self.malware_center_proc.stdout.readline()
+            if out == '' and self.malware_center_proc.poll() != None:
+                break
+            if out != '':
+                wx.CallAfter(self.malware_center.AppendText, out)
 
     def controller_thread_func(self):
         while True:

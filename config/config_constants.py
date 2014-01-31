@@ -3,6 +3,7 @@ PYTHONPATH = '/Library/Frameworks/Python.framework/Versions/2.7/bin/python'
 
 MININETCE_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
 CONTROLLER_PATH = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
+MALWARE_CENTER_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition/src/malwaretools'
 GUI_HTML = 'GUI/GUI.html'
 
 
@@ -13,8 +14,12 @@ SRC_SCRIPT_FOLDER = MININETCE_PATH + '/scripts/'
 DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/'
 NODELIST_FILEPATH = MININETCE_PATH + '/config/nodelist.txt'
 
-MALWARE_CENTER_IP   = "10.211.55.2"
+
+
+MALWARE_MODE_ON = True
+MALWARE_CENTER_IP   = '172.0.1.100'
 MALWARE_CENTER_PORT = 56565
+INFECTED_HOSTS_FILENAME = 'infected_hosts.txt'
 
 FIRST_HOST_IP = '1.2.3.1'
 
@@ -43,7 +48,7 @@ DRAWING_FLAG = True
 RANDOM_GRAPH_SIZE = 11
 
 SCRIPT_FOLDER = 'scripts/nodes/'
-REMOTE_CONTROLLER_IP   = '10.211.55.2'
+REMOTE_CONTROLLER_IP   = '172.0.1.100'
 REMOTE_CONTROLLER_PORT = '6633'
 
 

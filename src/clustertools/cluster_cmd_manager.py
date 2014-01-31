@@ -1,6 +1,7 @@
 from paramiko                import *
 #from main                    import logger_MininetCE
-from config.config_constants import SRC_SCRIPT_FOLDER, DST_SCRIPT_FOLDER
+from config.config_constants import SRC_SCRIPT_FOLDER, DST_SCRIPT_FOLDER, MALWARE_MODE_ON, \
+    DST_SCRIPT_FOLDER, MALWARE_CENTER_IP, MALWARE_CENTER_PORT, INFECTED_HOSTS_FILENAME
 
 
 def send_script_to_cluster_node(node_IP, script_filename, node_map):
@@ -42,6 +43,9 @@ def send_support_scripts_to_cluster_node(node_IP, node_map):
     send_turn_on_script_to_cluster_node(node_IP, script_name, node_map)
     send_script_to_cluster_node(node_IP, 'scapy_packet_gen.py', node_map)
     send_script_to_cluster_node(node_IP, 'port_sniffer.py', node_map)
+    send_script_to_cluster_node(node_IP, 'file_monitor.py', node_map)
+    send_script_to_cluster_node(node_IP, 'worm_instance.py', node_map)
+
 
 
 def send_turn_on_script_to_cluster_node(node_IP, script_filename, node_map):
@@ -111,6 +115,10 @@ def exec_start_up_script(node_IP, node_intf_map, ssh_chan_map, node_mname_map):
     reset_vs_cmd = 'ovs-vsctl del-br s' + split_IP[3]
     send_cmd_to_cluster_node(node_IP, reset_vs_cmd, ssh_chan_map, node_mname_map)
 
+    clean_infected_hosts_file_cmd = '> ' + DST_SCRIPT_FOLDER + INFECTED_HOSTS_FILENAME
+    send_cmd_to_cluster_node(node_IP, clean_infected_hosts_file_cmd, ssh_chan_map, node_mname_map)
+
+
     # Turn On Mininet instance on nodes in cluster
     send_mn_turn_on_cmd_to_cluster_node(node_IP, ssh_chan_map)
 
@@ -129,3 +137,4 @@ def send_mn_turn_on_cmd_to_cluster_node(node_IP, ssh_chan_map):
     while not buff.endswith('mininet> '):
         buff += ssh_chan_map[node_IP].recv(9999)
     #logger_MininetCE.info("SUCCESS:" + node_IP + ": Mininet turning ON")
+

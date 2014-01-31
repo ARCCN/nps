@@ -1,34 +1,49 @@
 import sys
 from scapy.all import *
 import threading
+import os
 
 
-MALWARE_CENTER_IP   = "1.2.1.1"
-MALWARE_CENTER_PORT = 56565
 
 def catch_sasser_worm_on_host(intf_name):
     sniff(iface=intf_name, filter="tcp and ( port 445 )", count=1254)
     sniff(iface=intf_name, filter="tcp and ( port 445 or port 9996 )", count=2*586)
     sniff(iface=intf_name, filter="tcp and ( port 5554 or port 1033 )", count=2*1)
 
-def tell_malware_center_about_infection(ip="localhost", port=56565, message="infected"):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        sock.sendto(message,(ip,port))
-        print("send worm instance complete")
-    finally:
-        sock.close()
 
-def sniffer(host_ip):
-    print(host_ip)
-    #    catch_sasser_worm_on_host(int_name)
-    tell_malware_center_about_infection(MALWARE_CENTER_IP, MALWARE_CENTER_PORT, host_ip)
+def write_to_file_about_infection(host_intf_name, infected_hosts_filename):
+    file = open(infected_hosts_filename, "a")
+
+    cmd = "ifconfig " + host_intf_name + " | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'" \
+                                    ">> " + infected_hosts_filename
+
+    myip = os.popen(cmd).read()
+    file.write(myip)
+    file.close()
+
+def sniffer(host_intf_name, infected_hosts_filename):
+    catch_sasser_worm_on_host(host_intf_name)
+    #print('Catched!')
+    write_to_file_about_infection(host_intf_name, infected_hosts_filename)
 
 
-if __name__=="__main__":
-    host_ip = sys.argv[1]
-    # intf_name = sys.argv[2]
-    thread = threading.Thread(target=sniffer, args=(host_ip,))
-    thread.start()
 
-    print("finish_script")
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == '--help':
+        print 'args: (host_intf_name, infected_hosts_filename)'
+        exit(-1)
+
+    if len(sys.argv) != 3:
+        print('Not enough args')
+        exit(-123)
+
+    host_intf_name = sys.argv[1]
+    infected_hosts_filename = sys.argv[2]
+
+
+    #thread = threading.Thread(target=sniffer, args=(host_intf_name, infected_hosts_filename))
+    #thread.start()
+    sniffer(host_intf_name, infected_hosts_filename)
+
+    #print("finish_script")

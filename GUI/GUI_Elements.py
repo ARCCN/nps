@@ -121,35 +121,35 @@ class GraphEditorPanel(wx.Panel):
 
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        btn = CustomButton(self, -1, "Live")
+        self.live_btn = CustomButton(self, -1, "Live")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
-        self.Bind(wx.EVT_BUTTON, self.OnLiveButton, btn)
-        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+        self.Bind(wx.EVT_BUTTON, self.OnLiveButton, self.live_btn)
+        hbox.Add(self.live_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
-        btn = CustomButton(self, -1, "Options")
+        self.options_btn = CustomButton(self, -1, "Options")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
-        self.Bind(wx.EVT_BUTTON, self.OnOptionsButton, btn)
-        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+        self.Bind(wx.EVT_BUTTON, self.OnOptionsButton, self.options_btn)
+        hbox.Add(self.options_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
-        btn = CustomButton(self, -1, "Editor")
-        # btn.SetBackgroundColour('#93FF8C') B2B2B2
-        self.Bind(wx.EVT_BUTTON, self.OnEditorButton, btn)
-        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+        self.editor_btn = CustomButton(self, -1, "Editor")
+        #self.editor_btn.SetBackgroundColour('#FFFFFF')
+        self.Bind(wx.EVT_BUTTON, self.OnEditorButton, self.editor_btn)
+        hbox.Add(self.editor_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
-        btn = CustomButton(self, -1, "Result")
+        self.result_btn = CustomButton(self, -1, "Result")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
-        self.Bind(wx.EVT_BUTTON, self.OnResultButton, btn)
-        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+        self.Bind(wx.EVT_BUTTON, self.OnResultButton, self.result_btn)
+        hbox.Add(self.result_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
-        btn = CustomButton(self, -1, "Visualiser")
+        self.visualiser_btn = CustomButton(self, -1, "Visualiser")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
-        self.Bind(wx.EVT_BUTTON, self.OnVisualiserButton, btn)
-        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+        self.Bind(wx.EVT_BUTTON, self.OnVisualiserButton, self.visualiser_btn)
+        hbox.Add(self.visualiser_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
-        btn = CustomButton(self, -1, "World Map")
+        self.worldmap_btn = CustomButton(self, -1, "World Map")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
-        self.Bind(wx.EVT_BUTTON, self.OnWorldMapButton, btn)
-        hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+        self.Bind(wx.EVT_BUTTON, self.OnWorldMapButton, self.worldmap_btn)
+        hbox.Add(self.worldmap_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
         btn = CustomButton(self, -1, "Undo")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
@@ -175,6 +175,7 @@ class GraphEditorPanel(wx.Panel):
                               "     my_graph_editor.set_UIside_panel_opened(true);}});")
         self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
         self.options_status = True
+        #self.options_btn.SetBackgroundColour('#FFFFFF')
 
     def hide_options(self):
         self.wv.RunScript("$('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast', function ()"
@@ -183,6 +184,8 @@ class GraphEditorPanel(wx.Panel):
                               "     my_graph_editor.set_UIside_panel_opened(false);});")
         self.wv.RunScript("$('#graph_ed' + ' #tweaks_button').toggleClass('graph_editor_button_on');")
         self.options_status = False
+        #self.options_btn.SetBackgroundColour('#B2B2B2')
+        #self.editor_btn.SetBackgroundColour('#FFFFFF')
 
     def show_result(self):
         self.wv.RunScript("document.getElementById('result_image').src = \"result.png?random=\"+new Date().getTime();")
@@ -191,6 +194,8 @@ class GraphEditorPanel(wx.Panel):
         self.wv.RunScript("$(canvas).hide();")
         self.wv.RunScript("$('#graph_ed'+' #result_button').toggleClass('graph_editor_button_on');")
         self.current_tab = 'Result'
+        #self.result_btn.SetBackgroundColour('#FFFFFF')
+        #self.editor_btn.SetBackgroundColour('#B2B2B2')
 
     def hide_result(self):
         self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
@@ -198,6 +203,8 @@ class GraphEditorPanel(wx.Panel):
         self.wv.RunScript("$('#graph_ed' + ' #result').hide();")
         self.wv.RunScript("$('#graph_ed' + ' #result_button').toggleClass('graph_editor_button_on');")
         self.current_tab = 'Editor'
+        #self.result_btn.SetBackgroundColour('#B2B2B2')
+        #self.editor_btn.SetBackgroundColour('#FFFFFF')
 
     def show_visualiser(self):
         self.wv.RunScript("$('#graph_ed' + ' #vizualizer').show();")
@@ -205,6 +212,8 @@ class GraphEditorPanel(wx.Panel):
         self.wv.RunScript("$(canvas).hide();")
         self.wv.RunScript("$('#graph_ed'+' #vizualizer_button').toggleClass('graph_editor_button_on');")
         self.current_tab = 'Visualiser'
+        #self.visualiser_btn.SetBackgroundColour('#FFFFFF')
+        #self.editor_btn.SetBackgroundColour('#B2B2B2')
 
     def hide_visualiser(self):
         self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
@@ -212,6 +221,8 @@ class GraphEditorPanel(wx.Panel):
         self.wv.RunScript("$('#graph_ed' + ' #vizualizer').hide();")
         self.wv.RunScript("$('#graph_ed' +' #vizualizer_button').toggleClass('graph_editor_button_on');")
         self.current_tab = 'Editor'
+        #self.visualiser_btn.SetBackgroundColour('#B2B2B2')
+        #self.editor_btn.BackgroundColour('#FFFFFF')
 
     def show_worldmap(self):
         self.wv.RunScript("$('#graph_ed' + ' #worldmap').show();")
@@ -220,6 +231,8 @@ class GraphEditorPanel(wx.Panel):
         self.wv.RunScript("$(canvas).hide();")
         self.wv.RunScript("$('#graph_ed'+' #worldmap_button').toggleClass('graph_editor_button_on');")
         self.current_tab = 'WorldMap'
+        #self.worldmap_btn.SetBackgroundColour('#FFFFFF')
+        #self.editor_btn.SetBackgroundColour('#B2B2B2')
 
     def hide_worldmap(self):
         self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
@@ -227,6 +240,8 @@ class GraphEditorPanel(wx.Panel):
         self.wv.RunScript("$('#graph_ed' + ' #worldmap').hide();")
         self.wv.RunScript("$('#graph_ed' +' #worldmap_button').toggleClass('graph_editor_button_on');")
         self.current_tab = 'Editor'
+        #self.worldmap_btn.SetBackgroundColour('#B2B2B2')
+        #self.editor_btn.SetBackgroundColour('#FFFFFF')
 
     def go_to_editor_tab(self):
         if self.current_tab == 'Editor' and self.options_status == True:
@@ -237,6 +252,8 @@ class GraphEditorPanel(wx.Panel):
             self.hide_visualiser()
         if self.current_tab == 'WorldMap':
             self.hide_worldmap()
+
+
 
     def OnLiveButton(self, event):
         if self.current_tab == 'Editor':
@@ -250,24 +267,25 @@ class GraphEditorPanel(wx.Panel):
 
     def OnEditorButton(self, event):
         self.go_to_editor_tab()
+        #self.editor_btn.SetBackgroundColour('#FFFFFF')
 
     def OnResultButton(self, event):
         if self.current_tab == 'Result':
-            self.go_to_editor_tab()
+            self.hide_result()
         else:
             self.go_to_editor_tab()
             self.show_result()
 
     def OnVisualiserButton(self, event):
         if self.current_tab == 'Visualiser':
-            self.go_to_editor_tab()
+            self.hide_visualiser()
         else:
             self.go_to_editor_tab()
             self.show_visualiser()
 
     def OnWorldMapButton(self, event):
         if self.current_tab == 'WorldMap':
-            self.go_to_editor_tab()
+            self.hide_worldmap()
         else:
             self.go_to_editor_tab()
             self.show_worldmap()

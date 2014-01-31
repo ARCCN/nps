@@ -2,7 +2,7 @@ import cmd
 
 from src.clustertools.cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node, \
                                                          send_mininet_cmd_to_cluster_node
-from config.config_constants                      import CLI_PROMPT_STRING
+from config.config_constants                      import CLI_PROMPT_STRING, DST_SCRIPT_FOLDER, INFECTED_HOSTS_FILENAME
 
 class CLI_director(cmd.Cmd):
     '''Class of CLI Director.
@@ -196,6 +196,34 @@ class CLI_director(cmd.Cmd):
         print('usage:')
         print('\tswitchnum')
 
+    def do_setupsniffers(self, args):
+        for host in self.host_IP_map.keys():
+            cmd = host + ' python ' + DST_SCRIPT_FOLDER + 'port_sniffer.py ' + host + \
+                  '-eth0 ' + DST_SCRIPT_FOLDER + INFECTED_HOSTS_FILENAME + ' &'
+            #print cmd
+            send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[host]],
+                                              cmd, self.ssh_chan_map, quite=False)
+
+    def help_setupsniffers(self):
+        print('usage:')
+        print('\tsetupsniffers')
+
+
+    def do_startworm(self, args):
+        hosts = args.split()
+
+        for host in hosts:
+            if self.is_hostname(host):
+
+                cmd = host + ' python ' + DST_SCRIPT_FOLDER + 'worm_instance.py ' + host + '-eth0' + ' &'
+                #print cmd
+                send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[host]],
+                                                  cmd, self.ssh_chan_map, quite=False)
+
+    def help_startworm(self):
+        print('usage:')
+        print('\tstartworm hostname')
+
     def do_clusterinfo(self,args):
         print('Number of nodes in graph is ' + str(len(self.host_map.keys())+self.switch_num) + '.')
         print('Number of hosts is ' + str(len(self.host_map.keys())) + '.')
@@ -232,7 +260,7 @@ class CLI_director(cmd.Cmd):
             it has been interpreted. If you want to modifdy the input line
             before execution (for example, variable substitution) do it here.
         """
-        self._hist += [ line.strip() ]
+        self._hist += [line.strip()]
         return line
 
     def postcmd(self, stop, line):

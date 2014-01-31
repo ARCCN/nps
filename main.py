@@ -146,18 +146,29 @@ if __name__ == '__main__':
     make_threaded(send_support_scripts_to_cluster_node, [node_map,], node_map)
     print('DONE!')
 
+    if MALWARE_MODE_ON:
+        print('Turn ON file monitor scripts on nodes'.ljust(STRING_ALIGNMENT, ' ')),
+        # Turn ON infected hosts file monitor scripts on cluster nodes
+        file_monitor_cmd = 'python ' + DST_SCRIPT_FOLDER + 'file_monitor.py ' + \
+                           MALWARE_CENTER_IP + ' ' + str(MALWARE_CENTER_PORT) + ' ' + \
+                           DST_SCRIPT_FOLDER + INFECTED_HOSTS_FILENAME + ' &'
+        #print file_monitor_cmd
+        make_threaded(send_cmd_to_cluster_node, [file_monitor_cmd, ssh_chan_map, node_mname_map], node_map)
+        print('DONE!')
+
     # STAGE 1. Execute start-up scripts on nodes
     print('Executing start up scripts on nodes'.ljust(STRING_ALIGNMENT, ' ')),
     make_threaded(exec_start_up_script, [node_intf_map, ssh_chan_map, node_mname_map], node_map)
     print('DONE!')
 
-    #print('Configuring host-processes eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
-    #node_IP_pool_map, node_IP_gr_map = define_node_ip_pool(node_groups, leaves, node_map)
-    #make_threaded(host_process_configurator_nodegroup,
-    #                    [node_groups, node_IP_gr_map, node_IP_pool_map, str(HOST_NETMASK),
-    #                        leaves, host_to_node_map, host_map, host_IP_map, ssh_chan_map],
-    #                    node_map)
-    #print('DONE!')
+
+    print('Configuring host-processes eth interfaces'.ljust(STRING_ALIGNMENT, ' ')),
+    node_IP_pool_map, node_IP_gr_map = define_node_ip_pool(node_groups, leaves, node_map)
+    make_threaded(host_process_configurator_nodegroup,
+                        [node_groups, node_IP_gr_map, node_IP_pool_map, str(HOST_NETMASK),
+                            leaves, host_to_node_map, host_map, host_IP_map, ssh_chan_map],
+                        node_map)
+    print('DONE!')
 
     end_config_timestamp = time.time()
     print('Setting up cluster for ' + str(end_config_timestamp-begin_config_timestamp) + ' sec.')

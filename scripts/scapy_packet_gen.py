@@ -9,8 +9,8 @@ magic = 100
 
 def gen_sasser_traffic( dst_ip, out_intf ):
     sendp(Ether()/IP(dst=dst_ip)/TCP(dport=445        ), iface=out_intf, count=1254)
-    sendp(Ether()/IP(dst=dst_ip)/TCP(dport=[445,9996] ), iface=out_intf, count=586+magic)
-    sendp(Ether()/IP(dst=dst_ip)/TCP(dport=[5554,1033]), iface=out_intf, count=1+magic)
+    sendp(Ether()/IP(dst=dst_ip)/TCP(dport=[445,9996] ), iface=out_intf, count=586)
+    sendp(Ether()/IP(dst=dst_ip)/TCP(dport=[5554,1033]), iface=out_intf, count=1)
 
 def gen_blaster_traffic( dst_ip, output_interface ):
     sendp(Ether()/IP(dst=dst_ip)/TCP(dport=135        ), iface=output_interface, count=540)
