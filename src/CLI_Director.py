@@ -288,7 +288,10 @@ class CLI_director(cmd.Cmd):
                 new_line = words[0]
                 self.do_ifconfig(new_line)
                 return
-        if self.is_hostname(words[0]):
+        if self.is_hostname(words[0]) and words not in self.host_IP_map.keys():
+            print('Unknown host name')
+            return
+        elif self.is_hostname(words[0]) and words in self.host_IP_map.keys():
             cmd = ''
             for word in words:
                 cmd += word + ' '

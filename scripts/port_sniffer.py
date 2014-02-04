@@ -1,7 +1,10 @@
 import sys
-from scapy.all import *
+import sqlite3 as lite
 import threading
 import os
+
+from scapy.all import *
+
 
 
 
@@ -11,20 +14,41 @@ def catch_sasser_worm_on_host(intf_name):
     sniff(iface=intf_name, filter="tcp and ( port 5554 or port 1033 )", count=2*1)
 
 
-def write_to_file_about_infection(host_intf_name, infected_hosts_filename):
+def write_to_file(host_intf_name, infected_hosts_filename):
     file = open(infected_hosts_filename, "a")
 
     cmd = "ifconfig " + host_intf_name + " | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'" \
                                     ">> " + infected_hosts_filename
 
     myip = os.popen(cmd).read()
-    file.write(myip)
+    if myip == '':
+        myip = 'NONE'
+    print host_intf_name + ':' + myip
+    file.write(host_intf_name + ':' + myip)
     file.close()
+
+
+def write_to_db(host_intf_name, db_filename):
+    con = lite.connect(db_filename)
+
+    cur = con.cursor()
+
+    cmd = "ifconfig " + host_intf_name + " | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'"
+    myip = os.popen(cmd).read()
+    if myip == '':
+        myip = 'NONE'
+
+    cur.execute("INSERT INTO Infected_hosts VALUES('" + host_intf_name + "','" + myip + "')")
+    con.commit()
+    con.close()
+
+
 
 def sniffer(host_intf_name, infected_hosts_filename):
     catch_sasser_worm_on_host(host_intf_name)
     #print('Catched!')
-    write_to_file_about_infection(host_intf_name, infected_hosts_filename)
+    #write_to_file(host_intf_name, infected_hosts_filename)
+    write_to_db(host_intf_name, infected_hosts_filename)
 
 
 
@@ -42,8 +66,7 @@ if __name__ == "__main__":
     infected_hosts_filename = sys.argv[2]
 
 
-    #thread = threading.Thread(target=sniffer, args=(host_intf_name, infected_hosts_filename))
-    #thread.start()
     sniffer(host_intf_name, infected_hosts_filename)
 
-    #print("finish_script")
+    #write_to_db(host_intf_name, infected_hosts_filename)
+

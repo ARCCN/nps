@@ -2,8 +2,7 @@ import os
 import sys
 import socket
 import time
-import threading
-from multiprocessing import Process, Queue
+import sqlite3 as lite
 
 FILE_MONITOR_SLEEP = 3
 FILE_MONITOR_LIFE_TIME = 30
@@ -31,7 +30,7 @@ def file_monitor(malware_center_ip, malware_center_port, fn):
             last = curr
 
             # actions on file changes
-            fp = open(fn)
+            fp = open(fn, 'r')
             readed_lines_num = 0
             for i, line in enumerate(fp):
                 if i >= curr_line_num:
@@ -45,6 +44,26 @@ def file_monitor(malware_center_ip, malware_center_port, fn):
         full_time += FILE_MONITOR_SLEEP
         #tell_malware_center_about_infection(malware_center_ip, malware_center_port, 'nochanges')
         time.sleep(FILE_MONITOR_SLEEP)
+
+def db_monitor(malware_center_ip, malware_center_port, db_filename):
+    con = lite.connect(db_filename)
+
+    cur = con.cursor()
+    cur.execute("DROP TABLE IF EXISTS Infected_hosts")
+    cur.execute("CREATE TABLE Infected_hosts(Name TEXT, IP TEXT)")
+
+    while True:
+        time.sleep(FILE_MONITOR_SLEEP)
+        cur.execute("SELECT * FROM Infected_hosts")
+        rows = cur.fetchall()
+        for row in rows:
+            message = row[0] + ":" + row[1]
+            cur.execute("DELETE FROM Infected_hosts WHERE Name='" + row[0] + "'")
+
+            tell_malware_center_about_infection(malware_center_ip, malware_center_port, message)
+        con.commit()
+
+
 
 
 if __name__ == '__main__':
@@ -60,11 +79,10 @@ if __name__ == '__main__':
     malware_center_port = int(sys.argv[2])
     filename = sys.argv[3]
 
-    #p = Process(target=file_monitor, args=(malware_center_ip, malware_center_port, filename))
-    #p.daemon = True
-    #p.start()
-    file_monitor(malware_center_ip, malware_center_port, filename)
+    #file_monitor(malware_center_ip, malware_center_port, filename)
+
+    db_monitor(malware_center_ip, malware_center_port, filename)
 
 
-    #print('finish_script')
+
 
