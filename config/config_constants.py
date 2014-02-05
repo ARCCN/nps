@@ -1,18 +1,19 @@
 STRING_ALIGNMENT = 50
 PYTHONPATH = '/Library/Frameworks/Python.framework/Versions/2.7/bin/python'
 
-MININETCE_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
+NPS_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
 CONTROLLER_PATH = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
 MALWARE_CENTER_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition/src/malwaretools'
 GUI_HTML = 'GUI/GUI.html'
 
 
-LOG_FILEPATH      = MININETCE_PATH + '/logs/MininetCluster.log'
-ROOT_LOG_FILEPATH = MININETCE_PATH + '/logs/MininetCluster_root.log'
-MALWARE_LOG_PATH  = MININETCE_PATH + '/logs/MalwarePropagation.log'
-SRC_SCRIPT_FOLDER = MININETCE_PATH + '/scripts/'
+LOG_FILEPATH      = NPS_PATH + '/logs/MininetCluster.log'
+ROOT_LOG_FILEPATH = NPS_PATH + '/logs/MininetCluster_root.log'
+MALWARE_LOG_PATH  = NPS_PATH + '/logs/MalwarePropagation.log'
+SRC_SCRIPT_FOLDER = NPS_PATH + '/scripts/'
 DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/'
-NODELIST_FILEPATH = MININETCE_PATH + '/config/nodelist.txt'
+NODELIST_FILEPATH = NPS_PATH + '/config/nodelist.txt'
+MAIN_DB_PATH      = NPS_PATH + '/tmp/'
 
 
 
@@ -20,6 +21,9 @@ MALWARE_MODE_ON = True
 MALWARE_CENTER_IP   = '172.0.1.100'
 MALWARE_CENTER_PORT = 56565
 INFECTED_HOSTS_FILENAME = 'infected_hosts.db'
+
+MAIN_DB_NAME = 'infected_hosts.db'
+
 
 FIRST_HOST_IP = '1.2.3.1'
 

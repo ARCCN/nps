@@ -215,6 +215,8 @@ Vertex = function(pos, label) {
     this.frozen = false;
     this.label = label || next_label();
 //    this.service_dhcp = false;
+    this.infected = false;
+    this.vulnerable = false;
     this.service_dhcp = false;
     this.netapps = {};
 
@@ -246,7 +248,7 @@ Vertex.prototype = {
         return angle;
     },
     display: function() {
-        var node_number;
+        var node_name;
         ctx.strokeStyle = "#000000";
         if (this.selected) {
             ctx.fillStyle = "#FF0000";
@@ -254,7 +256,13 @@ Vertex.prototype = {
             ctx.fillStyle = "#ADB3DB"; //CCC000
         } else {
             if (NODE_NUMBERS) {
-                ctx.fillStyle = "#FFFFFF";
+                if (this.infected && this.vulnerable){
+                    ctx.fillStyle = "#FF1B1B"; //cool red
+                } else if (!this.infected && this.vulnerable){
+                    ctx.fillStyle = "#1EB203"; //cool green
+                } else {
+                    ctx.fillStyle = "#FFFFFF";
+                }
             } else if (this.frozen){
                 ctx.fillStyle = "#C0C0C0";
             } else {
@@ -270,20 +278,29 @@ Vertex.prototype = {
             ctx.fillText(' DHCP = ' + this.service_dhcp.toString(), this.pos.x-(w/2)*NODE_RADIUS,
                 this.pos.y-(h+2)*NODE_RADIUS + NODE_RADIUS);
 
-            var count = 3;
-            for (netapp in this.netapps) {
-                ctx.fillText(' ' + netapp.toString() + ' = ' + this.netapps[netapp].toString(),
-                    this.pos.x-(w/2)*NODE_RADIUS, this.pos.y-(h+2)*NODE_RADIUS + count *NODE_RADIUS);
-                count++;
-            }
+            // For test only
+            ctx.fillText(' INF = ' + this.infected.toString(),
+                    this.pos.x-(w/2)*NODE_RADIUS, this.pos.y-(h+2)*NODE_RADIUS + 3 *NODE_RADIUS);
+            ctx.fillText(' VAL = ' + this.vulnerable.toString(),
+                    this.pos.x-(w/2)*NODE_RADIUS, this.pos.y-(h+2)*NODE_RADIUS + 4 *NODE_RADIUS);
+            ctx.fillText(' LABEL = ' + this.label,
+                    this.pos.x-(w/2)*NODE_RADIUS, this.pos.y-(h+2)*NODE_RADIUS + 5 *NODE_RADIUS);
+
+//            var count = 3;
+//            for (netapp in this.netapps) {
+//                ctx.fillText(' ' + netapp.toString() + ' = ' + this.netapps[netapp].toString(),
+//                    this.pos.x-(w/2)*NODE_RADIUS, this.pos.y-(h+2)*NODE_RADIUS + count *NODE_RADIUS);
+//                count++;
+//            }
         }
         else {
             circle(this.pos.x, this.pos.y, NODE_RADIUS);
         }
         if (NODE_NUMBERS) {
             ctx.fillStyle = "#000000";
-            node_number = nodes.indexOf(this).toString();
-            ctx.fillText(node_number, this.pos.x - 4 * node_number.length, this.pos.y + 3);
+//            node_name = nodes.indexOf(this).toString();
+            node_name = this.label
+            ctx.fillText(node_name, this.pos.x - 4 * node_name.length, this.pos.y + 3);
         }
     },
     vector_from: function(v) {
@@ -1157,7 +1174,29 @@ function get_UIside_panel_opened(){
 }
 
 function get_SIZE_x(){
-    return SIZE.x
+    return SIZE.x;
+}
+
+function set_node_infected(label){
+    nodes[parseInt(label)].infected = true;
+
+}
+
+function set_node_vulnerable(label){
+    nodes[parseInt(label)].vulnerable = true;
+
+}
+
+function set_nodes_vulnerable(){
+    for (i = 0; i < nodes.length; i += 1) {
+        nodes[i].vulnerable = true;
+    }
+}
+
+function set_nodes_invulnerable(){
+    for (i = 0; i < nodes.length; i += 1) {
+        nodes[i].vulnerable = false;
+    }
 }
 
 
@@ -1167,6 +1206,10 @@ init();
 //an global object graph_editor is created containing all global functions
 return {
     import_from_JSON: import_from_JSON,
+    set_node_infected:set_node_infected,
+    set_nodes_vulnerable:set_nodes_vulnerable,
+    set_nodes_invulnerable:set_nodes_invulnerable,
+    set_node_vulnerable:set_node_vulnerable,
     export_sage: export_sage,
     toggle_live: toggle_live,
     erase_graph: erase_graph,

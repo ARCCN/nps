@@ -1,8 +1,12 @@
 import subprocess
 import time
 import wx
-from config.config_constants import NODELIST_FILEPATH, CHECK_PING_TIME_PERIOD
+from config.config_constants import NODELIST_FILEPATH, CHECK_PING_TIME_PERIOD, MALWARE_MODE_ON
 from src.KThread import KThread
+from src.mininettools.mininet_script_operator import define_leaves_in_graph
+
+import json
+import networkx as nx
 
 __author__ = 'vitalyantonenko'
 
@@ -15,6 +19,15 @@ class CustomButton(wx.Button):
         self.SetBackgroundColour('#B2B2B2') #C4C4FF
         # more customization here
 
+class CustomToggleButton(wx.ToggleButton):
+    def __init__(self, *a, **k):
+        #style = ( wx.NO_BORDER )
+        #wx.ToggleButton.__init__(self,  style=style, *a, **k)
+        wx.ToggleButton.__init__(self, *a, **k)
+
+        self.SetBackgroundColour('#B2B2B2') #C4C4FF
+        # more customization here
+
 
 class CustomTextCtrl_readonly(wx.TextCtrl):
     def __init__(self, *a, **k):
@@ -22,6 +35,7 @@ class CustomTextCtrl_readonly(wx.TextCtrl):
         wx.TextCtrl.__init__(self, style=style, *a, **k)
 
         self.SetBackgroundColour('#D8D8D8')
+        self.SetMaxLength(100)
         # more customization here
 
 
@@ -103,7 +117,7 @@ class GraphEditorPanel(wx.Panel):
     """
     """
     #----------------------------------------------------------------------
-    def __init__(self, parent, wv):
+    def __init__(self, parent, wv, inf_hosts_list=None):
         wx.Panel.__init__(self, parent, id=wx.ID_ANY, style=
                              wx.BK_DEFAULT
                              #wx.BK_TOP
@@ -115,6 +129,9 @@ class GraphEditorPanel(wx.Panel):
         self.tabs = {'Result', 'Visualizer', 'WorldMap'}
 
         self.wv = wv
+        if MALWARE_MODE_ON:
+            self.inf_hosts_list = inf_hosts_list
+            self. graph_data = ""
 
         self.current_tab = 'Editor'
         self.options_status = False
@@ -130,6 +147,19 @@ class GraphEditorPanel(wx.Panel):
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
         self.Bind(wx.EVT_BUTTON, self.OnOptionsButton, self.options_btn)
         hbox.Add(self.options_btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        if MALWARE_MODE_ON:
+            self.showinf_btn = CustomButton(self, -1, "Show Inf")
+            # btn.SetBackgroundColour('#93FF8C') B2B2B2
+            self.Bind(wx.EVT_BUTTON, self.OnShowInfButton, self.showinf_btn)
+            hbox.Add(self.showinf_btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+            self.showinf_chb = wx.CheckBox(self, label='Show Inf')
+            self.showinf_chb.Bind(wx.EVT_CHECKBOX, self.OnShowInfChbClick)
+            hbox.Add(self.showinf_chb, 1, wx.EXPAND|wx.RIGHT, 1)
+            self.update_thread = KThread(target=self.update_thread_func)
+            self.update_thread.setDaemon(True)
+            self.thread_already_created = True
 
         self.editor_btn = CustomButton(self, -1, "Editor")
         #self.editor_btn.SetBackgroundColour('#FFFFFF')
@@ -167,6 +197,7 @@ class GraphEditorPanel(wx.Panel):
         hbox.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
         self.SetSizer(hbox)
+
 
     def show_options(self):
         self.wv.RunScript("$('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() + 185 + 'px'}, "
@@ -253,6 +284,22 @@ class GraphEditorPanel(wx.Panel):
         if self.current_tab == 'WorldMap':
             self.hide_worldmap()
 
+    def set_graph_data(self, graph_data):
+        self.graph_data = graph_data
+
+    def change_hosts_color(self, graph_data):
+        # Draw in green only leaves
+        js = json.loads(graph_data)
+        G = nx.Graph()
+        for edge in js['edges']:
+            if int(edge[0]) not in G.nodes():
+                G.add_node(int(edge[0]))
+            if int(edge[1]) not in G.nodes():
+                G.add_node(int(edge[1]))
+            G.add_edge(int(edge[0]), int(edge[1]))
+        leaves = define_leaves_in_graph(G)
+        for l in leaves:
+            self.wv.RunScript("my_graph_editor.set_node_vulnerable(\"" + str(l) + "\");")
 
 
     def OnLiveButton(self, event):
@@ -265,9 +312,37 @@ class GraphEditorPanel(wx.Panel):
         elif self.options_status and self.current_tab == 'Editor':
             self.hide_options()
 
+    def OnShowInfButton(self, event):
+        if self.current_tab == 'Editor':
+            for host in self.inf_hosts_list:
+                self.wv.RunScript("my_graph_editor.set_node_infected(\"" + host[1:] + "\")")
+
+    def OnShowInfChbClick(self, event):
+        sender = event.GetEventObject()
+        isChecked = sender.GetValue()
+
+        if isChecked:
+            self.change_hosts_color(self.graph_data)
+            if not self.thread_already_created:
+                self.update_thread = KThread(target=self.update_thread_func)
+                self.update_thread.setDaemon(True)
+            self.update_thread.start()
+        else:
+            self.update_thread.kill()
+            self.thread_already_created = False
+            self.wv.RunScript("my_graph_editor.set_nodes_invulnerable()")
+
+    def update_thread_func(self):
+        while True:
+            time.sleep(1)
+            evt = wx.CommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED, self.showinf_btn.GetId())
+            wx.PostEvent(self.showinf_btn, evt)
+
     def OnEditorButton(self, event):
         self.go_to_editor_tab()
         #self.editor_btn.SetBackgroundColour('#FFFFFF')
+
+
 
     def OnResultButton(self, event):
         if self.current_tab == 'Result':

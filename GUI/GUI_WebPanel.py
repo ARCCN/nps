@@ -3,6 +3,8 @@ import subprocess
 import sys
 from wx import html2 as webview
 
+import json
+
 import networkx as nx
 import wx
 from GUI.GUI_Elements import CustomButton, CustomTextCtrl, NodeStatusPanel, GraphEditorPanel,CustomTextCtrl_readonly
@@ -12,7 +14,8 @@ from config.config_constants import CONTROLLER_PATH, MALWARE_CENTER_IP, MALWARE_
     MALWARE_MODE_ON, MALWARE_CENTER_PATH
 from src.KThread import KThread
 
-from src.malwaretools.malware_center import start_malware_center
+from src.mininettools.mininet_script_operator import define_leaves_in_graph
+
 
 
 class WebPanel(wx.Panel):
@@ -29,6 +32,10 @@ class WebPanel(wx.Panel):
         '''
         self.p = None
         wx.Panel.__init__(self, parent)
+
+        if MALWARE_MODE_ON:
+            self.inf_hosts_list = []
+            self.hosts_list = []
 
         self.current = os.path.realpath(parent.parent.html_path)
         self.frame = parent
@@ -81,8 +88,8 @@ class WebPanel(wx.Panel):
         sizer.Add(node_status_panel, 0, wx.EXPAND)
 
         ## Graph editor control panel
-        graph_editor_panel = GraphEditorPanel(self, self.wv)
-        sizer.Add(graph_editor_panel, 0, wx.EXPAND)
+        self.graph_editor_panel = GraphEditorPanel(self, self.wv, self.inf_hosts_list)
+        sizer.Add(self.graph_editor_panel, 0, wx.EXPAND)
 
 
         sizer.Add(self.wv, 1, wx.EXPAND)
@@ -141,6 +148,20 @@ class WebPanel(wx.Panel):
         self.Layout()
         #self.wv.LoadURL('file://' + self.current)
 
+    def change_hosts_color(self, graph_data):
+        # Draw in green only leaves
+        js = json.loads(graph_data)
+        G = nx.Graph()
+        for edge in js['edges']:
+            if int(edge[0]) not in G.nodes():
+                G.add_node(int(edge[0]))
+            if int(edge[1]) not in G.nodes():
+                G.add_node(int(edge[1]))
+            G.add_edge(int(edge[0]), int(edge[1]))
+        leaves = define_leaves_in_graph(G)
+        for l in leaves:
+            self.wv.RunScript("my_graph_editor.set_node_vulnerable(\"" + str(l) + "\");")
+
     def OnDropFiles(self, x, y, filenames):
         print('FILE!!!')
 
@@ -174,23 +195,14 @@ class WebPanel(wx.Panel):
                                        "NPS Graph files (*.nps)|*.nps", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if openFileDialog.ShowModal() == wx.ID_CANCEL:
             return
-        #input_stream = wx.FileInputStream(openFileDialog.GetPath())
-
         load_file = open(openFileDialog.GetPath(), 'r')
         graph_data = load_file.read()
         print graph_data
 
         self.wv.RunScript("jrg = '%s'" % graph_data)
         self.wv.RunScript("my_graph_editor.import_from_JSON(jrg)")
-
-
         load_file.close()
 
-
-
-        #if not input_stream.IsOk():
-        #    wx.LogError("Cannot open file '%s'."%openFileDialog.GetPath())
-        #    return
 
     def OnSaveButton(self, event):
         saveFileDialog = wx.FileDialog(self, "Save NPS Graph file", "", "",
@@ -223,6 +235,9 @@ class WebPanel(wx.Panel):
         # p.set_graph_data(graph_data)
 
         if MALWARE_MODE_ON:
+            self.graph_editor_panel.set_graph_data(graph_data)
+            #self.change_hosts_color(graph_data)
+
             malware_center_cmd = "python " + MALWARE_CENTER_PATH + "/malware_center.py " + \
                                  MALWARE_CENTER_IP + ' ' + str(MALWARE_CENTER_PORT)
             self.malware_center_proc = subprocess.Popen(malware_center_cmd, stdout=subprocess.PIPE, shell=True)
@@ -236,13 +251,6 @@ class WebPanel(wx.Panel):
         self.controller_thread.setDaemon(True)
         self.controller_thread.start()
         #self.controller.AppendText("CONTROLLER ON")
-
-        # self.p = pexpect.spawn(sys.prefix + '/bin/python main.py \'' + graph_data + '\'', timeout=777)
-        #
-        # self.p.expect('mininet CE> ') #mininet CE>
-        # for s in self.p.before:
-        #     if len(s) != 0 and s != '\n':
-        #         self.console.AppendText(s)
 
         console_cmd = sys.prefix + '/bin/python main.py \'' + graph_data + '\''
         self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
@@ -319,6 +327,12 @@ class WebPanel(wx.Panel):
             if out == '' and self.malware_center_proc.poll() != None:
                 break
             if out != '':
+                if "new worm instance " in out:
+                    host = out.split()[3].split(':')[0].split('-')[0]
+                    #self.wv.RunScript("my_graph_editor.set_node_infected(\"3\")")
+                    print "my_graph_editor.set_node_infected(\"" + host[1:] + "\")"
+                    self.inf_hosts_list.append(host)
+                    #self.wv.RunScript("my_graph_editor.set_node_infected(\"" + host[1:] + "\")")
                 wx.CallAfter(self.malware_center.AppendText, out)
 
     def controller_thread_func(self):

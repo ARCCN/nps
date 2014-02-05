@@ -50,6 +50,11 @@ def sniffer(host_intf_name, infected_hosts_filename):
     #write_to_file(host_intf_name, infected_hosts_filename)
     write_to_db(host_intf_name, infected_hosts_filename)
 
+    cmd = 'python /home/clusternode/MininetScrupts/worm_instance.py ' + host_intf_name + ' &'
+    os.popen(cmd)
+
+
+
 
 
 
