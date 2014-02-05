@@ -236,6 +236,7 @@ class WebPanel(wx.Panel):
 
         if MALWARE_MODE_ON:
             self.graph_editor_panel.set_graph_data(graph_data)
+            self.graph_editor_panel.enable_showinf_chb()
             #self.change_hosts_color(graph_data)
 
             malware_center_cmd = "python " + MALWARE_CENTER_PATH + "/malware_center.py " + \

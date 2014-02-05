@@ -152,11 +152,13 @@ class GraphEditorPanel(wx.Panel):
             self.showinf_btn = CustomButton(self, -1, "Show Inf")
             # btn.SetBackgroundColour('#93FF8C') B2B2B2
             self.Bind(wx.EVT_BUTTON, self.OnShowInfButton, self.showinf_btn)
+            self.showinf_btn.Hide()
             hbox.Add(self.showinf_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
             self.showinf_chb = wx.CheckBox(self, label='Show Inf')
             self.showinf_chb.Bind(wx.EVT_CHECKBOX, self.OnShowInfChbClick)
             hbox.Add(self.showinf_chb, 1, wx.EXPAND|wx.RIGHT, 1)
+            self.showinf_chb.Enable(False)
             self.update_thread = KThread(target=self.update_thread_func)
             self.update_thread.setDaemon(True)
             self.thread_already_created = True
@@ -286,6 +288,9 @@ class GraphEditorPanel(wx.Panel):
 
     def set_graph_data(self, graph_data):
         self.graph_data = graph_data
+
+    def enable_showinf_chb(self):
+        self.showinf_chb.Enable(True)
 
     def change_hosts_color(self, graph_data):
         # Draw in green only leaves
