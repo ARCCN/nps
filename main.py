@@ -2,7 +2,6 @@
 from src.mininettools import mininet_script_generator, mininet_script_operator
 
 
-
 def delete_logs():
     if os.path.isfile(LOG_FILEPATH):
         os.remove(LOG_FILEPATH)
@@ -26,15 +25,8 @@ def delete_logs():
 #    logger_MalwareProp.addHandler(logging.FileHandler(MALWARE_LOG_PATH))
 
 from paramiko import *
-import os
-import sys
-import time
-import pickle
-import json
-
+import os, sys, time, json
 import networkx as nx
-
-
 
 from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
 from config.config_constants import LOG_FILEPATH, ROOT_LOG_FILEPATH, MALWARE_LOG_PATH, NODELIST_FILEPATH

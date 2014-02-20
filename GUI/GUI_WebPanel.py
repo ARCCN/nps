@@ -141,7 +141,7 @@ class WebPanel(wx.Panel):
             con_sizer.Add(self.malware_center, 1, wx.BOTTOM|wx.EXPAND, 1)
         con_sizer.Add(controller_tabs, 1, wx.BOTTOM|wx.EXPAND, 1)
         #con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND)
-        con_sizer.Add(console_tabs, 3, wx.ALL|wx.EXPAND)
+        con_sizer.Add(console_tabs, 5, wx.ALL|wx.EXPAND)
         con_sizer.Add(con_hsizer, 0, wx.ALL|wx.EXPAND)
 
         glob_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -231,6 +231,9 @@ class WebPanel(wx.Panel):
         # Save current graph
         self.console.ChangeValue('')
         self.controller.ChangeValue('')
+        if MALWARE_MODE_ON:
+            self.malware_center.ChangeValue('')
+
         prev_title = self.wv.GetCurrentTitle()
         self.wv.RunScript("document.title = my_graph_editor.export_sage()")
         graph_data = self.wv.GetCurrentTitle()
@@ -354,10 +357,11 @@ class WebPanel(wx.Panel):
 
     def console_thread_func(self):
         while True:
-            out = self.console_proc.stdout.readline()
-            if out == '' and self.console_proc.poll() != None:
+            out = self.console_proc.stdout.read(1)
+            if not out:
                 break
-            if out != '':
+            else:
                 wx.CallAfter(self.console.AppendText, out)
+
 
 
