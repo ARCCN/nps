@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import time
 from wx import html2 as webview
 
 import json
@@ -88,7 +89,10 @@ class WebPanel(wx.Panel):
         sizer.Add(node_status_panel, 0, wx.EXPAND)
 
         ## Graph editor control panel
-        self.graph_editor_panel = GraphEditorPanel(self, self.wv, self.inf_hosts_list)
+        if MALWARE_MODE_ON:
+            self.graph_editor_panel = GraphEditorPanel(self, self.wv, self.inf_hosts_list)
+        else:
+            self.graph_editor_panel = GraphEditorPanel(self, self.wv, None)
         sizer.Add(self.graph_editor_panel, 0, wx.EXPAND)
 
 
@@ -337,12 +341,16 @@ class WebPanel(wx.Panel):
                 wx.CallAfter(self.malware_center.AppendText, out)
 
     def controller_thread_func(self):
+        #FOR HUGE TOPO#
+        wx.CallAfter(self.controller.AppendText, 'CONTROLLER ON')
         while True:
+            #time.sleep(1)
             out = self.controller_proc.stdout.readline()
             if out == '' and self.controller_proc.poll() != None:
                 break
             if out != '':
-                wx.CallAfter(self.controller.AppendText, out)
+                #wx.CallAfter(self.controller.AppendText, out)
+                pass
 
     def console_thread_func(self):
         while True:
