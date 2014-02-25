@@ -260,7 +260,19 @@ class WebPanel(wx.Panel):
         self.controller_thread.start()
         #self.controller.AppendText("CONTROLLER ON")
 
-        console_cmd = sys.prefix + '/bin/python main.py \'' + graph_data + '\''
+        #save graph data to tmp file
+        file_name = 'tmp/topo.nps'
+        graph_file = open(file_name, 'w')
+        graph_file.write(graph_data)
+        graph_file.close()
+
+        #console_cmd = sys.prefix + '/bin/python main.py \'' + graph_data + '\''
+        #self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+        #self.console_thread = KThread(target=self.console_thread_func)
+        #self.console_thread.setDaemon(True)
+        #self.console_thread.start()
+
+        console_cmd = sys.prefix + '/bin/python main.py \'' + file_name + '\''
         self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
         self.console_thread = KThread(target=self.console_thread_func)
         self.console_thread.setDaemon(True)
