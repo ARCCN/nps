@@ -168,7 +168,7 @@ class ConsoleTabPanel(wx.Panel):
         vbox.Add(hbox, 0, wx.EXPAND)
 
         self.console_tabs = wx.Notebook(self)
-        vbox.Add(self.console_tabs, 2, flag=wx.EXPAND)
+        vbox.Add(self.console_tabs, 1, flag=wx.EXPAND)
 
         self.SetSizer(vbox)
 

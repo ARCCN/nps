@@ -31,11 +31,11 @@ class CustomToggleButton(wx.ToggleButton):
 
 class CustomTextCtrl_readonly(wx.TextCtrl):
     def __init__(self, *a, **k):
-        style = ( wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL )
+        style = ( wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL | wx.EXPAND )
         wx.TextCtrl.__init__(self, style=style, *a, **k)
 
         self.SetBackgroundColour('#D8D8D8')
-        self.SetMaxLength(100)
+        #self.SetMaxLength(100)
         # more customization here
 
 

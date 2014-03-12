@@ -973,8 +973,7 @@ function create_controls(div) {
     $(div).append('<div id="result"></div>');
     result_gr = div+' #result';
     $(result_gr).append("<table>\
-        <img src='result.png' width='700' height='500' id='result_image' />\
-        </table>").hide();
+        <img src='result.png' width='" + SIZE.x + "' height='" + SIZE.y + "' id='result_image' /></table>").hide();
 
     // Create Options tab code and controllers - create "INFOBOX"
     $(div + ' .infobox #info').hide();

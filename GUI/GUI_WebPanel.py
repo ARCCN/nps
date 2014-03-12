@@ -98,17 +98,21 @@ class WebPanel(wx.Panel):
 
         sizer.Add(self.wv, 1, wx.EXPAND)
 
-        #self.console = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
-        #font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-        #self.console.SetFont(font_console)
+        self.console = CustomTextCtrl_readonly(self, wx.ID_ANY, size=(235,100))
+        font_console = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        self.console.SetFont(font_console)
 
-        ## Console tab panel
-        console_tabs = ConsoleTabPanel(self)
-        self.console = console_tabs.get_console()
+        ### Console tab panel
+        #console_tabs = ConsoleTabPanel(self)
+        #self.console = console_tabs.get_console()
 
-        #self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY) #size=(235,100)
-        #font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-        #self.controller.SetFont(font_controller)
+        self.controller = CustomTextCtrl_readonly(self, wx.ID_ANY) #size=(235,100)
+        font_controller = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+        self.controller.SetFont(font_controller)
+
+        ### Controller tab panel
+        #controller_tabs = ControllerTabPanel(self)
+        #self.controller = controller_tabs.get_console()
 
         if MALWARE_MODE_ON:
             ## Malware center panel
@@ -116,9 +120,6 @@ class WebPanel(wx.Panel):
             font_malware_center = wx.Font(7, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
             self.malware_center.SetFont(font_malware_center)
 
-        ## Controller tab panel
-        controller_tabs = ControllerTabPanel(self)
-        self.controller = controller_tabs.get_console()
 
         ## Send command row
         btn = CustomButton(self, wx.ID_ANY, 'Send')
@@ -139,9 +140,10 @@ class WebPanel(wx.Panel):
         if MALWARE_MODE_ON:
             con_sizer.Add(wx.StaticText(self, -1, 'Malware center output:'), 0, wx.BOTTOM|wx.EXPAND, 1)
             con_sizer.Add(self.malware_center, 1, wx.BOTTOM|wx.EXPAND, 1)
-        con_sizer.Add(controller_tabs, 1, wx.BOTTOM|wx.EXPAND, 1)
-        #con_sizer.Add(self.console, 2, wx.ALL|wx.EXPAND)
-        con_sizer.Add(console_tabs, 5, wx.ALL|wx.EXPAND)
+        #con_sizer.Add(controller_tabs, 1, wx.BOTTOM|wx.EXPAND, 1)
+        con_sizer.Add(self.controller, 1, wx.BOTTOM|wx.EXPAND, 1)
+        #con_sizer.Add(console_tabs, 5, wx.ALL|wx.EXPAND)
+        con_sizer.Add(self.console, 5, wx.ALL|wx.EXPAND)
         con_sizer.Add(con_hsizer, 0, wx.ALL|wx.EXPAND)
 
         glob_sizer = wx.BoxSizer(wx.HORIZONTAL)

@@ -1,4 +1,5 @@
 #from main import logger_MininetCE
+import sys
 
 
 def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, quite=True):
@@ -13,14 +14,28 @@ def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, quite=True):
     ssh_chan_map[node_IP].send(cmd)
     buff = ""
     if cmd != 'exit\n':
+        #while not buff.endswith('mininet> '):
+        #    buff += ssh_chan_map[node_IP].recv(9999)
+        ## print("SUCCESS:" + node_IP + ": " + cmd)
+        ##    print buff
+        #if not quite:
+        #    buff_lines = buff.splitlines()
+        #    for line in buff_lines[:-1]:
+        #        print(line)
+
+        last = ""
         while not buff.endswith('mininet> '):
-            buff += ssh_chan_map[node_IP].recv(9999)
+            out = ssh_chan_map[node_IP].recv(1)
+            if out:
+                if out == '\n' and last != '\n': # remove duplication end of line
+                    pass
+                elif not quite:
+                    sys.stdout.write(out)
+            buff += out
+            last = out
         # print("SUCCESS:" + node_IP + ": " + cmd)
         #    print buff
-        if not quite:
-            buff_lines = buff.splitlines()
-            for line in buff_lines[:-1]:
-                print(line)
+
         #logger_MininetCE.info("SUCCESS:" + node_IP + ": " + cmd)
 
 
@@ -38,12 +53,22 @@ def send_mininet_ping_to_cluster_node(node_IP, cmd, ssh_chan_map):
     cmd += '\n'
     ssh_chan_map[node_IP].send(cmd)
     buff = ''
+    #while not buff.endswith('mininet> '):
+    #    if ssh_chan_map[node_IP].recv_ready():
+    #        buff += ssh_chan_map[node_IP].recv(9999)
+    #buff_lines = buff.splitlines()
+    #for line in buff_lines[:-1]:
+    #    print(line)
+    last = ""
     while not buff.endswith('mininet> '):
-        if ssh_chan_map[node_IP].recv_ready():
-            buff += ssh_chan_map[node_IP].recv(9999)
-    buff_lines = buff.splitlines()
-    for line in buff_lines[:-1]:
-        print(line)
+        out = ssh_chan_map[node_IP].recv(1)
+        if out:
+            if out == '\n' and last != '\n': # remove duplication end of line
+                pass
+            else:
+                sys.stdout.write(out)
+        buff += out
+        last = out
 
 def test_delay_between_mn_hosts(node_IP, src_host_IP, dst_host_IP, threshold, ssh_chan_map):
     '''Send Mininet console command to test delay between hosts and compare to threshold.

@@ -1,9 +1,9 @@
 STRING_ALIGNMENT = 50
 PYTHONPATH = '/Library/Frameworks/Python.framework/Versions/2.7/bin/python'
 
-NPS_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition'
+NPS_PATH = '/Users/vitalyantonenko/PycharmProjects/NPS'
 CONTROLLER_PATH = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
-MALWARE_CENTER_PATH = '/Users/vitalyantonenko/PycharmProjects/MininetClusterEdition/src/malwaretools'
+MALWARE_CENTER_PATH = '/Users/vitalyantonenko/PycharmProjects/NPS/src/malwaretools'
 GUI_HTML = 'GUI/GUI.html'
 
 
