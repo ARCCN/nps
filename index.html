@@ -4,11 +4,19 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="NPS : " />
+    <meta name="description" content="Network Prototyping Simulator (NPS)" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>NPS</title>
+	<div id="mnce-screenshot-l">
+		<img src="images/screenshots/screenshot-1.png" />
+    </div>
+	<div id="mnce-screenshot-r">
+		<img src="images/screenshots/screenshot-2.png" />
+    </div>
+
+    <title>Network Prototype Simulation</title>
+
   </head>
 
   <body>
@@ -16,60 +24,351 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/ARCCN/nps">View on GitHub</a>
+          <a id="forkme_banner" href="https://github.com/anvial/MininetClusterEdition">View on GitHub</a>
 
-          <h1 id="project_title">NPS</h1>
-          <h2 id="project_tagline"></h2>
+          <h1 id="project_title">Network Prototype Simulator</h1>
+          <h2 id="project_tagline">Expanding Mininet on Cluster Architecture</h2>
 
             <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/ARCCN/nps/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/ARCCN/nps/tarball/master">Download this project as a tar.gz file</a>
+              <a class="zip_download_link" href="https://github.com/anvial/MininetClusterEdition/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/anvial/MininetClusterEdition/tarball/master">Download this project as a tar.gz file</a>
             </section>
         </header>
     </div>
 
     <!-- MAIN CONTENT -->
+    <div id="logo" href="http://www.arccn.ru/">
+		<img src="images/logo_eng.png" />
+    </div>
+	
+
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<a name="welcome-to-mininet-cluster-edition-page" class="anchor" href="#welcome-to-mininet-cluster-edition-page"><span class="octicon octicon-link"></span></a>Welcome to Network Prototype Simulator Page.</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>Network Prototyping Simulator is a simulation system that expands <a href="http://mininet.org/">Mininet</a> network emulator to computer cluster. That allow us to reproduce the network with such an amount of nodes that hardly was possible before. The maximum size of network topology in NPS depends on number of cluster nodes with Mininet instances. One cluster node can emulate more than thousand hosts, and an modern server could execute at least 15 cluster nodes packed in virtual machines. As the result, we get about 15 thousands hosts per server. The scalability of NPS makes it possible to emulate really big networks.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>By the architecture, NPS saves features of Mininet, so it does not become a clear simulation system, it remains a network prototyping system. Means one could trust the results of such simulation and there is no need to prove correctness and adequacy of the model built.</p>
+
+<hr><h2>
+<a name="mininet-ce-quick-start-guide" class="anchor" href="#mininet-ce-quick-start-guide"><span class="octicon octicon-link"></span></a>NPS Quick Start Guide</h2>
+
+<h1>
+<a name="mininet-ce-architecture" class="anchor" href="#mininet-ce-architecture"><span class="octicon octicon-link"></span></a>NPS architecture</h1>
+NPS setup has two types of nodes: "cluster" node and "control" node. Currently both are packed into virtual machines. Naturally cluster setup consists of one control node and many cluster nodes. Virtualization system used is Oracle VirtualBox.    
+
+<h1>
+<a name="creating-cluster-node-vm" class="anchor" href="#creating-cluster-node-vm"><span class="octicon octicon-link"></span></a>Creating Cluster Node VM</h1>
+
+<ul>
+<li>Create VM with 1 CPU core, 1Gb of RAM, 6.2 Gb disk space and two NICs (eth0 - for control, eth1 - for cluster data exchange). Set 1st NIC initially as NAT, 2nd as "Internal network" and allow "Promicious Mode: Allow All"</li>
+<li>Install the Ubuntu 13.10 64-bit OS using ISO file from the <a href="http://www.ubuntu.com/download">ubuntu site</a></li>
+<li>Change the root password to "root":</li>
+</ul><pre><code>$sudo passwd root
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<ul><li>Make a directory for storing cluster node startup scripts:</li>
+</ul><pre><code>$mkdir -p /home/clusternode/MininetScripts
+</code></pre>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<ul><li>Poweroff created VM and clone it. Thus making a backup copy in case you decide to redo software installation</li></ul>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<ul>
+<li>Boot clone and install necessary software:</li>
+</ul><pre><code>#apt-get install python-scapy mininet
+</code></pre>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<ul>
+<li>Also one can install debug and development software of choice, f.e.:</li>
+</ul><pre><code>#apt-get install vim mc strace tcpdump netcat nmap
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<ul>
+<li>Install Mininet:</li>
+</ul><pre><code>#apt-get install mininet
+</code></pre>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<ul>
+<li>Copy Mininet services script to Mininet folder:</li>
+</ul><pre><code>#cp path/to/NPS/config/services.py 
+&#09root@clusternodename:/usr/share/pyshared/mininet/
+</code>
+<code>#cp path/to/NPS/config/services.py 
+&#09root@clusternodename:/usr/lib/python2.7/dist-packages/mininet/
+</code></pre>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<ul>
+<li>Poweroff machine and clone this VM as many times as you need nodes in your cluster. Reconfigure eth0 on each of clones as "bridged adapter, virbr0" </li>
+</ul><h1>
+<a name="working-with-vm-clones" class="anchor" href="#working-with-vm-clones"><span class="octicon octicon-link"></span></a>Working With VM Clones</h1>
 
-<h3>
+<p>Boot each of cluster nodes and proceed with following updates</p>
+
+<ul>
+<li>Update properly node name in <em>/etc/hostname</em> and <em>/etc/hosts</em>. For n001 it would look like:</li>
+</ul><pre><code>/etc/hostname:
+n001
+/etc/hosts:
+[..]
+127.0.0.1	n001
+10.0.2.101	n001 
+10.0.2.102	n002
+10.0.2.201	ccnode
+[..]
+</code></pre>
+
+<ul>
+<li>Check <em>/etc/NetworkManager/NetworkManager.conf</em> for switching off control of managed interfaces:</li>
+</ul><pre><code>/etc/NetworkManager/NetworkManager.conf
+[..]
+[ifupdown]
+managed=false
+[..]
+</code></pre>
+
+<ul>
+<li>Update network configuration <em>/etc/network/interfaces</em>:</li>
+</ul><pre><code>/etc/network/interfaces:
+[..]
+manual eth1
+
+auto eth0
+iface eth0 inet static
+	address 10.0.2.101
+	netmask 255.255.255.0
+[..]
+</code></pre>
+
+<ul>
+<li>In case you generate clusternodes after control node don't forget to place ssh keys properly. Described below.</li>
+</ul>
+
+<h1>
+<a name="creating-mininet-ce-control-node" class="anchor" href="#creating-mininet-ce-control-node"><span class="octicon octicon-link"></span></a>Creating NPS control node</h1>
+As the basis for NPS control node we used Ubuntu Desktop 13.10 distribution. You can find an installation medium on <a href="http://www.ubuntu.com">Ubuntu site</a>. For NPS control node one needs amd64 architecture install CD.
+
+
+<ul>
+<li>Create Virtual Box machine (will be refered as <em>ccnode</em> further) with 2 cores CPU, 4Gb of RAM, 32GB disk, 2 ethernet interfaces. First one (eth0) will be used to communicate with cluster nodes and has to be set as "<em>bridged adapter, virbr0</em>". The second NI (eth1) would be advisable to use as "NAT-ed" interface to communicate with Internet. Further we assume setup of a sample cluster consisting of one control node <em>ccnode</em> and two cluster nodes <em>n001</em> and <em>n002</em>.</li>
+</ul>
+
+<ul>
+<li>Install Ubuntu Desktop 13.10 distribution on this machine, customize according to your taste with your favorite tool set and update it. Set <em>root</em>'s password for "root" and create a user <em>mininet</em> with password "mininet". Make a backup copy of blank control node. This could spare you system installation step in case you decide to recreate control node. </li>
+</ul>
+
+<ul>
+<li>After reboot proceed with changing <em>/etc/hostname</em> and <em>/etc/hosts</em></li>
+</ul><pre><code>
+/etc/hostname:
+ccnode
+								
+/etc/hosts:
+[..]
+10.0.2.201	ccnode.mn-cnet	ccnode
+10.0.2.101	n001.mn-cnet	n001
+10.0.2.102	n002.mn-cnet	n002
+[..]
+</code></pre>
+
+<ul>
+<li>For persistent network configuration one needs to update <em>/etc/network/interfaces</em> file with description of eth0 and eth1. Also check NetworkManager to be switched off for managed network interfaces. </li>
+</ul><pre><code>
+/etc/network/interfaces:
+[..]
+auto eth0
+iface eth0 inet static
+	address 10.0.2.201
+	netmask	255.255.255.0
+
+auto eth1
+iface eth1 inet dhcp
+	dns-nameservers 8.8.8.8 <or you real DNS IP here>
+
+[..]
+
+/etc/NetworkManager/NetworkManager.conf: 
+[..]
+[ifupdown]
+managed=false
+[..]
+</code></pre>
+
+<ul>
+<li>Generate ssh keys for <em>mininet</em> user on <em>ccnode</em> and place public parts to <em>.ssh/authorized_keys</em> for users <em>root</em> and <em>mininet</em> users on nodes. NPS scripts need access to cluster nodes. For details f.e. see this miniarticle <a href="http://www.linuxproblem.org/art_9.html">SSH login without password</a> .</li>
+</ul>
+
+<ul>
+<li>Install development soft necessary for installation of some fresh software pieces from tarballs</li>
+</ul><pre><code>
+apt-get install python-networkx python-matplotlib python-paramiko 
+apt-get install cmake default-jdk git ant libgl1-mesa-dev freeglut3-dev libgstreamer0.10-dev libgstreamermm-0.10-dev libwebkitgtk-devmetis-5.1.0
+</code></pre>
+
+<ul>
+<li>Install <a href="http://glaros.dtc.umn.edu/gkhome/views/metis">METIS library</a>. Download sources of <a href="http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz">latest stable METIS 5.1.0</a>. Put tarball in <em>/home/mininet/metis dir</em> and untar there. Edit <em>metis-5.1.0/include/metis.h</em> and proceed with compilation.</li>
+</ul><pre><code>
+include/metis.h:
+[..]
+IDXTYPEWIDTH 64
+[..]
+Compile and install:
+$make config shared=1
+$make
+$sudo make install
+$sudo ldconfig
+</code></pre>
+
+<ul>
+<li>Install <a href="http://www.projectfloodlight.org/floodlight/">floodlight SDN controller</a>. Download sources of latest <a href="http://floodlight-download.projectfloodlight.org/files/floodlight-source-0.90.tar.gz">floodlight 0.90</a>. Unpack tarball in <em>/home/mininet/floodlight</em> and launch <em>ant</em> in floodlight's source directory. For purposes of mininetCE <em>floodlight.jar</em> can be left in build directory without honest system install.</li>
+</ul><pre><code>
+$ cd floodlight-0.90
+$ ant
+</code></pre>
+
+<ul>
+<li>For MininetCE GUI one needs <a href="http://www.wxpython.org/">wxPython</a>. Download sources of <a href="http://downloads.sourceforge.net/wxpython/wxPython-src-2.9.5.0.tar.bz2">wxPython-2.9.5</a>. Unpack tarball in <em>/home/mininet/wxPython</em>. One of build scripts need some little fixing and after that wxPython can be built and installed.</li>
+</ul><pre><code>
+/home/mininet/wxPython/wxPython-2.9.5.0/build/tools/builder.py:
+[..L121..]
+	if options:
+		args.extend(options)
+[..]
+[..L134..]
+	if options:
+		args.extend(options)
+[..]
+
+$cd /home/mininet/wxPython/wxPython-2.9.5.0/wxPython
+$sudo python2.7 build-wxpython.py --build_dir=../build-wxPython/ --install
+$sudo ldconfig
+</code></pre>
+
+<ul>
+<li>Download sources of NPS into <em>/home/mininet/mininetCE</em> directory.</li>
+</ul><pre><code>
+$ cd /home/mininet/mininetCE
+$ git clone https://github.com/anvial/MininetClusterEdition.git
+</code></pre>
+
+<ul>
+<li>Fill properly <em>/home/mininet/mininetCE/MininetClusterEdition/config/nodelist.txt</em>. It contains description of cluster nodes in format one node per string and string has a sequence of fields as: [nodeIP] [hostname] [root password] [mininet's devoted networking device] [SDN controller IP] [SDN controller port]</li>
+</ul><pre><code>
+/home/mininet/mininetCE/MininetClusterEdition/config/nodelist.txt:
+10.0.2.101 n001 root eth1 10.0.2.201 6633
+10.0.2.102 n002 root eth1 10.0.2.201 6633
+</code></pre>
+
+<ul>
+<li>Last step of control node creation procedure is to update NPS configuration constants file <em>/home/mininet/mininetCE/MininetClusterEdition/config/config_constants.py</em></li>
+</ul><pre><code>
+/home/mininet/mininetCE/MininetClusterEdition/config/config_constants.py:
+[..]
+MININETCE_PATH = '/home/mininet/mininetCE/MininetClusterEdition'
+CONTROLLER_PATH = '/home/mininet/floodlight/floodlight-0.90/'
+SRC_SCRIPT_FOLDER = MININETCE_PATH + '/scripts/'
+DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/' 
+
+MALWARE_CENTER_IP = "10.0.2.201"
+MALWARE_CENTER_PORT = 56565
+
+FIRST_HOST_IP = '1.2.3.1'
+
+CLUSTER_NODE_MACHINE_NAME = 'n001'
+SCRIPT_FOLDER = 'scripts/nodes/'
+REMOTE_CONTROLLER_IP = '10.0.2.201'
+REMOTE_CONTROLLER_PORT = '10.0.2.201'
+[..]
+</code></pre>
+
+<p>After that steps You can run NPS GUI using python2.7 interpreter</p>
+<pre><code>
+$python ./MCEGUI.py
+</code></pre>
+
+<h1>
+<a name="simple-workflow" class="anchor" href="#simple-workflow"><span class="octicon octicon-link"></span></a>Simple Workflow</h1>
+
+<ul>
+<li>In case of need to change the set of cluster nodes one can change <em>config/nodelist.txt</em> file according to rules mentioned in "Creating NPS control node". Launch properly adjusted set of cluster node VMs.</li>
+</ul>
+
+<ul>
+<li>Create (or use existing) input Mininet script with custom topology creation. The example of such script is in the standard Mininet distribution in <em>_custom/topo-2sw-2host.py</em></li>
+</ul>
+
+<ul>
+<li>Run NPS GUI</li>
+</ul><pre><code>$ python ./MCEGUI.py
+</code></pre>
+
+<ul>
+<li>Interact with Mininet cluster network. Console window is located on lower left corner of main window For example:</li>
+</ul><pre><code>NPS&gt; help
+NPS&gt; h1 ping h2
+NPS&gt; h1 ifconfig
+NPS&gt; hosts info
+</code></pre>
+
+<ul>
+<li>Close the NPS</li>
+</ul><pre><code>NPS&gt; exit
+</code></pre>
+
+<hr><h3>
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Having trouble with NPS? Contact <a href="mailto:vantonenko@arccn.ru">vantonenko@arccn.ru</a>.</p>
+
+<hr><h3>
+<a name="useful-hints" class="anchor" href="#useful-hints"><span class="octicon octicon-link"></span></a>Useful Hints</h3>
+
+<p>If you needed to draw in NPS GUI graph size of more than 500 nodes. You need to provide some fixes in NetworkX library.</p>
+<p>In  "/usr/lib/pymodules/python2.7/networkx/drawing/layout.py", change the code in line 233</p>
+
+</ul><pre><code>A=nx.to_scipy_sparse_matrix(G,weight=weight)
+</code></pre>
+
+<p>to</p>
+
+</ul><pre><code>A=nx.to_scipy_sparse_matrix(G, weight=weight,dtype='f')
+</code></pre>
+
+<p>Source: <a href="https://groups.google.com/forum/#!msg/networkx-discuss/DvwOq62sUnk/Qt7nbNwZnEIJ">here</a>.</p>
+
+
+<hr><h3>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Authors</h3>
+
+<p>Antonenko Vitaly</p>
+
+<p>ARCCN, Moscow</p>
+
+<p><a href="mailto:vantonenko@arccn.ru">vantonenko@arccn.ru</a>, <a href="mailto:anvial@lvk.cs.msu.su">anvial@lvk.cs.msu.su</a></p>
+
+<p>Andrey Nikolaev</p>
+
+<p>ARCCN, Moscow</p>
+
+<p><a href="mailto:anikolaev@arccn.ru">anikolaev@arccn.ru</a>, <a href="mailto:gentoorion@gmail.com">gentoorion@gmail.com</a></p>
+
+<hr><h3>
+<a name="special-thanks" class="anchor" href="#special-thanks"><span class="octicon octicon-link"></span></a>Special Thanks</h3>
+<p>Special Thanks go to the following for their help and support in
+the development of NPS system: </p>
+<p>LJYBowser</p>
+
+
+<p><strong>Enjoy the simulation with NPS!</strong></p>
       </section>
     </div>
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">NPS maintained by <a href="https://github.com/ARCCN">ARCCN</a></p>
+        <p class="copyright">Network Prototype Simulator maintained by <a href="https://github.com/anvial">anvial</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+	<p><strong>(C) ARCCN, 2013</strong></p>
       </footer>
     </div>
 

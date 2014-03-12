@@ -39,6 +39,9 @@ ol, ul {
   list-style: none;
 }
 
+blockquote, q {
+}
+
 table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -118,11 +121,14 @@ a {
   -ms-transition: text-shadow 0.5s ease;
 }
 
-a:hover, a:focus {text-decoration: underline;}
+#main_content a:hover {
+  color: #0069ba;
+  text-shadow: #0090ff 0px 0px 2px;
+}
 
-footer a {
-  color: #F2F2F2;
-  text-decoration: underline;
+footer a:hover {
+  color: #43adff;
+  text-shadow: #0090ff 0px 0px 2px;
 }
 
 em {
@@ -148,15 +154,6 @@ img {
   -ms-box-shadow: 0 0 5px #ebebeb;
 }
 
-p img {
-  display: inline;
-  margin: 0;
-  padding: 0;
-  vertical-align: middle;
-  text-align: center;
-  border: none;
-}
-
 pre, code {
   width: 100%;
   color: #222;
@@ -168,6 +165,9 @@ pre, code {
   border-radius: 2px;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
+
+
+
 }
 
 pre {
@@ -195,17 +195,16 @@ blockquote {
   border-left: 3px solid #bbb;
 }
 
-
 ul, ol, dl {
   margin-bottom: 15px
 }
 
-ul {
+ul li {
   list-style: inside;
   padding-left: 20px;
 }
 
-ol {
+ol li {
   list-style: decimal inside;
   padding-left: 20px;
 }
@@ -252,6 +251,11 @@ td {
 form {
   background: #f2f2f2;
   padding: 20px;
+}
+
+img {
+  width: 100%;
+  max-width: 100%;
 }
 
 /*******************************************************************************
@@ -353,9 +357,40 @@ Full-Width Styles
 }
 
 #main_content_wrap {
-  background: #f2f2f2;
+  /*background: #f2f2f2;
   border-top: 1px solid #111;
-  border-bottom: 1px solid #111;
+  border-bottom: 1px solid #111;*/
+background: #CECECE; /* Old browsers */
+/*background: #ffffff; *//* Old browsers *//*
+background: -moz-linear-gradient(left,  #ffffff 13%, #d6d6ff 23%, #ffffff 39%); *//* FF3.6+ *//*
+background: -webkit-gradient(linear, left top, right top, color-stop(13%,#ffffff), color-stop(23%,#d6d6ff), color-stop(39%,#ffffff)); *//* Chrome,Safari4+ *//*
+background: -webkit-linear-gradient(left,  #ffffff 13%,#d6d6ff 23%,#ffffff 39%); *//* Chrome10+,Safari5.1+ *//*
+background: -o-linear-gradient(left,  #ffffff 13%,#d6d6ff 23%,#ffffff 39%); *//* Opera 11.10+ *//*
+background: -ms-linear-gradient(left,  #ffffff 13%,#d6d6ff 23%,#ffffff 39%); *//* IE10+ *//*
+background: linear-gradient(to right,  #ffffff 13%,#d6d6ff 23%,#ffffff 39%); *//* W3C *//*
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 ); *//* IE6-9 *//*
+*/
+}
+
+#logo {
+  width: 250px;
+  height:250px;
+  float:left;
+
+}
+
+#mnce-screenshot-l{
+  width: 300px;
+  height:130px;
+  float:left;
+
+}
+
+#mnce-screenshot-r{
+  width: 300px;
+  height:130px;
+  float:right;
+  padding-right: 15px
 }
 
 #main_content {
