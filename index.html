@@ -252,19 +252,19 @@ $ git clone https://github.com/ARCCN/nps.git
 </code></pre>
 
 <ul>
-<li>Fill properly <em>/home/mininet/nps/MininetClusterEdition/config/nodelist.txt</em>. It contains description of cluster nodes in format one node per string and string has a sequence of fields as: [nodeIP] [hostname] [root password] [mininet's devoted networking device] [SDN controller IP] [SDN controller port]</li>
+<li>Fill properly <em>/home/mininet/nps/`/config/nodelist.txt</em>. It contains description of cluster nodes in format one node per string and string has a sequence of fields as: [nodeIP] [hostname] [root password] [mininet's devoted networking device] [SDN controller IP] [SDN controller port]</li>
 </ul><pre><code>
-/home/mininet/nps/MininetClusterEdition/config/nodelist.txt:
+/home/mininet/nps/nps/config/nodelist.txt:
 10.0.2.101 n001 root eth1 10.0.2.201 6633
 10.0.2.102 n002 root eth1 10.0.2.201 6633
 </code></pre>
 
 <ul>
-<li>Last step of control node creation procedure is to update NPS configuration constants file <em>/home/mininet/nps/MininetClusterEdition/config/config_constants.py</em></li>
+<li>Last step of control node creation procedure is to update NPS configuration constants file <em>/home/mininet/nps/nps/config/config_constants.py</em></li>
 </ul><pre><code>
-/home/mininet/nps/MininetClusterEdition/config/config_constants.py:
+/home/mininet/nps/nps/config/config_constants.py:
 [..]
-nps_PATH = '/home/mininet/nps/MininetClusterEdition'
+nps_PATH = '/home/mininet/nps/nps'
 CONTROLLER_PATH = '/home/mininet/floodlight/floodlight-0.90/'
 SRC_SCRIPT_FOLDER = nps_PATH + '/scripts/'
 DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/' 
