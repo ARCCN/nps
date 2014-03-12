@@ -24,14 +24,14 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/anvial/MininetClusterEdition">View on GitHub</a>
+          <a id="forkme_banner" href="https://github.com/ARCCN/nps">View on GitHub</a>
 
           <h1 id="project_title">Network Prototype Simulator</h1>
           <h2 id="project_tagline">Expanding Mininet on Cluster Architecture</h2>
 
             <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/anvial/MininetClusterEdition/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/anvial/MininetClusterEdition/tarball/master">Download this project as a tar.gz file</a>
+              <a class="zip_download_link" href="https://github.com/ARCCN/nps/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ARCCN/nps/tarball/master">Download this project as a tar.gz file</a>
             </section>
         </header>
     </div>
@@ -45,17 +45,17 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h3>
-<a name="welcome-to-mininet-cluster-edition-page" class="anchor" href="#welcome-to-mininet-cluster-edition-page"><span class="octicon octicon-link"></span></a>Welcome to Network Prototype Simulator Page.</h3>
+<a name="welcome-to-nps-page" class="anchor" href="#welcome-to-nps-page"><span class="octicon octicon-link"></span></a>Welcome to Network Prototype Simulator Page.</h3>
 
 <p>Network Prototyping Simulator is a simulation system that expands <a href="http://mininet.org/">Mininet</a> network emulator to computer cluster. That allow us to reproduce the network with such an amount of nodes that hardly was possible before. The maximum size of network topology in NPS depends on number of cluster nodes with Mininet instances. One cluster node can emulate more than thousand hosts, and an modern server could execute at least 15 cluster nodes packed in virtual machines. As the result, we get about 15 thousands hosts per server. The scalability of NPS makes it possible to emulate really big networks.</p>
 
 <p>By the architecture, NPS saves features of Mininet, so it does not become a clear simulation system, it remains a network prototyping system. Means one could trust the results of such simulation and there is no need to prove correctness and adequacy of the model built.</p>
 
 <hr><h2>
-<a name="mininet-ce-quick-start-guide" class="anchor" href="#mininet-ce-quick-start-guide"><span class="octicon octicon-link"></span></a>NPS Quick Start Guide</h2>
+<a name="nps-quick-start-guide" class="anchor" href="#nps-quick-start-guide"><span class="octicon octicon-link"></span></a>NPS Quick Start Guide</h2>
 
 <h1>
-<a name="mininet-ce-architecture" class="anchor" href="#mininet-ce-architecture"><span class="octicon octicon-link"></span></a>NPS architecture</h1>
+<a name="nps-architecture" class="anchor" href="#nps-architecture"><span class="octicon octicon-link"></span></a>NPS architecture</h1>
 NPS setup has two types of nodes: "cluster" node and "control" node. Currently both are packed into virtual machines. Naturally cluster setup consists of one control node and many cluster nodes. Virtualization system used is Oracle VirtualBox.    
 
 <h1>
@@ -145,7 +145,7 @@ iface eth0 inet static
 </ul>
 
 <h1>
-<a name="creating-mininet-ce-control-node" class="anchor" href="#creating-mininet-ce-control-node"><span class="octicon octicon-link"></span></a>Creating NPS control node</h1>
+<a name="creating-nps-control-node" class="anchor" href="#creating-nps-control-node"><span class="octicon octicon-link"></span></a>Creating NPS control node</h1>
 As the basis for NPS control node we used Ubuntu Desktop 13.10 distribution. You can find an installation medium on <a href="http://www.ubuntu.com">Ubuntu site</a>. For NPS control node one needs amd64 architecture install CD.
 
 
@@ -220,14 +220,14 @@ $sudo ldconfig
 </code></pre>
 
 <ul>
-<li>Install <a href="http://www.projectfloodlight.org/floodlight/">floodlight SDN controller</a>. Download sources of latest <a href="http://floodlight-download.projectfloodlight.org/files/floodlight-source-0.90.tar.gz">floodlight 0.90</a>. Unpack tarball in <em>/home/mininet/floodlight</em> and launch <em>ant</em> in floodlight's source directory. For purposes of mininetCE <em>floodlight.jar</em> can be left in build directory without honest system install.</li>
+<li>Install <a href="http://www.projectfloodlight.org/floodlight/">floodlight SDN controller</a>. Download sources of latest <a href="http://floodlight-download.projectfloodlight.org/files/floodlight-source-0.90.tar.gz">floodlight 0.90</a>. Unpack tarball in <em>/home/mininet/floodlight</em> and launch <em>ant</em> in floodlight's source directory. For purposes of NPS <em>floodlight.jar</em> can be left in build directory without honest system install.</li>
 </ul><pre><code>
 $ cd floodlight-0.90
 $ ant
 </code></pre>
 
 <ul>
-<li>For MininetCE GUI one needs <a href="http://www.wxpython.org/">wxPython</a>. Download sources of <a href="http://downloads.sourceforge.net/wxpython/wxPython-src-2.9.5.0.tar.bz2">wxPython-2.9.5</a>. Unpack tarball in <em>/home/mininet/wxPython</em>. One of build scripts need some little fixing and after that wxPython can be built and installed.</li>
+<li>For NPS GUI one needs <a href="http://www.wxpython.org/">wxPython</a>. Download sources of <a href="http://downloads.sourceforge.net/wxpython/wxPython-src-2.9.5.0.tar.bz2">wxPython-2.9.5</a>. Unpack tarball in <em>/home/mininet/wxPython</em>. One of build scripts need some little fixing and after that wxPython can be built and installed.</li>
 </ul><pre><code>
 /home/mininet/wxPython/wxPython-2.9.5.0/build/tools/builder.py:
 [..L121..]
@@ -245,28 +245,28 @@ $sudo ldconfig
 </code></pre>
 
 <ul>
-<li>Download sources of NPS into <em>/home/mininet/mininetCE</em> directory.</li>
+<li>Download sources of NPS into <em>/home/mininet/nps</em> directory.</li>
 </ul><pre><code>
-$ cd /home/mininet/mininetCE
-$ git clone https://github.com/anvial/MininetClusterEdition.git
+$ cd /home/mininet/nps
+$ git clone https://github.com/ARCCN/nps.git
 </code></pre>
 
 <ul>
-<li>Fill properly <em>/home/mininet/mininetCE/MininetClusterEdition/config/nodelist.txt</em>. It contains description of cluster nodes in format one node per string and string has a sequence of fields as: [nodeIP] [hostname] [root password] [mininet's devoted networking device] [SDN controller IP] [SDN controller port]</li>
+<li>Fill properly <em>/home/mininet/nps/MininetClusterEdition/config/nodelist.txt</em>. It contains description of cluster nodes in format one node per string and string has a sequence of fields as: [nodeIP] [hostname] [root password] [mininet's devoted networking device] [SDN controller IP] [SDN controller port]</li>
 </ul><pre><code>
-/home/mininet/mininetCE/MininetClusterEdition/config/nodelist.txt:
+/home/mininet/nps/MininetClusterEdition/config/nodelist.txt:
 10.0.2.101 n001 root eth1 10.0.2.201 6633
 10.0.2.102 n002 root eth1 10.0.2.201 6633
 </code></pre>
 
 <ul>
-<li>Last step of control node creation procedure is to update NPS configuration constants file <em>/home/mininet/mininetCE/MininetClusterEdition/config/config_constants.py</em></li>
+<li>Last step of control node creation procedure is to update NPS configuration constants file <em>/home/mininet/nps/MininetClusterEdition/config/config_constants.py</em></li>
 </ul><pre><code>
-/home/mininet/mininetCE/MininetClusterEdition/config/config_constants.py:
+/home/mininet/nps/MininetClusterEdition/config/config_constants.py:
 [..]
-MININETCE_PATH = '/home/mininet/mininetCE/MininetClusterEdition'
+nps_PATH = '/home/mininet/nps/MininetClusterEdition'
 CONTROLLER_PATH = '/home/mininet/floodlight/floodlight-0.90/'
-SRC_SCRIPT_FOLDER = MININETCE_PATH + '/scripts/'
+SRC_SCRIPT_FOLDER = nps_PATH + '/scripts/'
 DST_SCRIPT_FOLDER = '/home/clusternode/MininetScripts/' 
 
 MALWARE_CENTER_IP = "10.0.2.201"
@@ -283,7 +283,7 @@ REMOTE_CONTROLLER_PORT = '10.0.2.201'
 
 <p>After that steps You can run NPS GUI using python2.7 interpreter</p>
 <pre><code>
-$python ./MCEGUI.py
+$python ./NPSGUI.py
 </code></pre>
 
 <h1>
@@ -303,7 +303,7 @@ $python ./MCEGUI.py
 </code></pre>
 
 <ul>
-<li>Interact with Mininet cluster network. Console window is located on lower left corner of main window For example:</li>
+<li>Interact with NPS cluster network. Console window is located on lower left corner of main window For example:</li>
 </ul><pre><code>NPS&gt; help
 NPS&gt; h1 ping h2
 NPS&gt; h1 ifconfig
