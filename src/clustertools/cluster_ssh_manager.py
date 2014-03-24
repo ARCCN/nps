@@ -2,6 +2,19 @@ from paramiko import *
 #from main     import logger_MininetCE
 
 
+def open_ssh_to_node(node_IP, node_map, ssh_map, ssh_chan_map):
+    '''Open SSH sessions to concrete node in cluster.
+
+    Args:
+        node_IP: Cluster node IP.
+
+    '''
+    ssh_map[node_IP] = SSHClient()
+    ssh_map[node_IP].set_missing_host_key_policy(AutoAddPolicy())
+    ssh_map[node_IP].connect(hostname=node_IP, username=node_map[node_IP], password=node_map[node_IP])
+    ssh_chan_map[node_IP] = ssh_map[node_IP].invoke_shell()
+
+
 
 def open_ssh_to_nodes(node_map):
     '''Open SSH sessions to each node in cluster.

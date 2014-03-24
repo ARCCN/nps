@@ -7,8 +7,7 @@ import wx
 
 from GUI.GUI_WebPanel        import WebPanel
 from config.config_constants import ALPHA_VALUE, RESULT_PIC_DPI
-import sys
-
+from config.config_colors import COLOR_NAMES
 
 def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     '''Drawing result graph to the file "result.png".
@@ -43,7 +42,9 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
 
     label_pos = {k: [v[0],v[1]+ avr_pos] for k, v in pos.items()}
 
-    colors = ['b','g','r','c','m','y']
+    #colors = ['b','g','r','c','m','y']
+    colors = COLOR_NAMES.values()
+
 
     labels = {}
     for n in G.nodes():
@@ -59,7 +60,8 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
 
     for group in edge_groups.keys():
         if group != 'no_group':
-            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group], alpha=ALPHA_VALUE, width=3.0)
+            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group],
+                                   alpha=ALPHA_VALUE, width=3.0)
         else:
             nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k', alpha=ALPHA_VALUE, width=3.0)
 

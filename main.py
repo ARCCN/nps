@@ -144,7 +144,8 @@ if __name__ == '__main__':
 
     # open ssh sessions to nodes
     print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
-    ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
+    #ssh_map, ssh_chan_map = open_ssh_to_nodes(node_map)
+    make_threaded(open_ssh_to_node, [node_map, ssh_map, ssh_chan_map], node_map)
     print('DONE!')
 
     # send scripts to nodes

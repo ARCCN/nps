@@ -69,15 +69,21 @@ class NodeStatusPanel(wx.Panel):
 
 
         self.node_labels = []
+        gridSizer = wx.GridSizer(rows=len(self.node_map.keys())%10, cols=10, hgap=1, vgap=1)
         for node in self.node_map.keys():
             #response = os.system("ping -c 1 " + node)
             node_label = wx.StaticText(self, -1, node, style=wx.ALIGN_CENTER)
+            font = wx.Font(10, 0, 0, wx.NORMAL)
+            node_label.SetFont(font)
             #if response == 0:
             #    node_label.SetForegroundColour('green')
             #else:
             #    node_label.SetForegroundColour('red')
-            hbox.Add(node_label, 1, wx.EXPAND|wx.RIGHT, 1)
+
+            #hbox.Add(node_label, 1, wx.EXPAND|wx.RIGHT, 1)
+            gridSizer.Add(node_label, 0, wx.ALIGN_RIGHT)
             self.node_labels.append(node_label)
+        hbox.Add(gridSizer, 1, wx.EXPAND|wx.RIGHT, 1)
 
         self.SetSizer(hbox)
 
