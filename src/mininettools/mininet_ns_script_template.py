@@ -394,8 +394,7 @@ def gen_mn_ns_script_by_template(file, nodes_ext_intf, node_group, edge_group,
 
 
 
-def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_group, edge_group,
-                                 ext_intf_list, leaves, node_ctrl_map, hosts_net_services, first_host_ip, host_IP_map):
+def gen_mn_ns_script_by_template_with_custom_host_ip(file, node, group, spec_group, leaves, hosts_net_services, hosts):
     '''Generate turn on script for Cluster node with network services and with custom host IP addresses
 
     Args:
@@ -434,11 +433,11 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
     file.write("\n")
     file.write('\n')
     file.write('sw_ext_intf = [')
-    for i, node in enumerate(ext_intf_list):
+    for i, node_in_gr in enumerate(spec_group['vertexes']):
         file.write('\'s')
-        file.write(str(node))
+        file.write(str(node_in_gr))
         file.write('\'')
-        if i != len(ext_intf_list)-1:
+        if i != len(spec_group['vertexes'])-1:
             file.write(',')
     file.write(']')
     file.write('\n')
@@ -450,40 +449,39 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
     file.write('\n')
     file.write('        \"Add hosts and swiches\"\n')
     #Define IPs
-    curr_host_ip = first_host_ip
-    for node in node_group:
-        if node in leaves:
+    for node_in_gr in group['vertexes']:
+        if node_in_gr in leaves:
             file.write('        h')
-            file.write(str(node))
+            file.write(str(node_in_gr))
             file.write(' = self.addHost( \'h')
-            file.write(str(node))
+            file.write(str(node_in_gr))
             file.write('\', ip=\'')
-            file.write(host_IP_map['h'+str(node)])
+            file.write(hosts['h'+str(node_in_gr)]['IP'])
             file.write('/')
             file.write(str(HOST_NETMASK))
             file.write('\' )\n')
             #curr_host_ip = get_next_IP(curr_host_ip)
         else:
             file.write('        s')
-            file.write(str(node))
+            file.write(str(node_in_gr))
             file.write(' = self.addSwitch( \'s')
-            file.write(str(node))
+            file.write(str(node_in_gr))
             file.write('\' )\n')
     file.write('\n')
     file.write('        \"Add links\"\n')
-    for edge in edge_group:
+    for edge_in_gr in group['edges']:
         file.write('        self.addLink( ')
-        if edge[0] in leaves:
+        if edge_in_gr[0] in leaves:
             file.write('h')
         else:
             file.write('s')
-        file.write(str(edge[0]))
+        file.write(str(edge_in_gr[0]))
         file.write(', ')
-        if edge[1] in leaves:
+        if edge_in_gr[1] in leaves:
             file.write('h')
         else:
             file.write('s')
-        file.write(str(edge[1]))
+        file.write(str(edge_in_gr[1]))
         file.write(', delay=\'')
         file.write(str(LINK_DELAY))
         file.write('ms\')\n')
@@ -691,9 +689,9 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
     file.write("        switch = customConstructor( SWITCHES, self.options.switch )\n")
     file.write("        host = customConstructor( HOSTS, self.options.host )\n")
     file.write('        controller = lambda name: RemoteController( name,ip=\'')
-    file.write(node_ctrl_map[0])
+    file.write(node['controller'][0])
     file.write('\',port=int(\'')
-    file.write(node_ctrl_map[1])
+    file.write(node['controller'][1])
     file.write('\') )\n')
     file.write("        link = customConstructor( LINKS, self.options.link )\n")
     file.write("\n")
@@ -716,7 +714,7 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
     file.write("\n")
     file.write('\n')
     file.write('        intfName = \'')
-    file.write(nodes_ext_intf)
+    file.write(node['out_intf'])
     file.write('\'\n')
     file.write('        info( \'*** Checking\', intfName, \'\\n\' )\n')
     file.write('        checkIntf( intfName )\n')
@@ -745,7 +743,7 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, nodes_ext_intf, node_
     file.write("#navy\n")
     file.write("#Add services here\n")
     for host in sorted(hosts_net_services.keys()):
-        if (int(host) in leaves) and (int(host) in node_group):
+        if (int(host) in leaves) and (int(host) in group['vertexes']):
             for net_service, status in hosts_net_services[host].items():
                 if status == True:
                     if net_service == 'dhcp':

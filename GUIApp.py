@@ -9,16 +9,11 @@ from GUI.GUI_WebPanel        import WebPanel
 from config.config_constants import ALPHA_VALUE, RESULT_PIC_DPI
 from config.config_colors import COLOR_NAMES
 
-def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
+def draw_graph(G, groups, leaves, nodes, pos):
     '''Drawing result graph to the file "result.png".
 
     Args:
-        G: NetworkX graph.
-        node_groups: Group ID to node-list map.
-        edge_groups: Group ID to edge-list map.
-        leaves: List of leave-nodes in network graph.
-        node_map: Cluster node map.
-        pos: Position of nodes in drawing graph.
+
     '''
     mpl.rcParams['toolbar'] = 'None'
     mpl.rcParams['font.size'] = 11
@@ -32,9 +27,6 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
             max_pos = v[1]
     avr_pos = max_pos / 50
 
-    # fig = plt.figure(1, figsize=(15, 8), frameon=False)
-    # fig.canvas.set_window_title("Mininet CE Network Graph")
-
     frame = plt.gca()
     frame.axes.get_xaxis().set_visible(False)
     frame.axes.get_yaxis().set_visible(False)
@@ -45,7 +37,6 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
     #colors = ['b','g','r','c','m','y']
     colors = COLOR_NAMES.values()
 
-
     labels = {}
     for n in G.nodes():
         if n in leaves:
@@ -54,23 +45,20 @@ def draw_graph(G, node_groups, edge_groups, leaves, node_map, pos):
             labels[n] = 's' + str(n)
 
     pl_nodes = []
-    for group in node_groups.keys():
-        pl_node = nx.draw_networkx_nodes(G, pos, nodelist=node_groups[group], node_color=colors[group], node_size=50)
-        pl_nodes.append(pl_node)
-
-    for group in edge_groups.keys():
-        if group != 'no_group':
-            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color=colors[group],
+    for id, group in groups.items():
+        if id != 'no_group':
+            pl_node = nx.draw_networkx_nodes(G, pos, nodelist=group['vertexes'], node_color=colors[id], node_size=50)
+            pl_nodes.append(pl_node)
+            nx.draw_networkx_edges(G, pos, edgelist=group['edges'], edge_color=colors[id],
                                    alpha=ALPHA_VALUE, width=3.0)
         else:
-            nx.draw_networkx_edges(G, pos, edgelist=edge_groups[group], edge_color='k', alpha=ALPHA_VALUE, width=3.0)
+            nx.draw_networkx_edges(G, pos, edgelist=group['edges'], edge_color='k', alpha=ALPHA_VALUE, width=3.0)
 
     nx.draw_networkx_labels(G, label_pos, labels, font_size=10, font_family='candara')
-    leg = plt.legend(pl_nodes, node_map.keys(), prop={'size': 8}, handletextpad=3)
+
+    leg = plt.legend(pl_nodes, nodes.keys(), prop={'size': 8}, handletextpad=3)
     leg.legendPatch.set_alpha(0.77)
-
     plt.savefig('GUI/result.png', dpi=RESULT_PIC_DPI, transparent=True, bbox_inches='tight', pad_inches=0)
-
 
 
 class GUI_Editor(wx.Frame):

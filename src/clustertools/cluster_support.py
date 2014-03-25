@@ -1,10 +1,7 @@
 from random      import randint
-
-#from main        import logger_MininetCE
 from src.KThread import KThread
 
 import networkx  as nx
-
 
 
 def read_nodelist_from_file(nodelist_filepath):
@@ -13,24 +10,27 @@ def read_nodelist_from_file(nodelist_filepath):
     Args:
         nodelist_file: Name of file with list of cluster nodes.
     '''
-    node_map = {}
-    node_mname_map = {}
-    node_intf_map = {}
-    node_ctrl_map = {}
+    nodes = {}
+
     # open nodelist file
-    #logger_MininetCE.info('Reading nodelist from file')
     nodelist_file = open(nodelist_filepath, 'r')
     file_lines = nodelist_file.readlines()
-    for file_line in file_lines:
+    for i, file_line in enumerate(file_lines):
         splitted_line = file_line.split(' ')
-        node_mname_map[splitted_line[0]] = splitted_line[1]
-        node_map[splitted_line[0]]             = splitted_line[2]
-        node_intf_map[splitted_line[0]]        = splitted_line[3]
-        node_ctrl_map[splitted_line[0]]        = (splitted_line[4], splitted_line[5][:-1])
 
-    #logger_MininetCE.info('DONE!')
+        node = {}
+        node['IP'] = splitted_line[0]
+        node['hostname'] = splitted_line[1] # node_mname_map
+        node['username'] = splitted_line[2] # node_map
+        node['out_intf'] = splitted_line[3] # node_intf_map
+        node['controller'] = (splitted_line[4], splitted_line[5][:-1]) # node_ctrl_map
+        node['group'] = i # node_IP_gr_map
+        node['IP_pool'] = None # node_IP_pool_map
+        node['ssh'] = None
+        node['ssh_chan'] = None
+        nodes[splitted_line[0]] = node
 
-    return node_map, node_intf_map, node_ctrl_map, node_mname_map
+    return nodes
 
 
 def get_next_IP(IP):
@@ -125,7 +125,7 @@ def randomize_infected(prob):
         return False
 
 
-def make_threaded(function, args, node_map):
+def make_threaded(function, args, nodes):
     '''Launch fuction in threads. Number of thread equal to number of cluster nodes.
 
     Args:
@@ -135,8 +135,8 @@ def make_threaded(function, args, node_map):
     '''
     threads = []
     list_args = list(args)
-    for node_IP in node_map.keys():
-        list_args.insert(0, node_IP)
+    for node in nodes.values():
+        list_args.insert(0, node)
         thread = KThread(target=function, args=tuple(list_args))
         threads.append(thread)
         list_args.pop(0)

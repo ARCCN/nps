@@ -1,4 +1,5 @@
 import cmd
+import os
 
 from src.clustertools.cluster_mininet_cmd_manager import send_mininet_ping_to_cluster_node, \
                                                          send_mininet_cmd_to_cluster_node
@@ -9,27 +10,22 @@ class CLI_director(cmd.Cmd):
 
     TODO
     '''
-    def __init__(self, host_map, host_to_node_map, host_IP_map, ssh_chan_map, switch_num, h_and_sw_node_map):
+    def __init__(self, hosts, nodes, cluster_info):
         '''Cunstructor of CLI Director.
 
         Args:
             host_map: Host IP to host name map.
             host_to_node_map: Host IP to node ID map.
             host_IP_map: Host name to host IP map.
-            ssh_chan_map: SSH session chan to cluster node map.
             switch_num: Number of switches (not leave-nodes) in network graph.
             h_and_sw_node_map:
         '''
         cmd.Cmd.__init__(self)
         self.prompt = CLI_PROMPT_STRING
-        self.intro  = "Welcome to Mininet CE console!"  ## defaults to None
-
-        self.host_map = host_map
-        self.host_to_node_map = host_to_node_map
-        self.host_IP_map = host_IP_map
-        self.ssh_chan_map = ssh_chan_map
-        self.switch_num = switch_num
-        self.h_and_sw_node_map = h_and_sw_node_map
+        self.intro  = "Welcome to NPS console!"  ## defaults to None
+        self.hosts = hosts
+        self.nodes = nodes
+        self.cluster_info = cluster_info
 
     ## Command definitions ##
     def do_hist(self, args):
@@ -57,6 +53,26 @@ class CLI_director(cmd.Cmd):
         ## The only reason to define this method is for the help text in the doc string
         cmd.Cmd.do_help(self, args)
 
+    def is_host_exist(self, h):
+        if self.is_hostname(h):
+            if h not in self.hosts.keys():
+                return None
+            else:
+                return h
+        else:
+            # FIX me when you have time
+            find_flag = False
+            for host in self.hosts.values():
+                if host['IP'] == h:
+                    find_flag = True
+                    h = host['name']
+                    break
+            if find_flag:
+                return h
+            else:
+                return None
+            # FIX block end
+
     def do_ping(self, args):
         """Simple ping command"""
         args = args.split()
@@ -65,21 +81,19 @@ class CLI_director(cmd.Cmd):
             return
         src = args[0]
         dst = args[1]
-
-        if src not in self.host_IP_map.keys() and src not in self.host_IP_map.values():
+        src = self.is_host_exist(src)
+        dst = self.is_host_exist(dst)
+        if src == None:
             print('No such src host')
             return
-        if dst not in self.host_IP_map.keys() and dst not in self.host_IP_map.values():
+        if dst == None:
             print('No such dst host')
             return
-
-        if not self.is_hostname(src):
-            src = self.host_map[src]
-        if self.is_hostname(dst):
-            dst = self.host_IP_map[dst]
-
-        cmd = src + ' ping -c 4 ' + dst
-        send_mininet_ping_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd, self.ssh_chan_map)
+        dst_host = self.hosts[dst]
+        cmd = src + ' ping -c 4 ' + dst_host['IP']
+        src_host = self.hosts[src]
+        node = self.nodes[src_host['nodeIP']]
+        send_mininet_ping_to_cluster_node(node, cmd)
 
     def help_ping(self):
         print('usage:')
@@ -91,19 +105,20 @@ class CLI_director(cmd.Cmd):
         print('\th1       ping h2')
 
     def do_pingAll(self, args):
-        for src in self.host_IP_map.keys():
-            for dst in self.host_IP_map.keys():
-                if src != dst:
-                    dst = self.host_IP_map[dst]
-                    cmd = src + ' ping -c 4 ' + dst
-                    send_mininet_ping_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd, self.ssh_chan_map)
+        #for src in self.host_IP_map.keys():
+        #    for dst in self.host_IP_map.keys():
+        #        if src != dst:
+        #            dst = self.host_IP_map[dst]
+        #            cmd = src + ' ping -c 4 ' + dst
+        #            node = self.nodes[self.host_to_node_map[self.host_IP_map[src]]]
+        #            send_mininet_ping_to_cluster_node(node, cmd)
+        pass
 
     def help_pingAll(self):
         print('usage:')
         print('\tpingAll')
         print('example:')
         print('\tpingAll')
-
 
     def do_ifconfig(self, args):
         args = args.split()
@@ -112,19 +127,14 @@ class CLI_director(cmd.Cmd):
             return
         src = args[0]
 
-        if src not in self.host_IP_map.keys() and src not in self.host_IP_map.values():
-            print('No such host')
+        src = self.is_host_exist(src)
+        if src == None:
+            print('No such src host')
             return
-
-        if self.is_hostname(src):
-            cmd = src + ' ifconfig'
-        else:
-            cmd = self.host_map[src] + ' ifconfig'
-        if self.is_hostname(src):
-            send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[src]], cmd,
-                                             self.ssh_chan_map, quite=False)
-        else:
-            send_mininet_cmd_to_cluster_node(self.host_to_node_map[src], cmd, self.ssh_chan_map, quite=False)
+        cmd = src + ' ifconfig'
+        src_host = self.hosts[src]
+        node = self.nodes[src_host['nodeIP']]
+        send_mininet_cmd_to_cluster_node(node, cmd, quite=False)
 
     def help_ifconfig(self):
         print('usage:')
@@ -136,8 +146,8 @@ class CLI_director(cmd.Cmd):
     def do_hosts(self, args):
         args = args.split()
         if len(args) == 0:
-            for host in self.host_IP_map.keys():
-                print(host),
+            for host in self.hosts.values():
+                print(host['name']),
                 print(' '),
             print('')
         elif len(args) == 1 and args[0].lower() == 'ip':
@@ -145,30 +155,30 @@ class CLI_director(cmd.Cmd):
             print(': '),
             print('host IP'.center(15, ' ')),
             print(' : ')
-            for host, ip in self.host_IP_map.items():
-                print(host.ljust(7, ' ')),
+            for host in self.hosts.values():
+                print(host['name'].ljust(7, ' ')),
                 print(' : '),
-                print(ip)
+                print(host['IP'])
         elif len(args) == 1 and args[0].lower() in ['node', 'cluster']:
             print('host IP'.center(15, ' ')),
             print(': '),
             print('node IP'.center(15, ' '))
-            for host, node in self.host_to_node_map.items():
-                print(host.ljust(15, ' ')),
+            for host in self.hosts.values():
+                print(host['IP'].ljust(15, ' ')),
                 print(' : '),
-                print(node)
+                print(host['nodeIP'])
         elif len(args) == 1 and args[0].lower() == 'info':
             print('hostname'.center(7, ' ')),
             print(': '),
             print('host IP'.center(15, ' ')),
             print(' : '),
             print('node IP'.center(15, ' '))
-            for host, ip in self.host_IP_map.items():
-                print(host.ljust(7, ' ')),
+            for host in self.hosts.values():
+                print(host['name'].ljust(7, ' ')),
                 print(' : '),
-                print(ip.ljust(15, ' ')),
+                print(host['IP'].ljust(15, ' ')),
                 print(' : '),
-                print(self.host_to_node_map[ip])
+                print(host['nodeIP'])
         else:
             print('wrong syntax in command "hosts"')
 
@@ -183,26 +193,27 @@ class CLI_director(cmd.Cmd):
         print('\thosts info')
 
     def do_hostnum(self,args):
-        print('Number of hosts is ' + str(len(self.host_map.keys())) + '.')
+        print('Number of hosts is ' + str(len(self.hosts)) + '.')
 
     def help_hostnum(self):
         print('usage:')
         print('\thostnum')
 
     def do_switchnum(self,args):
-        print('Number of switches is ' + str(self.switch_num) + '.')
+        print('Number of switches is ' + str(self.cluster_info['switch_number']) + '.')
 
     def help_switchnum(self):
         print('usage:')
         print('\tswitchnum')
 
     def do_setupsniffers(self, args):
-        for host in self.host_IP_map.keys():
-            cmd = host + ' python ' + DST_SCRIPT_FOLDER + 'port_sniffer.py ' + host + \
+        for host in self.hosts.values():
+            cmd = host['name'] + ' python ' + DST_SCRIPT_FOLDER + 'port_sniffer.py ' + host['name'] + \
                   '-eth0 ' + DST_SCRIPT_FOLDER + INFECTED_HOSTS_FILENAME + ' &'
             #print cmd
-            send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[host]],
-                                              cmd, self.ssh_chan_map, quite=False)
+
+            node = self.nodes[host['nodeIP']]
+            send_mininet_cmd_to_cluster_node(node, cmd, quite=False)
 
     def help_setupsniffers(self):
         print('usage:')
@@ -210,29 +221,32 @@ class CLI_director(cmd.Cmd):
 
 
     def do_startworm(self, args):
-        hosts = args.split()
+        malware_hosts = args.split()
 
-        for host in hosts:
-            if self.is_hostname(host):
+        for malware_host_name in malware_hosts:
+            if self.is_hostname(malware_host):
 
-                cmd = host + ' python ' + DST_SCRIPT_FOLDER + 'worm_instance.py ' + host + '-eth0' + ' &'
+                cmd = malware_host_name + ' python ' + DST_SCRIPT_FOLDER + 'worm_instance.py '\
+                      + malware_host_name + '-eth0' + ' &'
                 #print cmd
-                send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[host]],
-                                                  cmd, self.ssh_chan_map, quite=False)
+
+                host = self.hosts[malware_host_name]
+                node = self.nodes[host['nodeIP']]
+                send_mininet_cmd_to_cluster_node(node, cmd, quite=False)
 
     def help_startworm(self):
         print('usage:')
         print('\tstartworm hostname')
 
     def do_clusterinfo(self,args):
-        print('Number of nodes in graph is ' + str(len(self.host_map.keys())+self.switch_num) + '.')
-        print('Number of hosts is ' + str(len(self.host_map.keys())) + '.')
-        print('Number of switches is ' + str(self.switch_num) + '.')
+        print('Number of nodes in graph is ' + str(len(self.hosts.keys())+self.cluster_info['switch_number']) + '.')
+        print('Number of hosts is ' + str(len(self.hosts.keys())) + '.')
+        print('Number of switches is ' + str(self.cluster_info['switch_number']) + '.')
         print('')
         print('Cluster graph distribution:')
-        for cn in self.h_and_sw_node_map.keys():
-            print('\t' + str(cn) + ') ' + 'hosts = ' + str(self.h_and_sw_node_map[cn][0]).rjust(5, ' ') + " ; "
-                  + 'switches = ' + str(self.h_and_sw_node_map[cn][1]).rjust(5, ' ') + ".")
+        for id, cn in self.cluster_info['node_info'].items():
+            print('\t' + str(id) + ') ' + 'hosts = ' + str(cn[0]).rjust(5, ' ') + " ; "
+                  + 'switches = ' + str(cn[1]).rjust(5, ' ') + ".")
 
     def help_clusterinfo(self):
         print('usage:')
@@ -288,23 +302,18 @@ class CLI_director(cmd.Cmd):
                 new_line = words[0]
                 self.do_ifconfig(new_line)
                 return
-        if self.is_hostname(words[0]) and words not in self.host_IP_map.keys():
-            print('Unknown host name')
-            return
-        elif self.is_hostname(words[0]) and words in self.host_IP_map.keys():
-            cmd = ''
-            for word in words:
-                cmd += word + ' '
-            send_mininet_cmd_to_cluster_node(self.host_to_node_map[self.host_IP_map[words[0]]],
-                                              cmd, self.ssh_chan_map, quite=False)
-            return
-        else:
-            print('Sorry, unknown command')
 
-            # try:
-            #     exec(line) in self._locals, self._globals
-            # except Exception, e:
-            #     print e.__class__, ":", e
+        src_host = self.is_host_exist(words[0])
+        if src_host == None:
+            print('No such src host')
+            return
+        cmd = ''
+        for word in words:
+            cmd += word + ' '
+        host = self.hosts[src_host]
+        node = self.nodes[host['nodeIP']]
+        send_mininet_cmd_to_cluster_node(node, cmd, quite=False)
+        return
 
     def is_hostname(self, str):
         if str[0] == 'h':

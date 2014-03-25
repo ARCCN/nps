@@ -2,7 +2,7 @@
 import sys
 
 
-def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, quite=True):
+def send_mininet_cmd_to_cluster_node(node, cmd, quite=True):
     '''Send Mininet console command to cluster node.
 
     Args:
@@ -11,21 +11,12 @@ def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, quite=True):
     '''
 
     cmd += '\n'
-    ssh_chan_map[node_IP].send(cmd)
+    node['ssh_chan'].send(cmd)
     buff = ""
     if cmd != 'exit\n':
-        #while not buff.endswith('mininet> '):
-        #    buff += ssh_chan_map[node_IP].recv(9999)
-        ## print("SUCCESS:" + node_IP + ": " + cmd)
-        ##    print buff
-        #if not quite:
-        #    buff_lines = buff.splitlines()
-        #    for line in buff_lines[:-1]:
-        #        print(line)
-
         last = ""
         while not buff.endswith('mininet> '):
-            out = ssh_chan_map[node_IP].recv(1)
+            out = node['ssh_chan'].recv(1)
             if out:
                 if out == '\n' and last != '\n': # remove duplication end of line
                     pass
@@ -33,13 +24,9 @@ def send_mininet_cmd_to_cluster_node(node_IP, cmd, ssh_chan_map, quite=True):
                     sys.stdout.write(out)
             buff += out
             last = out
-        # print("SUCCESS:" + node_IP + ": " + cmd)
-        #    print buff
-
-        #logger_MininetCE.info("SUCCESS:" + node_IP + ": " + cmd)
 
 
-def send_mininet_ping_to_cluster_node(node_IP, cmd, ssh_chan_map):
+def send_mininet_ping_to_cluster_node(node, cmd):
     '''Send Mininet console command PING to cluster node and check the result of its execution.
 
     Args:
@@ -51,17 +38,11 @@ def send_mininet_ping_to_cluster_node(node_IP, cmd, ssh_chan_map):
         False: If the ping failed to reach the destination point.
     '''
     cmd += '\n'
-    ssh_chan_map[node_IP].send(cmd)
+    node['ssh_chan'].send(cmd)
     buff = ''
-    #while not buff.endswith('mininet> '):
-    #    if ssh_chan_map[node_IP].recv_ready():
-    #        buff += ssh_chan_map[node_IP].recv(9999)
-    #buff_lines = buff.splitlines()
-    #for line in buff_lines[:-1]:
-    #    print(line)
     last = ""
     while not buff.endswith('mininet> '):
-        out = ssh_chan_map[node_IP].recv(1)
+        out = node['ssh_chan'].recv(1)
         if out:
             if out == '\n' and last != '\n': # remove duplication end of line
                 pass

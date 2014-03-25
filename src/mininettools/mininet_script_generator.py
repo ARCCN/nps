@@ -166,48 +166,44 @@ def generate_mn_ns_script_auto(node_intf_map, node_groups, edge_groups, node_ext
             file.close()
 
 
-def generate_mn_ns_script_with_custom_host_ip_auto(node_intf_map, node_groups, edge_groups, node_ext_intf_group, leaves,
-                                         node_map, node_ctrl_map, hosts_net_services):
+def generate_mn_ns_script_with_custom_host_ip_auto(nodes, groups, leaves, hosts_net_services):
     '''Generate turn on script for Cluster node.
 
     Args:
-        node_ext_intf: External network insterface name to the node.
-        node_group: Group ID to node-list map.
-        edge_group: Group ID to edge-list map.
-        node_ext_insf_group: External network insterface name to the node group.
-        leaves: List of leave-node in network graph.
-        node_map: Cluster node map.
+
     '''
-    host_to_node_map, host_map, host_IP_map = {}, {}, {}
-    node_IP_pool_map, node_IP_gr_map = define_node_ip_pool(node_groups, leaves, node_map)
+    hosts = {}
+
+    nodes = define_node_ip_pool(groups, leaves, nodes)
+
+    for ip, node in nodes.items():
+        group = groups[node['group']]
+        curr_host_ip = node['IP_pool']
+        for node_in_gr in group['vertexes']:
+            if node_in_gr in leaves:
+                curr_host = 'h' + str(node_in_gr)
+                host = {}
+                host['IP'] = curr_host_ip
+                host['name'] = curr_host
+                host['IP_node'] = ip
+
+                hosts[curr_host] = host
+                # prepare for next host
+                curr_host_ip = get_next_IP(curr_host_ip)
+
+        filename = 'turn_on_script_for_' + ip + '.py'
+        filepath = SCRIPT_FOLDER + filename
+
+        file = open(filepath, 'w')
+
+        spec_group = groups['no_group']
+
+        gen_mn_ns_script_by_template_with_custom_host_ip(file, node, group, spec_group, leaves,
+                                    hosts_net_services, hosts)
+        file.close()
 
 
-    for group in node_groups.keys():
-        if group != 'ext_intf':
-            node_IP = node_map.keys()[group]
-
-            node_group = node_groups[node_IP_gr_map[node_IP]]
-            curr_host_ip = node_IP_pool_map[node_IP]
-            for node in node_group:
-                if node in leaves:
-                    curr_host = 'h' + str(node)
-                    host_to_node_map[curr_host_ip] = node_IP
-                    host_map[curr_host_ip] = curr_host
-                    host_IP_map[curr_host] = curr_host_ip
-                    # prepare for next host
-                    curr_host_ip = get_next_IP(curr_host_ip)
-
-            filename = 'turn_on_script_for_' + node_IP + '.py'
-            filepath = SCRIPT_FOLDER + filename
-
-            file = open(filepath, 'w')
-
-            gen_mn_ns_script_by_template_with_custom_host_ip(file, node_intf_map[node_IP], node_groups[group],
-                                        edge_groups[group], node_ext_intf_group, leaves, node_ctrl_map[node_IP],
-                                        hosts_net_services, node_IP_pool_map[node_IP], host_IP_map)
-            file.close()
-
-    return host_to_node_map, host_map, host_IP_map
+    return hosts
 
 
 if __name__ == '__main__':
