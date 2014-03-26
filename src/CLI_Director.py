@@ -224,12 +224,10 @@ class CLI_director(cmd.Cmd):
         malware_hosts = args.split()
 
         for malware_host_name in malware_hosts:
-            if self.is_hostname(malware_host):
-
+            if self.is_hostname(malware_host_name):
                 cmd = malware_host_name + ' python ' + DST_SCRIPT_FOLDER + 'worm_instance.py '\
                       + malware_host_name + '-eth0' + ' &'
                 #print cmd
-
                 host = self.hosts[malware_host_name]
                 node = self.nodes[host['nodeIP']]
                 send_mininet_cmd_to_cluster_node(node, cmd, quite=False)
