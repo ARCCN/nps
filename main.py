@@ -30,6 +30,29 @@ if __name__ == '__main__':
     malware_node_list = {}
     pos = None
 
+    if str(sys.argv[1]) == '--clean':
+        # take nodelist from file
+        print('Taking nodelist from config file'.ljust(STRING_ALIGNMENT, ' ')),
+        nodes = read_nodelist_from_file(NODELIST_FILEPATH)
+        print('DONE!')
+        # open ssh sessions to nodes
+        print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
+        make_threaded(open_ssh_to_node, [], nodes)
+        print('DONE!')
+        # Deleting ovs bridges from nodes
+        print('Deleting ovs bridges from cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
+        make_threaded(send_cmd_to_cluster_node, ['ovs-vsctl list-br | xargs -L1 ovs-vsctl del-br',], nodes)
+        print('DONE!')
+        # close ssh sessions to nodes
+        print('Sending exit to cluster nodes'.ljust(STRING_ALIGNMENT, ' ')),
+        make_threaded(send_cmd_to_cluster_node, ['exit',], nodes)
+        print('DONE!')
+        print('Sending CLOSE to all ssh connections'.ljust(STRING_ALIGNMENT, ' ')),
+        close_ssh_to_nodes(nodes)
+        print('DONE!')
+        print('FINISH')
+        exit(0)
+
     # take nodelist from file
     print('Taking nodelist from config file'.ljust(STRING_ALIGNMENT, ' ')),
     nodes = read_nodelist_from_file(NODELIST_FILEPATH)
@@ -48,13 +71,15 @@ if __name__ == '__main__':
 
     G, pos, node_services = get_networkX_graph(graph_data)
     ## this function will not use cluster nodes if there is less then 2 graph vertexes to cluster node
-    nodes = mininet_script_operator.nodes_number_optimization(G, nodes)
+    #nodes = mininet_script_operator.nodes_number_optimization(G, nodes)
 
     print('Splitting network graph for nodes'.ljust(STRING_ALIGNMENT, ' ')),
     leaves = mininet_script_operator.define_leaves_in_graph(G)
-    groups = mininet_script_operator.split_graph_on_parts(G, len(nodes))
-    if len(groups) == 1:
-        groups = {0: groups[1]}
+    groups, nodes = mininet_script_operator.split_graph_on_parts(G, nodes)
+    print 'GR = ', len(groups), ' NN = ', len(nodes)
+
+    #if len(groups) == 1:
+    #    groups = {0: groups[1]}
     print('DONE!')
 
     if DRAWING_FLAG:
@@ -85,7 +110,6 @@ if __name__ == '__main__':
         file_monitor_cmd = 'python ' + DST_SCRIPT_FOLDER + 'file_monitor.py ' + \
                            MALWARE_CENTER_IP + ' ' + str(MALWARE_CENTER_PORT) + ' ' + \
                            DST_SCRIPT_FOLDER + INFECTED_HOSTS_FILENAME + ' &'
-        #print file_monitor_cmd
         make_threaded(send_cmd_to_cluster_node, [file_monitor_cmd, ], nodes)
         print('DONE!')
 

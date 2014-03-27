@@ -37,6 +37,11 @@ def send_support_scripts_to_cluster_node(node):
     Args:
         node_IP: IP address of cluster node.
     '''
+
+    # delete old scripts
+    del_old_support_scripts_cmd = 'rm ' + DST_SCRIPT_FOLDER + '*'
+    send_cmd_to_cluster_node(node, del_old_support_scripts_cmd)
+
     script_name = 'turn_on_script_for_' + node['IP'] + '.py'
     send_turn_on_script_to_cluster_node(node, script_name)
     send_script_to_cluster_node(node, 'scapy_packet_gen.py')

@@ -48,6 +48,29 @@ class CustomTextCtrl(wx.TextCtrl):
         # more customization here
 
 
+def make_threaded(function, args, node_labels):
+    threads = []
+    list_args = list(args)
+    for node_label in node_labels:
+        list_args.insert(0, node_label)
+        thread = KThread(target=function, args=tuple(list_args))
+        threads.append(thread)
+        list_args.pop(0)
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+def color_ping_func(node_label):
+        ping = subprocess.Popen(["ping", "-c", "1", node_label.GetLabel()], stdout=subprocess.PIPE, shell=False)
+        ping.wait()
+        if ping.returncode != 0:
+            node_label.SetBackgroundColour('#F79C94')
+        else:
+            node_label.SetBackgroundColour('#A3F291')
+        time.sleep(CHECK_PING_TIME_PERIOD)
+
+
 class NodeStatusPanel(wx.Panel):
     """
     """
@@ -76,7 +99,7 @@ class NodeStatusPanel(wx.Panel):
             gridSizer = wx.GridSizer(rows=node_num%10, cols=10, hgap=1, vgap=1)
         for node in self.node_map.keys():
             node_label = wx.StaticText(self, -1, node, style=wx.ALIGN_CENTER)
-            font = wx.Font(10, 0, 0, wx.NORMAL)
+            font = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
             node_label.SetFont(font)
             gridSizer.Add(node_label, 0, wx.EXPAND)
             self.node_labels.append(node_label)
@@ -89,15 +112,18 @@ class NodeStatusPanel(wx.Panel):
         self.ping_thread.start()
 
     def ping_thread_func(self):
+        #while True:
+        #    for node_label in self.node_labels:
+        #        ping = subprocess.Popen(["ping", "-c", "1", node_label.GetLabel()], stdout=subprocess.PIPE, shell=False)
+        #        ping.wait()
+        #        if ping.returncode != 0:
+        #            node_label.SetBackgroundColour('#F79C94')
+        #        else:
+        #            node_label.SetBackgroundColour('#A3F291')
+        #    time.sleep(CHECK_PING_TIME_PERIOD)
         while True:
-            for node_label in self.node_labels:
-                ping = subprocess.Popen(["ping", "-c", "1", node_label.GetLabel()], stdout=subprocess.PIPE, shell=False)
-                ping.wait()
-                if ping.returncode != 0:
-                    node_label.SetBackgroundColour('#F79C94')
-                else:
-                    node_label.SetBackgroundColour('#A3F291')
-            time.sleep(CHECK_PING_TIME_PERIOD)
+            make_threaded(color_ping_func, [], self.node_labels)
+
 
 
     def read_nodelist_from_file(self, nodelist_filepath):

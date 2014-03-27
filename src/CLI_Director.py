@@ -213,7 +213,8 @@ class CLI_director(cmd.Cmd):
             #print cmd
 
             node = self.nodes[host['nodeIP']]
-            send_mininet_cmd_to_cluster_node(node, cmd, quite=False)
+            send_mininet_cmd_to_cluster_node(node, cmd, quite=True)
+        print('Finish setuping sniffers!')
 
     def help_setupsniffers(self):
         print('usage:')

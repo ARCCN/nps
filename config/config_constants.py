@@ -15,7 +15,7 @@ MAIN_DB_PATH      = NPS_PATH + '/tmp/'
 
 ### MALWARE MODE
 MALWARE_MODE_ON = True
-MALWARE_CENTER_IP   = '172.0.1.100'
+MALWARE_CENTER_IP   = '10.30.40.95'
 MALWARE_CENTER_PORT = 56565
 INFECTED_HOSTS_FILENAME = 'infected_hosts.db'
 #MAIN_DB_NAME = 'infected_hosts.db'
@@ -24,6 +24,7 @@ INFECTED_HOSTS_FILENAME = 'infected_hosts.db'
 FIRST_HOST_IP = '1.2.3.1'
 HOST_NETMASK = 16 # mask of host intf on mininet cluster node
 LINK_DELAY = 5 # default link delay in ms
+NO_DELAY_FLAG = True
 
 ### CLUSTER NODE CONFIG
 CLUSTER_NODE_MACHINE_NAME = 'clusternode-Parallels-Virtual-Platform'
@@ -44,7 +45,7 @@ SCRIPT_FOLDER = 'scripts/nodes/'
 CHECK_PING_TIME_PERIOD = 30
 
 ### CONTROLLER CONFIG
-REMOTE_CONTROLLER_IP   = '172.0.1.100'
+REMOTE_CONTROLLER_IP   = '10.30.40.95'
 REMOTE_CONTROLLER_PORT = '6633'
 
 

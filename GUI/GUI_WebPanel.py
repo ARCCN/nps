@@ -57,6 +57,11 @@ class WebPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnSimulateButton, btn)
         btnSizer.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
+        btn = CustomButton(self, -1, "Clean")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnCleanButton, btn)
+        btnSizer.Add(btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
         btn = CustomButton(self, -1, "DB:JSON")
         btn.SetBackgroundColour('#B5B5B5')
         self.Bind(wx.EVT_BUTTON, self.OnDBJsonButton, btn)
@@ -275,6 +280,20 @@ class WebPanel(wx.Panel):
         #self.console_thread.start()
 
         console_cmd = sys.prefix + '/bin/python main.py \'' + file_name + '\''
+        self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+        self.console_thread = KThread(target=self.console_thread_func)
+        self.console_thread.setDaemon(True)
+        self.console_thread.start()
+
+    def OnCleanButton(self, event):
+        # Save current graph
+        self.console.ChangeValue('')
+        self.controller.ChangeValue('')
+        if MALWARE_MODE_ON:
+            self.malware_center.ChangeValue('')
+
+
+        console_cmd = sys.prefix + '/bin/python main.py --clean'
         self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
         self.console_thread = KThread(target=self.console_thread_func)
         self.console_thread.setDaemon(True)

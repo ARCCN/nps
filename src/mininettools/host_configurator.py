@@ -50,6 +50,7 @@ def define_node_ip_pool(groups, leaves, nodes):
     '''
 
     next_IP_pool = FIRST_HOST_IP
+
     for node in nodes.values():
         group = groups[node['group']]
         host_num = len(group['vertexes'])

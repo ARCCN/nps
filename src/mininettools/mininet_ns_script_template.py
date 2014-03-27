@@ -1,12 +1,7 @@
 __author__ = 'vitalyantonenko'
 
-from config.config_constants import SCRIPT_FOLDER, REMOTE_CONTROLLER_IP, REMOTE_CONTROLLER_PORT, \
-    HOST_NETMASK, LINK_DELAY
-#from host_configurator           import get_next_IP
+from config.config_constants import HOST_NETMASK, LINK_DELAY, NO_DELAY_FLAG
 
-
-
-#def gen_mn_ns_script_by_template(file, nodes_ext_intf, node_group, edge_group, ext_intf_list, leaves, node_ctrl_map):
 def gen_mn_ns_script_by_template(file, nodes_ext_intf, node_group, edge_group,
                                  ext_intf_list, leaves, node_ctrl_map, hosts_net_services):
     '''Generate turn on script for Cluster node with network services.
@@ -433,9 +428,9 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, node, group, spec_gro
     file.write("\n")
     file.write('\n')
     file.write('sw_ext_intf = [')
-    for i, node_in_gr in enumerate(spec_group['vertexes']):
+    for i, vertex in enumerate(spec_group['vertexes']):
         file.write('\'s')
-        file.write(str(node_in_gr))
+        file.write(str(vertex))
         file.write('\'')
         if i != len(spec_group['vertexes'])-1:
             file.write(',')
@@ -449,23 +444,23 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, node, group, spec_gro
     file.write('\n')
     file.write('        \"Add hosts and swiches\"\n')
     #Define IPs
-    for node_in_gr in group['vertexes']:
-        if node_in_gr in leaves:
+    for vertex in group['vertexes']:
+        if vertex in leaves:
             file.write('        h')
-            file.write(str(node_in_gr))
+            file.write(str(vertex))
             file.write(' = self.addHost( \'h')
-            file.write(str(node_in_gr))
+            file.write(str(vertex))
             file.write('\', ip=\'')
-            file.write(hosts['h'+str(node_in_gr)]['IP'])
+            file.write(hosts['h'+str(vertex)]['IP'])
             file.write('/')
             file.write(str(HOST_NETMASK))
             file.write('\' )\n')
             #curr_host_ip = get_next_IP(curr_host_ip)
         else:
             file.write('        s')
-            file.write(str(node_in_gr))
+            file.write(str(vertex))
             file.write(' = self.addSwitch( \'s')
-            file.write(str(node_in_gr))
+            file.write(str(vertex))
             file.write('\' )\n')
     file.write('\n')
     file.write('        \"Add links\"\n')
@@ -482,9 +477,12 @@ def gen_mn_ns_script_by_template_with_custom_host_ip(file, node, group, spec_gro
         else:
             file.write('s')
         file.write(str(edge_in_gr[1]))
-        file.write(', delay=\'')
-        file.write(str(LINK_DELAY))
-        file.write('ms\')\n')
+        if NO_DELAY_FLAG:
+            file.write(')\n')
+        else:
+            file.write(', delay=\'')
+            file.write(str(LINK_DELAY))
+            file.write('ms\')\n')
     file.write('\n')
     file.write('\n')
     file.write('def checkIntf( intf ):\n')

@@ -5,24 +5,19 @@ import networkx as nx
 from src        import metis
 
 
-def split_graph_on_parts(G, number_pf_parts):
+def split_graph_on_parts(G, nodes):
     '''Split graph on subgraphs.
 
     Args:
-        G: Entire network graph.
-        number_pf_parts: Number of subgraphs.
 
     Returns:
-        node_group: Group ID to node-list map.
-        edge_group: Group ID to edge-list map.
-        node_ext_intf_map: Group ID to external (cross-group links interfaces) map.
 
     '''
-
-    if number_pf_parts == 1:
-        (edgecuts, parts) = metis.part_graph(G, number_pf_parts, recursive=True)
+    number_of_parts = len(nodes)
+    if number_of_parts == 1:
+        (edgecuts, parts) = metis.part_graph(G, number_of_parts, recursive=True)
     else:
-        (edgecuts, parts) = metis.part_graph(G, number_pf_parts, contig=True, compress=True)
+        (edgecuts, parts) = metis.part_graph(G, number_of_parts, contig=True, compress=True)
 
     groups = {}
     for p in set(parts):
@@ -53,7 +48,13 @@ def split_graph_on_parts(G, number_pf_parts):
                 group['vertexes'].append(edge[0])
             if edge[1] not in group['vertexes']:
                 group['vertexes'].append(edge[1])
-    return groups
+
+    #delete not used nodes
+    for key, node in nodes.items():
+        if node['group'] not in set(parts):
+            del nodes[key]
+
+    return groups, nodes
 
 
 def standard_mininet_script_parser(filename, G):
@@ -129,17 +130,4 @@ def nodes_number_optimization(G, nodes):
 
 
 if __name__ == '__main__':
-    print('HELLO!\n')
-    G = nx.Graph()
-
-
-
-    G = nx.barabasi_albert_graph(17, 1, 777)
-    pos = nx.spring_layout(G)
-
-    leaves = define_leaves_in_graph(G)
-    node_groups, edge_groups, node_ext_intf_group = split_graph_on_parts(G, 2)
-
-    # generate_mininet_turn_on_script_auto("eth0", node_groups, edge_groups, leaves)
-
-    draw_graph(G, node_groups, edge_groups)
+   pass
