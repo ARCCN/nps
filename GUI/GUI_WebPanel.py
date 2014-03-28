@@ -128,7 +128,7 @@ class WebPanel(wx.Panel):
 
         ## Send command row
         btn = CustomButton(self, wx.ID_ANY, 'Send')
-        self.Bind(wx.EVT_BUTTON, self.onSendButton, btn)
+        self.Bind(wx.EVT_BUTTON, self.OnSendButton, btn)
 
         self.cmd_line = CustomTextCtrl(self, wx.ID_ANY) #size=(235,-1)
         font_cmd_line = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
@@ -179,10 +179,10 @@ class WebPanel(wx.Panel):
     def onKeyPress(self, event):
         keycode = event.GetKeyCode()
         if keycode == 13: # ENTER KEY
-            self.onSendButton(event)
+            self.OnSendButton(event)
         event.Skip()
 
-    def onSendButton(self, event):
+    def OnSendButton(self, event):
         cmd = self.cmd_line.GetValue()
         if cmd != 'exit':
             self.console_proc.stdin.write(cmd + '\n')

@@ -6,9 +6,11 @@
  * To change this template use File | Settings | File Templates.
  */
 
-function Draw_vizualization(div){
+function Draw_vizualization(div, size_x, size_y){
+
     var vizualizer = div+ ' #vizualizer';
-    $(vizualizer).append('<canvas id="viz_canvas" class="graph_editor_canvas" width = "700" height = "500"></canvas>').hide();
+    $(vizualizer).append('<canvas id="viz_canvas" class="graph_editor_canvas" width =' +
+        '"' + size_x + '" height = "' + size_y + '" >Your browser does not support canvas.</canvas>').hide();
 
     // include Rgraph
     $(vizualizer).append('<script src="lib/rgraph/RGraph.common.core.js" ></script>');

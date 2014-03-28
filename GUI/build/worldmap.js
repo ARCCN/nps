@@ -5,10 +5,11 @@
  * Time: 17:40
  * To change this template use File | Settings | File Templates.
  */
-function Draw_worldmap(div) {
+function Draw_worldmap(div, size_x, size_y) {
     var worldmap = div+ ' #worldmap';
 
-    $(worldmap).append('<div id="map" class="graph_editor_canvas" style="width: 700px; height: 500px;"></div>').hide();
+    $(worldmap).append('<div id="map" class="graph_editor_canvas" ' +
+        'style="width: '+ size_x + 'px; height: '+ size_y +'px;"></div>').hide();
 
     $(worldmap).append('<script src="build/jquery-jvectormap-1.2.2.min.js"></script>');
     $(worldmap).append('<script src="build/jquery-jvectormap-europe-mill-en.js"></script>');

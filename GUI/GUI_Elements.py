@@ -154,7 +154,7 @@ class GraphEditorPanel(wx.Panel):
                              #wx.BK_RIGHT
                              ) #size=(235,100)
 
-        self.tabs = {'Result', 'Visualizer', 'WorldMap'}
+        self.tabs = {'Result', 'Sigma', 'Visualizer', 'WorldMap'}
 
         self.wv = wv
         if MALWARE_MODE_ON:
@@ -200,6 +200,11 @@ class GraphEditorPanel(wx.Panel):
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
         self.Bind(wx.EVT_BUTTON, self.OnResultButton, self.result_btn)
         hbox.Add(self.result_btn, 1, wx.EXPAND|wx.RIGHT, 1)
+
+        self.sigma_btn = CustomButton(self, -1, "Sigma")
+        # btn.SetBackgroundColour('#93FF8C') B2B2B2
+        self.Bind(wx.EVT_BUTTON, self.OnSigmaButton, self.sigma_btn)
+        hbox.Add(self.sigma_btn, 1, wx.EXPAND|wx.RIGHT, 1)
 
         self.visualiser_btn = CustomButton(self, -1, "Visualiser")
         # btn.SetBackgroundColour('#93FF8C') B2B2B2
@@ -267,6 +272,25 @@ class GraphEditorPanel(wx.Panel):
         #self.result_btn.SetBackgroundColour('#B2B2B2')
         #self.editor_btn.SetBackgroundColour('#FFFFFF')
 
+    def show_sigma(self):
+        self.wv.RunScript("$('#graph_ed' + ' #sigmadiv').show();")
+        self.wv.RunScript("$('#graph_ed' + ' #sigmadiv').fadeIn().resize();")
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).hide();")
+        self.wv.RunScript("$('#graph_ed'+' #sigmadiv_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'Sigma'
+        #self.worldmap_btn.SetBackgroundColour('#FFFFFF')
+        #self.editor_btn.SetBackgroundColour('#B2B2B2')
+
+    def hide_sigma(self):
+        self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
+        self.wv.RunScript("$(canvas).show();")
+        self.wv.RunScript("$('#graph_ed' + ' #sigmadiv').hide();")
+        self.wv.RunScript("$('#graph_ed' + ' #sigmadiv_button').toggleClass('graph_editor_button_on');")
+        self.current_tab = 'Editor'
+        #self.result_btn.SetBackgroundColour('#B2B2B2')
+        #self.editor_btn.SetBackgroundColour('#FFFFFF')
+
     def show_visualiser(self):
         self.wv.RunScript("$('#graph_ed' + ' #vizualizer').show();")
         self.wv.RunScript("canvas = $('#graph_ed' +' canvas')[0];")
@@ -309,6 +333,8 @@ class GraphEditorPanel(wx.Panel):
             self.hide_options()
         if self.current_tab == 'Result':
             self.hide_result()
+        if self.current_tab == 'Sigma':
+            self.hide_sigma()
         if self.current_tab == 'Visualiser':
             self.hide_visualiser()
         if self.current_tab == 'WorldMap':
@@ -383,6 +409,13 @@ class GraphEditorPanel(wx.Panel):
         else:
             self.go_to_editor_tab()
             self.show_result()
+
+    def OnSigmaButton(self, event):
+        if self.current_tab == 'Sigma':
+            self.hide_sigma()
+        else:
+            self.go_to_editor_tab()
+            self.show_sigma()
 
     def OnVisualiserButton(self, event):
         if self.current_tab == 'Visualiser':

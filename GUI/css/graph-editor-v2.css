@@ -131,6 +131,15 @@ canvas.graph_editor_canvas{
     tabindex: 0;
 }
 
+div#sigma-container{
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+}
+
+
 div#viz_test{
     border: 1px solid #000000;
     float: left;
@@ -148,4 +157,6 @@ div h4{
     padding: 0px;
     margin: 12px 0px 0px 0px;
 }
+
+
 

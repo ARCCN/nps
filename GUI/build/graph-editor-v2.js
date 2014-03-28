@@ -20,7 +20,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     SPEED = 1.5,// 2.0
     FIXED_LENGTH = 100.0,
     ORIENTATION = Math.PI,
-    SHOWFPS = false,
+    SHOWFPS = true,
     SHIFT = false,
     LOOP = false,
     FPS = options.fps || 60,
@@ -957,17 +957,23 @@ function create_controls(div) {
         modal : true
     });
 
+    // Create Result2 tab html code
+    $(div).append('<div class="graph_editor_canvas" id="sigmadiv"></div>');
+    // Include Result2 lib
+    $(div).append('<script src="build/sigma.js" ></script>');
+    Draw_sigma(div, SIZE.x, SIZE.y);
+
     // Create Visualizer tab html code
     $(div).append('<div class="graph_editor_canvas" id="vizualizer"></div>');
     // Include Rgraph lib
     $(div).append('<script src="build/vizualization.js" ></script>');
-    Draw_vizualization(div);
+    Draw_vizualization(div, SIZE.x, SIZE.y);
 
     // Create World map tab html code
     $(div).append('<div class="graph_editor_canvas" id="worldmap" ></div>');
     // Include
     $(div).append('<script src="build/worldmap.js" ></script>');
-    Draw_worldmap(div);
+    Draw_worldmap(div, SIZE.x, SIZE.y);
 
     // Create result tab html code
     $(div).append('<div id="result"></div>');
@@ -1205,14 +1211,14 @@ init();
 //an global object graph_editor is created containing all global functions
 return {
     import_from_JSON: import_from_JSON,
-    set_node_infected:set_node_infected,
-    set_nodes_vulnerable:set_nodes_vulnerable,
-    set_nodes_invulnerable:set_nodes_invulnerable,
-    set_node_vulnerable:set_node_vulnerable,
+    set_node_infected: set_node_infected,
+    set_nodes_vulnerable: set_nodes_vulnerable,
+    set_nodes_invulnerable: set_nodes_invulnerable,
+    set_node_vulnerable: set_node_vulnerable,
     export_sage: export_sage,
     toggle_live: toggle_live,
     erase_graph: erase_graph,
-    get_SIZE_x:get_SIZE_x,
+    get_SIZE_x: get_SIZE_x,
     set_UIside_panel_opened: set_UIside_panel_opened,
     get_UIside_panel_opened: get_UIside_panel_opened,
     undo_remove: undo_remove,
