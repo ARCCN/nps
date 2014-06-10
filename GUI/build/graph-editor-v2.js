@@ -30,7 +30,7 @@ var edge_list = [], nodes = [], removed_edges = [],
     NETAPPS = ['WEB', 'VIDEO', 'FTP', 'P2P', 'SMTP', 'dhcpd'],
     last_frame;
 
-var tabs = {'vizualizer': false, 'result': false, 'worldmap': false};
+//var tabs = {'vizualizer': false, 'result': false, 'worldmap': false, 'visgraph': false};
 
 $(window).bind('resize', function() {
     SIZE.x = $(window).width();
@@ -38,18 +38,18 @@ $(window).bind('resize', function() {
     center = {x: SIZE.x/2, y: SIZE.y/2};
 });
 
-
-function hide_tabs(tabname) {
-    for (var i in tabs) {
-        if (i != tabname) {
-            if (tabs[i] == true){
-                $(div + ' #' + tabname).hide();
-                $(div+' #'+tabname+'_button').toggleClass('graph_editor_button_on');
-                tabs[i] = false;
-            }
-        }
-    }
-}
+//
+//function hide_tabs(tabname) {
+//    for (var i in tabs) {
+//        if (i != tabname) {
+//            if (tabs[i] == true){
+//                $(div + ' #' + tabname).hide();
+//                $(div+' #'+tabname+'_button').toggleClass('graph_editor_button_on');
+//                tabs[i] = false;
+//            }
+//        }
+//    }
+//}
 
 
 //Miscellaneous functions  
@@ -957,12 +957,6 @@ function create_controls(div) {
         modal : true
     });
 
-    // Create Result2 tab html code
-    $(div).append('<div class="graph_editor_canvas" id="sigmadiv"></div>');
-    // Include Result2 lib
-    $(div).append('<script src="build/sigma.js" ></script>');
-    Draw_sigma(div, SIZE.x, SIZE.y);
-
     // Create Visualizer tab html code
     $(div).append('<div class="graph_editor_canvas" id="vizualizer"></div>');
     // Include Rgraph lib
@@ -974,6 +968,13 @@ function create_controls(div) {
     // Include
     $(div).append('<script src="build/worldmap.js" ></script>');
     Draw_worldmap(div, SIZE.x, SIZE.y);
+
+    // Create Sigma tab html code
+    $(div).append('<div class="graph_editor_canvas" id="visgraph"></div>');
+    // Include Sigma lib
+    $(div).append('<script src="build/visgraph.js" ></script>');
+    var vis_graph = Draw_visgraph(div, SIZE.x, SIZE.y);
+
 
     // Create result tab html code
     $(div).append('<div id="result"></div>');

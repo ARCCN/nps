@@ -370,10 +370,8 @@ class WebPanel(wx.Panel):
             if out != '':
                 if "new worm instance " in out:
                     host = out.split()[3].split(':')[0].split('-')[0]
-                    #self.wv.RunScript("my_graph_editor.set_node_infected(\"3\")")
                     print "my_graph_editor.set_node_infected(\"" + host[1:] + "\")"
                     self.inf_hosts_list.append(host)
-                    #self.wv.RunScript("my_graph_editor.set_node_infected(\"" + host[1:] + "\")")
                 wx.CallAfter(self.malware_center.AppendText, out)
 
     def controller_thread_func(self):

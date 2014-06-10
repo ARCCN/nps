@@ -212,6 +212,7 @@ class CLI_director(cmd.Cmd):
                   '-eth0 ' + DST_SCRIPT_FOLDER + INFECTED_HOSTS_FILENAME + ' &'
             #print cmd
 
+            #print(self.nodes)
             node = self.nodes[host['nodeIP']]
             send_mininet_cmd_to_cluster_node(node, cmd, quite=True)
         print('Finish setuping sniffers!')
