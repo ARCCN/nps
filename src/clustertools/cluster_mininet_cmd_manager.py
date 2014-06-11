@@ -18,7 +18,7 @@ def send_mininet_cmd_to_cluster_node(node, cmd, quite=True):
         while not buff.endswith('mininet> '):
             out = node['ssh_chan'].recv(1)
             if out:
-                if out == '\n' and last != '\n': # remove duplication end of line
+                if out == '\n' and last == '\n': # remove duplication end of line
                     pass
                 elif not quite:
                     sys.stdout.write(out)
@@ -44,7 +44,7 @@ def send_mininet_ping_to_cluster_node(node, cmd):
     while not buff.endswith('mininet> '):
         out = node['ssh_chan'].recv(1)
         if out:
-            if out == '\n' and last != '\n': # remove duplication end of line
+            if out == '\n' and last == '\n': # remove duplication end of line
                 pass
             else:
                 sys.stdout.write(out)
