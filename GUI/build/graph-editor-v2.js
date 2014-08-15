@@ -780,6 +780,9 @@ Controller = function() {
             if (String.fromCharCode(e.charCode) === 'l') {
                 toggle_live();
             }
+            if (String.fromCharCode(e.charCode) === 'u') {
+                toggle_UIside();
+            }
             if (String.fromCharCode(e.charCode) === 'f') {
                 SHOWFPS = !SHOWFPS;
             }
@@ -1006,6 +1009,8 @@ function create_controls(div) {
         }
     });
     $(tweaks).append("<h4>Tweaks</h4>");
+    $(tweaks).append("<h4>Tweaks</h4>");
+
     $(tweaks).append('<table>');
     add_checkbox('Vertex numbers', NODE_NUMBERS, tweaks, function() {
                 NODE_NUMBERS = !NODE_NUMBERS;
@@ -1125,6 +1130,21 @@ function toggle_live() {
         $(div+' #live_button').toggleClass('graph_editor_button_on');
     }
 
+function toggle_UIside() {
+        if (UIside_panel_opened) {
+            $('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast', function ()
+                              {$('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() +'px'},
+                                     {queue: true, duration: 'fast', easing: 'linear'});
+                                my_graph_editor.set_UIside_panel_opened(false);});
+        } else {
+            $('#graph_ed').animate({'width': my_graph_editor.get_SIZE_x() + 185 + 'px'},
+                              {queue: true, duration: 'fast', easing: 'linear', complete: function (){
+                                            $('#graph_ed' + ' #graph_editor_tweaks').slideToggle('fast');
+                                            my_graph_editor.set_UIside_panel_opened(true);}
+                              });
+        }
+    }
+
 function init() {
     //construction of GraphEditor
     controller = Controller();
@@ -1218,6 +1238,7 @@ return {
     set_node_vulnerable: set_node_vulnerable,
     export_sage: export_sage,
     toggle_live: toggle_live,
+    toggle_UIside: toggle_UIside,
     erase_graph: erase_graph,
     get_SIZE_x: get_SIZE_x,
     set_UIside_panel_opened: set_UIside_panel_opened,
