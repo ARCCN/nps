@@ -4,7 +4,7 @@ body {
     #mynetwork {
       position:relative;
       width: auto;
-      height: 600px;
+      height: 700px;
       border: 1px solid lightgray;
     }
     table.legend_table {
@@ -44,4 +44,31 @@ body {
       border-color: #5394ed;
       padding:10px;
       text-align: center;
+    }
+
+    #ConsoleOutputArea {
+        width:99%;
+        border: none;
+        /*-webkit-box-sizing: border-box;*/
+        /*line-height: 44px;*/
+        font-family:Consolas;
+        /*font-size: 17pt;*/
+        /*-webkit-tap-highlight-color: rgba(0,0,0,0);*/
+        /*background-image:url('linedBack@2x.png');*/
+        /*outline: none;*/
+        resize: none;
+
+    }
+
+    #text {
+        width:85%;
+        border: none;
+        /*-webkit-box-sizing: border-box;*/
+        /*line-height: 44px;*/
+        font-family:Consolas;
+        /*font-size: 17pt;*/
+        /*-webkit-tap-highlight-color: rgba(0,0,0,0);*/
+        /*background-image:url('linedBack@2x.png');*/
+        /*outline: none;*/
+        resize: none;
     }

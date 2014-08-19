@@ -1,272 +1,113 @@
 <!doctype html>
 <html>
 <head>
-  <title>Network | Navigation</title>
+  <title>NPS | GUI</title>
 
   <link type="text/css" href="BrowserGUI.css" rel="Stylesheet">
   <script type="text/javascript" src="js/vis/vis.min.js"></script>
-  <script src="js/lodash/lodash.js"></script>
+  <script type="text/javascript" src="js/lodash/lodash.js"></script>
+  <script type="text/javascript" src="js/zerorpc/zerorpc.js"></script>
   <link type="text/css" rel="stylesheet" href="js/vis/vis.min.css">
 
+  <script type="text/javascript" src="BrowserGUI.js"></script>
+  <script type="text/javascript" src="WebSocketClient.js"></script>
+
   <script type="text/javascript">
-
-    function export_json(nodes, edges) {
-    var data = {}, pos, i, exec = '';
-    data.vertices = nodes.map(function(n) {
-        return n.label;
-    });
-    data.edges = edges.map(function(e) {
-        return [e.from, e.to, e.label];
-    });
-//    data.pos = {};
-//    for (i = 0; i < nodes.length; i++) {
-//        pos = nodes[i].get_pos();
-//        data.pos[nodes[i].label] = [pos.x, pos.y];
-//    }
-    data.name = "test";
-    data.netapps = {};
-    for (i = 0; i < nodes.length; i++) {
-        if (typeof nodes[i].title == 'string') {
-            data.netapps[nodes[i].label] = nodes[i].title.split(" ");
-        }
-//        var netapp_list = nodes[i].title.split(" ");
-//
-//        for (x=0;x<netapp_list.length;x++)
-//        {
-//            data.netapps[nodes[i].label][netapp_list[x]] = true;
-//        }
-    }
-    return JSON.stringify(data);
-    }
-
-
-
-
-
-    var nodes = null;
-    var edges = null;
-    var network = null;
-
-
-    function show_json() {
-        var span = document.getElementById("debug");
-        span.textContent = export_json(nodes, edges);
-//        span.textContent = nodes[0].title;
-
-    }
-
-    function draw() {
-      nodes = [];
-      edges = [];
-      var connectionCount = [];
-
-      // randomly create some nodes and edges
-      var nodeCount = document.getElementById('nodeCount').value;
-      for (var i = 0; i < nodeCount; i++) {
-        nodes.push({
-          id: i,
-          label: String(i)
-        });
-
-        connectionCount[i] = 0;
-
-        // create edges in a scale-free-network way
-        if (i == 1) {
-          var from = i;
-          var to = 0;
-          edges.push({
-            from: from,
-            to: to
-          });
-          connectionCount[from]++;
-          connectionCount[to]++;
-        }
-        else if (i > 1) {
-          var conn = edges.length * 2;
-          var rand = Math.floor(Math.random() * conn);
-          var cum = 0;
-          var j = 0;
-          while (j < connectionCount.length && cum < rand) {
-            cum += connectionCount[j];
-            j++;
-          }
-
-          var from = i;
-          var to = j;
-          edges.push({
-            from: from,
-            to: to
-          });
-          connectionCount[from]++;
-          connectionCount[to]++;
-        }
-      }
-
-      // create a network
-      var container = document.getElementById('mynetwork');
-      var data = {
-        nodes: nodes,
-        edges: edges
-      };
-      var options = {
-        hover: true,
-        clustering: true,
-
-        tooltip: {
-            delay: 300,
-            fontColor: "black",
-            fontSize: 14, // px
-            fontFace: "verdana",
-            color: {
-              border: "#666",
-              background: "#FFFFC6"
-            }
-        },
-
-        nodes: {
-            title:undefined,
-            color: {
-              border: 'black',
-              hover: {
-                background: 'pink',
-                border: 'red'
-              }
-            }
-        },
-        edges: {
-          length: 50
-        },
-        stabilize: false,
-        dataManipulation: true,
-        onAdd: function(data,callback) {
-          var span = document.getElementById('operation');
-          var idInput = document.getElementById('node-id');
-          var labelInput = document.getElementById('node-label');
-          var servicesInput = document.getElementById('node-services');
-          var saveButton = document.getElementById('saveButton');
-          var cancelButton = document.getElementById('cancelButton');
-          var div = document.getElementById('network-popUp');
-          span.innerHTML = "Add Node";
-          idInput.value = data.id;
-          labelInput.value = data.label;
-          servicesInput.value = "";
-          saveButton.onclick = saveData.bind(this,data,callback);
-          cancelButton.onclick = clearPopUp.bind();
-          div.style.display = 'block';
-
-        },
-        onEdit: function(data,callback) {
-
-          var span = document.getElementById('operation');
-          var idInput = document.getElementById('node-id');
-          var labelInput = document.getElementById('node-label');
-          var servicesInput = document.getElementById('node-services');
-          var saveButton = document.getElementById('saveButton');
-          var cancelButton = document.getElementById('cancelButton');
-          var div = document.getElementById('network-popUp');
-          span.innerHTML = "Edit Node";
-          idInput.value = data.id;
-          labelInput.value = data.label;
-
-          // find Index in nodes array
-          var node_index = _.findIndex(nodes, { 'id': data.id });
-          servicesInput.value = nodes[node_index].title;
-
-          saveButton.onclick = saveData.bind(this,data,callback);
-          cancelButton.onclick = clearPopUp.bind();
-          div.style.display = 'block';
-
-        },
-        onConnect: function(data,callback) {
-          if (data.from == data.to) {
-            var r=confirm("Do you want to connect the node to itself?");
-            if (r==true) {
-              callback(data);
-            }
-          }
-          else {
-            edges.push({
-                from: data.from,
-                to: data.to
-            });
-            callback(data);
-          }
-        }
-      };
-      network = new vis.Network(container, data, options);
-
-      // add event listeners
-      network.on('select', function(params) {
-        document.getElementById('selection').innerHTML = 'Selection: ' + params.nodes;
-      });
-
-      network.on("resize", function(params) {console.log(params.width,params.height)});
-
-
-
-      function clearPopUp() {
-        var saveButton = document.getElementById('saveButton');
-        var cancelButton = document.getElementById('cancelButton');
-        saveButton.onclick = null;
-        cancelButton.onclick = null;
-        var div = document.getElementById('network-popUp');
-        div.style.display = 'none';
-
-      }
-
-      function saveData(data,callback) {
-        var idInput = document.getElementById('node-id');
-        var labelInput = document.getElementById('node-label');
-        var servicesInput = document.getElementById('node-services');
-        var div = document.getElementById('network-popUp');
-        data.id = idInput.value;
-        data.label = labelInput.value;
-        data.title = servicesInput.value;
-
-        if (servicesInput.value == ""){
-            nodes.push({
-              id: idInput.value,
-              label: labelInput.value,
-              title: undefined
-            })
-        }
-        else {
-            nodes.push({
-                id: idInput.value,
-                label: labelInput.value,
-                title: servicesInput.value
-            })
-        }
-
-        alert(JSON.stringify(data));
-
-
-        clearPopUp();
-        callback(data);
-
-      }
-
-    }
-
-
-
+   function send_input_json() {
+       var json_data = export_json(nodes, edges);
+       send_data(json_data);
+   }
   </script>
+
 </head>
 
 <body onload="draw();">
 
+<button onclick="connect()">Connect to NPS</button>
+<button onclick="send_input_json()">Send input JSON</button>
 <button onclick="show_json()">Show json</button>
 <span id="debug">I want the result here</span>
 
-<form onsubmit="draw(); return false;">
-  <label for="nodeCount">Number of nodes:</label>
-  <input id="nodeCount" type="text" value="77" style="width: 50px;">
-  <!--<label for="clustering">Enable Clustering:</label>-->
-  <!--<input id="clustering" type="checkbox" onChange="draw()" checked="true">-->
-  <!--<label for="clusterEdgeThreshold">clusterEdgeThreshold:</label>-->
-  <!--<input id="clusterEdgeThreshold" type="text" value="20" style="width: 50px;">-->
-  <input type="submit" value="Generate">
-</form>
+
+<table>
+  <tr>
+    <td>
+      <form onsubmit="draw(); return false;">
+        <label for="nodeCount">Number of nodes:</label>
+        <input id="nodeCount" type="text" value="77" style="width: 50px;">
+        <!--<label for="clustering">Enable Clustering:</label>-->
+        <!--<input id="clustering" type="checkbox" onChange="draw()" checked="true">-->
+        <!--<label for="clusterEdgeThreshold">clusterEdgeThreshold:</label>-->
+        <!--<input id="clusterEdgeThreshold" type="text" value="20" style="width: 50px;">-->
+        <input type="submit" value="Generate">
+      </form>
+    </td>
+    <td>
+      <label><input type='checkbox' onclick='changeLayout(this);'>Layout</label>
+    </td>
+    <td>
+      <input type="hidden" id="layoutOn" value=false>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td>
+      <h2>Node</h2>
+      <table>
+        <tr>
+          <td></td>
+          <td><label for="custom-node-id">Id</label></td>
+          <td><input id="custom-node-id" type="text" value="6"></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><label for="custom-node-label">Label</label></td>
+          <td><input id="custom-node-label" type="text" value="Node 6"></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Action</td>
+          <td>
+            <button id="custom-node-add">Add</button>
+            <button id="custom-node-update">Update</button>
+            <button id="custom-node-remove">Remove</button>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td>
+      <h2>Edge</h2>
+      <table>
+        <tr>
+          <td></td>
+          <td><label for="custom-edge-id">Id</label></td>
+          <td><input id="custom-edge-id" type="text" value="5"></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><label for="custom-edge-from">From</label></td>
+          <td><input id="custom-edge-from" type="text" value="3"></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><label for="custom-edge-to">To</label></td>
+          <td><input id="custom-edge-to" type="text" value="4"></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Action</td>
+          <td>
+            <button id="custom-edge-add">Add</button>
+            <button id="custom-edge-update">Update</button>
+            <button id="custom-edge-remove">Remove</button>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
 
 <div id="network-popUp">
   <span id="operation">node</span> <br>
@@ -284,7 +125,39 @@
   <input type="button" value="cancel" id="cancelButton"></button>
 </div>
 <br />
-<div id="mynetwork"></div>
+
+<table width="100%" cellpadding="5">
+   <tr>
+    <td valign="top" width="75%" bgcolor="#f0f0f0">
+        <div id="mynetwork"></div>
+    </td>
+    <td valign="top" width="25%" bgcolor="#ffcc00">
+        <p>Status: <span id="readyState">-</span> <span id="status">Idle</span></p>
+        <p>Buffer: <span id="bufferedAmount">-</span> bytes</p>
+        <p>
+           <label>WebSocket URL: <input id="url" type="url" size="80" value="ws://127.0.0.1:9876"></label>
+           <label hidden="true">Protocol: <input id="protocol" type="text" size="10" value="" hidden="true"></label>
+           <input type=button value="Connect" onclick="connect()">
+           <input type=button value="Disconnect" onclick="disconnect()">
+        </p>
+        <input type=button value="Simulate" onclick="simulate()">
+        <textarea id="ConsoleOutputArea" rows="27" readonly></textarea>
+
+        <p>
+           <textarea id="text" type="text" rows="1" ></textarea>
+           <input type=button value="Send" onclick="send()">
+        </p>
+        <!--<p>-->
+           <!--&lt;!&ndash;<input type=button value="Spam 100 packets" onclick="send100()">&ndash;&gt;-->
+        <!--</p>-->
+        <!--<pre id="log">Log:</pre>-->
+    </td>
+   </tr>
+</table>
+
+
+
+
 
 <p id="selection"></p>
 </body>
