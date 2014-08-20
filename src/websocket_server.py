@@ -2,10 +2,11 @@
 import tornado.web
 import tornado.websocket
 import tornado.ioloop
-import sys, subprocess
+import sys, subprocess, os
 from src.KThread import KThread
+from main import NPS
 
-from config.config_constants import WEB_SOCKET_SERVER_PORT
+from config.config_constants import WEB_SOCKET_SERVER_PORT, MSGEXCH_SERVER_IP, MSGEXCH_SERVER_PORT, MSGEXCH_SERVER_PATH
 
 
 
@@ -15,8 +16,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     # the client connected
     def open(self):
         print "New client connected"
+        if os.path.isfile("tmp/groups.txt"):
+            os.remove("tmp/groups.txt")
         self.write_message("You are connected\n")
-
 
 
     # the client sent the message
@@ -34,39 +36,43 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.write_message('Saved JSON to file ' + self.input_json_file_name + '\n')
 
         elif message.find('msg::simulate::') == 0:
+            #nps = NPS(self.input_json_file_name)
             console_cmd = sys.prefix + '/bin/python main.py \'' + self.input_json_file_name + '\''
             print console_cmd
             self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
-            self.console_thread = KThread(target=self.console_thread_func)
-            self.console_thread.setDaemon(True)
-            self.console_thread.start()
+            self.console_mon_thread = KThread(target=self.console_mon_thread_func)
+            self.console_mon_thread.setDaemon(True)
+            self.console_mon_thread.start()
+        elif message.find('msg::groups::') == 0:
+            file_ = open('tmp/groups.txt', 'r')
+            groups = file_.readline()
+            file_.close()
+            self.write_message('msg::groups::' + groups)
         else:
             self.console_proc.stdin.write(message + '\n')
 
 
-    def console_thread_func(self):
+    def console_mon_thread_func(self):
         while True:
             out = self.console_proc.stdout.read(1)
             if not out:
                 break
             else:
-                print out,
+                #print out,
                 self.write_message(out)
 
 
     # client disconnected
     def on_close(self):
         print "Client disconnected"
-
-# start a new WebSocket Application
-# use "/" as the root, and the 
-# WebSocketHandler as our handler
-application = tornado.web.Application([
-    (r"/", WebSocketHandler),
-])
-
-# start the tornado server on port 8888
-if __name__ == "__main__":
-    application.listen(WEB_SOCKET_SERVER_PORT)
-    tornado.ioloop.IOLoop.instance().start()
-
+        
+        
+class WSServer:
+    def __init__(self):
+        self.application = tornado.web.Application([
+            (r"/", WebSocketHandler),
+        ])
+    
+    def start(self):
+        self.application.listen(WEB_SOCKET_SERVER_PORT)
+        tornado.ioloop.IOLoop.instance().start()

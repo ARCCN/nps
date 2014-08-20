@@ -24,7 +24,16 @@ var socket;
      };
      socket.onmessage = function (event) {
 //       log('RCVD: ' + event.data);
-       console_output(event.data);
+        if (event.data.indexOf('msg::groups::') == 0) {
+            var groups = event.data.slice('msg::groups::'.length);
+            json_groups = JSON.parse(groups);
+
+        }
+        else {
+            console_output(event.data);
+        }
+
+
      };
      socket.onclose = function (event) {
        status('Disconnected.');

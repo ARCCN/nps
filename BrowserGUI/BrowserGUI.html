@@ -53,9 +53,11 @@
       </form>
     </td>
     <td>
+      <label><input type='checkbox' onclick='changeGroups(this);'>Groups</label>
       <label><input type='checkbox' onclick='changeLayout(this);'>Layout</label>
     </td>
     <td>
+      <input type="hidden" id="groupsOn" value=false>
       <input type="hidden" id="layoutOn" value=false>
     </td>
   </tr>
@@ -157,6 +159,8 @@
            <textarea id="text" type="text" rows="1" ></textarea>
            <input type=button value="Send" onclick="send()">
         </p>
+
+        <textarea id="MsgexchServOutputArea" rows="5" readonly></textarea>
         <!--<p>-->
            <!--&lt;!&ndash;<input type=button value="Spam 100 packets" onclick="send100()">&ndash;&gt;-->
         <!--</p>-->

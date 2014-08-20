@@ -2,19 +2,6 @@
  * Created by vitalyantonenko on 13.08.14.
  */
 
-
-//    var client = new zerorpc.Client();
-//
-//    function send_command () {
-//        client.connect("tcp://127.0.0.1:4242");
-//
-//        client.invoke("hello", "RPC", function(error, res, more) {
-//            alert(res);
-//    });
-//
-//    }
-
-
 function export_json(nodes, edges) {
     var data = {}, pos, i, exec = '';
     data.vertices = nodes.map(function(n) {
@@ -29,14 +16,6 @@ function export_json(nodes, edges) {
         }
 
     });
-
-//        data.pos = nodes.map(function(n) {
-//            return [n.x, n.y];
-//        });
-//    data.pos = {};
-//    for (i = 0; i < nodes.length; i++) {
-//        data.pos[nodes[i].label] = [nodes[i].x, nodes[i].y];
-//    }
     data.name = "test";
     data.netapps = {};
     for (i = 0; i < nodes.length; i++) {
@@ -58,21 +37,35 @@ var edges = null;
 var network = null;
 //    var directionInput = document.getElementById("layoutOn");
 var layoutOn = false;
+var groupsOn = false;
+
+var json_groups;
 
 
 function show_json() {
     var span = document.getElementById("debug");
     span.textContent = export_json(nodes, edges);
 //        span.textContent = nodes[0].title;
-
+//    var json_groups = JSON.parse(groups);
 }
 
-function changeLayout (cb) {
-    if (cb.checked) {
+function changeLayout (l_cb) {
+    if (l_cb.checked) {
         layoutOn = true;
     }
     else {
         layoutOn = false;
+    }
+    draw();
+}
+
+function changeGroups (g_cb) {
+    if (g_cb.checked) {
+        groupsOn = true;
+        send_data('msg::groups::')
+    }
+    else {
+        groupsOn = false;
     }
     draw();
 }
@@ -83,45 +76,69 @@ function draw() {
   var connectionCount = [];
 
   // randomly create some nodes and edges
-  var nodeCount = document.getElementById('nodeCount').value;
-  for (var i = 0; i < nodeCount; i++) {
-    nodes.push({
-      id: i,
-      label: String(i)
-    });
+  if (groupsOn == true) {
+        for (var g in json_groups) {
+            if (g != "no_group") {
+                for (var k = 0; k < json_groups[g]["vertexes"].length; k++) {
+                    nodes.push({
+                        id: parseInt(json_groups[g]["vertexes"][k]),
+                        label: String(parseInt(json_groups[g]["vertexes"][k])),
+                        group: parseInt(g)+1
+                    });
+                }
+            }
+        }
 
-    connectionCount[i] = 0;
+        for (var g in json_groups) {
+            for (var k = 0; k < json_groups[g]["edges"].length; k++) {
+                edges.push({
+                    from: parseInt(json_groups[g]["edges"][k][0]),
+                    to: parseInt(json_groups[g]["edges"][k][1])
+                });
+            }
+        }
 
-    // create edges in a scale-free-network way
-    if (i == 1) {
-      var from = i;
-      var to = 0;
-      edges.push({
-        from: from,
-        to: to
-      });
-      connectionCount[from]++;
-      connectionCount[to]++;
-    }
-    else if (i > 1) {
-      var conn = edges.length * 2;
-      var rand = Math.floor(Math.random() * conn);
-      var cum = 0;
-      var j = 0;
-      while (j < connectionCount.length && cum < rand) {
-        cum += connectionCount[j];
-        j++;
+  }
+  else {
+      var nodeCount = document.getElementById('nodeCount').value;
+      for (var i = 0; i < nodeCount; i++) {
+            nodes.push({
+              id: i,
+              label: String(i)
+            });
+            connectionCount[i] = 0;
+
+            // create edges in a scale-free-network way
+            if (i == 1) {
+              var from = i;
+              var to = 0;
+              edges.push({
+                from: from,
+                to: to
+              });
+              connectionCount[from]++;
+              connectionCount[to]++;
+            }
+            else if (i > 1) {
+              var conn = edges.length * 2;
+              var rand = Math.floor(Math.random() * conn);
+              var cum = 0;
+              var j = 0;
+              while (j < connectionCount.length && cum < rand) {
+                cum += connectionCount[j];
+                j++;
+              }
+
+              var from = i;
+              var to = j;
+              edges.push({
+                from: from,
+                to: to
+              });
+              connectionCount[from]++;
+              connectionCount[to]++;
+            }
       }
-
-      var from = i;
-      var to = j;
-      edges.push({
-        from: from,
-        to: to
-      });
-      connectionCount[from]++;
-      connectionCount[to]++;
-    }
   }
 
   // create a network

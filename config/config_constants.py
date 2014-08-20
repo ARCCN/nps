@@ -4,7 +4,7 @@
 PYTHONPATH = '/Library/Frameworks/Python.framework/Versions/2.7/bin/python'
 NPS_PATH = '/Users/vitalyantonenko/PycharmProjects/NPS'
 CONTROLLER_PATH = '/Users/vitalyantonenko/Documents/ARCCN/Controllers/floodlight-0.90'
-MALWARE_CENTER_PATH = '/Users/vitalyantonenko/PycharmProjects/NPS/src/malwaretools'
+MALWARE_CENTER_PATH = NPS_PATH + '/src/malwaretools'
 GUI_HTML = 'GUI/GUI.html'
 ## SCRIPT PATHS
 SRC_SCRIPT_FOLDER = NPS_PATH + '/scripts/'
@@ -51,6 +51,11 @@ REMOTE_CONTROLLER_PORT = '6633'
 ### WEB SOCKET SERVER CONFIG
 WEB_SOCKET_SERVER_IP   = 'localhost'
 WEB_SOCKET_SERVER_PORT = '9876'
+
+### MSGEXCH SERVER CONFIG
+MSGEXCH_SERVER_PATH = NPS_PATH + '/src'
+MSGEXCH_SERVER_IP   = 'localhost'
+MSGEXCH_SERVER_PORT = '9877'
 
 
 
