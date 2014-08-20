@@ -13,9 +13,18 @@
   <script type="text/javascript" src="WebSocketClient.js"></script>
 
   <script type="text/javascript">
+
    function send_input_json() {
        var json_data = export_json(nodes, edges);
-       send_data(json_data);
+       var input_flag_str = "msg::input_json::";
+       send_data(input_flag_str + json_data);
+   }
+
+   function simulate() {
+//       connect();
+//       setTimeout(1000);
+       send_input_json();
+       send_data("msg::simulate::");
    }
   </script>
 
@@ -24,7 +33,8 @@
 <body onload="draw();">
 
 <button onclick="connect()">Connect to NPS</button>
-<button onclick="send_input_json()">Send input JSON</button>
+<!--<button onclick="send_input_json()">Send input JSON</button>-->
+<button onclick="simulate()">Simulate</button>
 <button onclick="show_json()">Show json</button>
 <span id="debug">I want the result here</span>
 

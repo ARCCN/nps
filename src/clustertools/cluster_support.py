@@ -173,3 +173,29 @@ def get_networkX_graph(graph_data):
         G.add_edge(int(edge[0]), int(edge[1]))
     return G, pos, graph_data['netapps']
 
+def get_networkX_graph_without_pos(graph_data):
+    '''Generate networkX graph from json string.
+
+    Args:
+        graph_data: Json string, that describes graph.
+
+    Returns:
+        NetworkX graph.
+    '''
+    G = nx.Graph()
+    for edge in graph_data['edges']:
+        if int(edge[0]) not in G.nodes():
+            #G.add_node(node_counter)
+            #node_num_map[edge[0]] = node_counter
+            #pos[node_counter] = [graph_data['pos'][edge[0]][0], 0 - graph_data['pos'][edge[0]][1]]
+            G.add_node(int(edge[0]))
+            #pos[int(edge[0])] = [graph_data['pos'][edge[0]][0], 0 - graph_data['pos'][edge[0]][1]]
+        if int(edge[1]) not in G.nodes():
+            #G.add_node(node_counter)
+            #node_num_map[edge[1]] = node_counter
+            #pos[node_counter] = [graph_data['pos'][edge[1]][0], 0 - graph_data['pos'][edge[1]][1]]
+            G.add_node(int(edge[1]))
+            #pos[int(edge[1])] = [graph_data['pos'][edge[1]][0], 0 - graph_data['pos'][edge[1]][1]]
+        G.add_edge(int(edge[0]), int(edge[1]))
+    return G, graph_data['netapps']
+

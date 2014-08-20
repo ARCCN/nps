@@ -69,7 +69,8 @@ if __name__ == '__main__':
         graph_data = json.loads(str(sys.argv[1]))
     print('DONE!')
 
-    G, pos, node_services = get_networkX_graph(graph_data)
+    #G, pos, node_services = get_networkX_graph(graph_data)
+    G, node_services = get_networkX_graph_without_pos(graph_data)
     ## this function will not use cluster nodes if there is less then 2 graph vertexes to cluster node
     #nodes = mininet_script_operator.nodes_number_optimization(G, nodes)
 

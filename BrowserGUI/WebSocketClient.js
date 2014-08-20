@@ -46,7 +46,6 @@ var socket;
    }
 
     function send_data(data) {
-       alert(data);
        socket.send(data);
     }
 
