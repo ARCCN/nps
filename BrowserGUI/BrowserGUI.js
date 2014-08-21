@@ -1,6 +1,22 @@
 /**
  * Created by vitalyantonenko on 13.08.14.
  */
+function send_input_json() {
+       var json_data = export_json(nodes, edges);
+       var input_flag_str = "msg::input_json::";
+       send_data(input_flag_str + json_data);
+   }
+
+function simulate() {
+//       connect();
+//       setTimeout(1000);
+       send_input_json();
+       send_data("msg::simulate::");
+   }
+
+function controller() {
+       send_data("msg::controller::");
+   }
 
 function export_json(nodes, edges) {
     var data = {}, pos, i, exec = '';

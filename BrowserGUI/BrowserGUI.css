@@ -59,7 +59,7 @@ body {
         resize: none;
 
     }
-    #MsgexchServOutputArea{
+    #ControllerOutputArea{
         width:99%;
         border: none;
         /*-webkit-box-sizing: border-box;*/

@@ -8,6 +8,10 @@
 //      document.getElementById('log').appendChild(document.createTextNode(new Date() + '   ' + msg + '\n'));
       document.getElementById('ConsoleOutputArea').appendChild(document.createTextNode(msg));
     }
+    function controller_output(msg) {
+//      document.getElementById('log').appendChild(document.createTextNode(new Date() + '   ' + msg + '\n'));
+      document.getElementById('ControllerOutputArea').appendChild(document.createTextNode(msg));
+    }
     function status(msg) {
 //      log(msg);
       document.getElementById('status').textContent = msg;
@@ -27,10 +31,18 @@ var socket;
         if (event.data.indexOf('msg::groups::') == 0) {
             var groups = event.data.slice('msg::groups::'.length);
             json_groups = JSON.parse(groups);
+        }
+        else if (event.data.indexOf('msg::controller::') == 0) {
+            controller_output(event.data.slice('msg::controller::'.length));
 
+            var textArea = document.getElementById('ControllerOutputArea');
+            textArea.scrollTop = textArea.scrollHeight;
         }
         else {
             console_output(event.data);
+
+            var textArea = document.getElementById('ConsoleOutputArea');
+            textArea.scrollTop = textArea.scrollHeight;
         }
 
 
@@ -52,6 +64,7 @@ var socket;
 
    function send() {
        socket.send(document.getElementById('text').value);
+       document.getElementById('text').value = "";
    }
 
     function send_data(data) {

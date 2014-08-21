@@ -6,7 +6,8 @@ import sys, subprocess, os
 from src.KThread import KThread
 from main import NPS
 
-from config.config_constants import WEB_SOCKET_SERVER_PORT, MSGEXCH_SERVER_IP, MSGEXCH_SERVER_PORT, MSGEXCH_SERVER_PATH
+from config.config_constants import WEB_SOCKET_SERVER_PORT, MSGEXCH_SERVER_IP, \
+    MSGEXCH_SERVER_PORT, MSGEXCH_SERVER_PATH, CONTROLLER_PATH
 
 
 
@@ -36,13 +37,21 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.write_message('Saved JSON to file ' + self.input_json_file_name + '\n')
 
         elif message.find('msg::simulate::') == 0:
-            #nps = NPS(self.input_json_file_name)
             console_cmd = sys.prefix + '/bin/python main.py \'' + self.input_json_file_name + '\''
             print console_cmd
             self.console_proc = subprocess.Popen(console_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
             self.console_mon_thread = KThread(target=self.console_mon_thread_func)
             self.console_mon_thread.setDaemon(True)
             self.console_mon_thread.start()
+
+        elif message.find('msg::controller::') == 0:
+            controller_cmd = "java -jar " + CONTROLLER_PATH + "/target/floodlight.jar"
+            print controller_cmd
+            self.controller_proc = subprocess.Popen(controller_cmd, stdout=subprocess.PIPE, shell=True)
+            self.controller_mon_thread = KThread(target=self.controller_mon_thread_func)
+            self.controller_mon_thread.setDaemon(True)
+            self.controller_mon_thread.start()
+
         elif message.find('msg::groups::') == 0:
             file_ = open('tmp/groups.txt', 'r')
             groups = file_.readline()
@@ -55,11 +64,21 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def console_mon_thread_func(self):
         while True:
             out = self.console_proc.stdout.read(1)
+            #self.console_proc.stdout.flush()
             if not out:
                 break
             else:
                 #print out,
                 self.write_message(out)
+
+    def controller_mon_thread_func(self):
+        while True:
+            out = self.controller_proc.stdout.readline()
+            if not out:
+                break
+            else:
+                #print out,
+                self.write_message("msg::controller::" + out)
 
 
     # client disconnected

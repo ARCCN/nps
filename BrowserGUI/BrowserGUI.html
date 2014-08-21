@@ -14,23 +14,14 @@
 
   <script type="text/javascript">
 
-   function send_input_json() {
-       var json_data = export_json(nodes, edges);
-       var input_flag_str = "msg::input_json::";
-       send_data(input_flag_str + json_data);
-   }
-
-   function simulate() {
-//       connect();
-//       setTimeout(1000);
-       send_input_json();
-       send_data("msg::simulate::");
+   function init_GUI() {
+       draw();
    }
   </script>
 
 </head>
 
-<body onload="draw();">
+<body onload="init_GUI()">
 
 <button onclick="connect()">Connect to NPS</button>
 <!--<button onclick="send_input_json()">Send input JSON</button>-->
@@ -149,10 +140,10 @@
         <p>
            <label>WebSocket URL: <input id="url" type="url" size="80" value="ws://127.0.0.1:9876"></label>
            <label hidden="true">Protocol: <input id="protocol" type="text" size="10" value="" hidden="true"></label>
-           <input type=button value="Connect" onclick="connect()">
+           <!--<input type=button value="Connect" onclick="connect()">-->
            <input type=button value="Disconnect" onclick="disconnect()">
         </p>
-        <input type=button value="Simulate" onclick="simulate()">
+        <!--<input type=button value="Simulate" onclick="simulate()">-->
         <textarea id="ConsoleOutputArea" rows="27" readonly></textarea>
 
         <p>
@@ -160,7 +151,8 @@
            <input type=button value="Send" onclick="send()">
         </p>
 
-        <textarea id="MsgexchServOutputArea" rows="5" readonly></textarea>
+        <textarea id="ControllerOutputArea" rows="5" readonly></textarea>
+        <button onclick="controller()">Controller ON</button>
         <!--<p>-->
            <!--&lt;!&ndash;<input type=button value="Spam 100 packets" onclick="send100()">&ndash;&gt;-->
         <!--</p>-->
@@ -168,10 +160,6 @@
     </td>
    </tr>
 </table>
-
-
-
-
 
 <p id="selection"></p>
 </body>
