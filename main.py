@@ -46,7 +46,7 @@ class NPS:
         self.nodes = read_nodelist_from_file(NODELIST_FILEPATH)
         print('DONE!')
         # open ssh sessions to nodes
-        print('Opening SSH connections to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
+        print('Opening SSH to all nodes in Cluster'.ljust(STRING_ALIGNMENT, ' ')),
         make_threaded(open_ssh_to_node, [], self.nodes)
         print('DONE!')
         # Deleting ovs bridges from nodes

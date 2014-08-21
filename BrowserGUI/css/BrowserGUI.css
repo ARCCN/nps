@@ -1,0 +1,148 @@
+body {
+      font: 10pt sans;
+      background-color: #d8d6d6;
+    }
+    #mynetwork {
+      /*position:relative;*/
+      width: 100%;
+      height: 700px;
+      border: 1px solid lightgray;
+    }
+    /*table.legend_table {*/
+      /*font-size: 11px;*/
+      /*border-width:1px;*/
+      /*border-color:#d3d3d3;*/
+      /*border-style:solid;*/
+    /*}*/
+    /*table.legend_table,td {*/
+      /*border-width:1px;*/
+      /*border-color:#d3d3d3;*/
+      /*border-style:solid;*/
+      /*padding: 2px;*/
+    /*}*/
+    /*div.table_content {*/
+      /*width:80px;*/
+      /*text-align:center;*/
+    /*}*/
+    /*div.table_description {*/
+      /*width:100px;*/
+    /*}*/
+
+    #operation {
+      font-size:28px;
+    }
+    #network-popUp {
+      display:none;
+      position:absolute;
+      top:350px;
+      left:170px;
+      z-index:299;
+      width:250px;
+      height:120px;
+      background-color: #f9f9f9;
+      border-style:solid;
+      border-width:3px;
+      border-color: #5394ed;
+      padding:10px;
+      text-align: center;
+    }
+
+    #ConsoleOutputArea {
+        width:100%;
+        height: 700px;
+        background-color: rgba(255,255,255,0.3);
+        /*border: none;*/
+        /*-webkit-box-sizing: border-box;*/
+        /*line-height: 44px;*/
+        font-family:Consolas;
+        font-size: 7pt;
+        /*-webkit-tap-highlight-color: rgba(0,0,0,0);*/
+        /*background-image:url('linedBack@2x.png');*/
+        /*outline: none;*/
+        resize: none;
+    }
+    #ControllerOutputArea{
+        width:100%;
+        height: 120px;
+        background-color: rgba(255,255,255,0.3);
+        /*border: none;*/
+        /*-webkit-box-sizing: border-box;*/
+        /*line-height: 44px;*/
+        font-family:Consolas;
+        font-size: 7pt;
+        /*-webkit-tap-highlight-color: rgba(0,0,0,0);*/
+        /*background-image:url('linedBack@2x.png');*/
+        /*outline: none;*/
+        resize: none;
+
+    }
+
+    #text {
+        width:100%;
+        /*border: none;*/
+        /*-webkit-box-sizing: border-box;*/
+        /*line-height: 44px;*/
+        background-color: rgba(255,255,255,0.3);
+        font-family:Consolas;
+        /*font-size: 17pt;*/
+        /*-webkit-tap-highlight-color: rgba(0,0,0,0);*/
+        /*background-image:url('linedBack@2x.png');*/
+        /*outline: none;*/
+        resize: none;
+    }
+
+    #SimulateButton {
+        width:100%;
+        height: 55px;
+    }
+
+    #Logo {
+        width:100%;
+
+    }
+    #url {
+        width: 100%;
+    }
+
+    .simpleButton{
+        width:100%;
+    }
+
+
+    .simulateButton {
+    -moz-box-shadow:inset 0px 1px 0px 0px #9acc85;
+    -webkit-box-shadow:inset 0px 1px 0px 0px #9acc85;
+    box-shadow:inset 0px 1px 0px 0px #9acc85;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #74ad5a), color-stop(1, #68a54b));
+    background:-moz-linear-gradient(top, #74ad5a 5%, #68a54b 100%);
+    background:-webkit-linear-gradient(top, #74ad5a 5%, #68a54b 100%);
+    background:-o-linear-gradient(top, #74ad5a 5%, #68a54b 100%);
+    background:-ms-linear-gradient(top, #74ad5a 5%, #68a54b 100%);
+    background:linear-gradient(to bottom, #74ad5a 5%, #68a54b 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#74ad5a', endColorstr='#68a54b',GradientType=0);
+    background-color:#74ad5a;
+    border:1px solid #3b6e22;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:arial;
+    font-size:13px;
+    font-weight:bold;
+    padding:6px 12px;
+    text-decoration:none;
+    }
+    .simulateButton:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #68a54b), color-stop(1, #74ad5a));
+    background:-moz-linear-gradient(top, #68a54b 5%, #74ad5a 100%);
+    background:-webkit-linear-gradient(top, #68a54b 5%, #74ad5a 100%);
+    background:-o-linear-gradient(top, #68a54b 5%, #74ad5a 100%);
+    background:-ms-linear-gradient(top, #68a54b 5%, #74ad5a 100%);
+    background:linear-gradient(to bottom, #68a54b 5%, #74ad5a 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#68a54b', endColorstr='#74ad5a',GradientType=0);
+    background-color:#68a54b;
+    }
+    .simulateButton:active {
+    position:relative;
+    top:1px;
+    }
+
