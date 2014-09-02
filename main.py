@@ -1,7 +1,7 @@
 from paramiko import *
 import os, sys, time, json
 
-from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG
+from config.config_constants import STRING_ALIGNMENT, DRAWING_FLAG, DRAWING_POS_FLAG
 from config.config_constants import NODELIST_FILEPATH
 from config.config_constants import CLI_MODE
 from config.config_constants import HOST_NETMASK
@@ -80,8 +80,10 @@ class NPS:
             graph_data = json.loads(self.input_file_name)
         print('DONE!')
 
-        #G, pos, node_services = get_networkX_graph(graph_data)
-        G, node_services = get_networkX_graph_without_pos(graph_data)
+        if DRAWING_FLAG:
+            G, pos, node_services = get_networkX_graph(graph_data)
+        else:
+            G, node_services = get_networkX_graph_without_pos(graph_data)
         ## this function will not use cluster nodes if there is less then 2 graph vertexes to cluster node
         #nodes = mininet_script_operator.nodes_number_optimization(G, nodes)
 

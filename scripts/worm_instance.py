@@ -26,7 +26,8 @@ def gen_sasser_traffic(dst_ip, out_intf):
 
 
 def worm_activity(out_intf):
-    hit_list = gen_hit_list(HIT_LIST_SIZE)
+    # hit_list = gen_hit_list(HIT_LIST_SIZE)
+    hit_list = default_ip_db
     while True:
         # select IP address of next target
         if not IP_GENERATION_FLAG:
@@ -45,6 +46,12 @@ if __name__ == '__main__':
         print('args: (out_intf)')
         exit(-1)
 
+    if len(sys.argv) > 1 and sys.argv[1] == '--attack':
+        out_intf = sys.argv[2]
+        ip = sys.argv[3]
+        gen_sasser_traffic(ip, out_intf)
+        exit(-1)
+
     if len(sys.argv) != 2:
         print('Not enough args')
         exit(-123)
@@ -52,6 +59,8 @@ if __name__ == '__main__':
     out_intf = sys.argv[1]
 
     worm_activity(out_intf)
+
+    exit(0)
 
 
 

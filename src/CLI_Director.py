@@ -210,7 +210,7 @@ class CLI_director(cmd.Cmd):
         for host in self.hosts.values():
             cmd = host['name'] + ' python ' + DST_SCRIPT_FOLDER + 'port_sniffer.py ' + host['name'] + \
                   '-eth0 ' + DST_SCRIPT_FOLDER + INFECTED_HOSTS_FILENAME + ' &'
-            #print cmd
+            print cmd
 
             #print(self.nodes)
             node = self.nodes[host['nodeIP']]

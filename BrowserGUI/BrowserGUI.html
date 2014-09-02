@@ -27,7 +27,8 @@
   <!--<link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/apple-touch-icon-72-precomposed.png">-->
   <!--<link rel="apple-touch-icon-precomposed" href="img/apple-touch-icon-57-precomposed.png">-->
   <!--<link rel="shortcut icon" href="img/favicon.png">-->
-  
+
+
   <script type="text/javascript" src="js/bootstrap/jquery.min.js"></script>
   <script type="text/javascript" src="js/bootstrap/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/bootstrap/scripts.js"></script>
@@ -45,6 +46,7 @@
 
    function init_GUI() {
        connect();
+       create_graph();
        draw();
    }
   </script>
@@ -55,23 +57,23 @@
 <div class="container">
   <div class="row clearfix">
     <div class="col-md-3 column">
-      <img id="Logo" src="img/logo_eng@2x.png" alt="some_text">
+      <img id="Logo" src="img/logo_eng@2x.png" alt="logo_icon">
     </div>
     <div class="col-md-3 column">
-      <!--<button onclick="connect()">Connect to NPS</button>-->
-      <!--<button onclick="send_input_json()">Send input JSON</button>-->
-      <!--<button onclick="simulate()">Simulate</button>-->
-      <form onsubmit="draw(); return false;">
+      <textarea id="MalwareCenterOutputArea" rows="5" readonly></textarea>
+      <button class="simpleButton" onclick="malwarecenter()">Malware Center ON</button>
+    </div>
+    <div class="col-md-3 column">
+      <form onsubmit="create_graph(); draw(); return false;">
         <label for="nodeCount">Number of nodes:</label>
         <input id="nodeCount" type="text" value="77" style="width: 50px;">
         <input type="submit" value="Generate">
       </form>
-    </div>
-    <div class="col-md-3 column">
+       <input class="simpleButton" type=button value="Add" onclick="add_node_test()">
       <p>Status: <span id="readyState">-</span> <span id="status">Idle</span></p>
         <p>Buffer: <span id="bufferedAmount">-</span> bytes</p>
         <p>
-           <label>WebSocket URL: <input id="url" type="url" value="ws://127.0.0.1:9876"></label>
+           <input id="url" type="url" value="ws://127.0.0.1:9876">
            <label hidden="true">Protocol: <input id="protocol" type="text" size="10" value="" hidden="true"></label>
            <!--<input type=button value="Connect" onclick="connect()">-->
         </p>
@@ -137,9 +139,11 @@
       <input class="simpleButton" type=button value="Send" onclick="send()">
     </div>
     <div class="col-md-9 column">
-      <label><input type='checkbox' onclick='changeGroups(this);'>Groups</label>
-      <label><input type='checkbox' onclick='changeLayout(this);'>Layout</label>
+      <label><input type='checkbox' onclick='changeGroups(this)'>Groups</label>
+      <label><input type='checkbox' onclick='changeMalware(this)'>Malware</label>
+      <label><input type='checkbox' onclick='changeLayout(this)'>Layout</label>
       <input type="hidden" id="groupsOn" value=false>
+      <input type="hidden" id="malwareOn" value=false>
       <input type="hidden" id="layoutOn" value=false>
     </div>
   </div>

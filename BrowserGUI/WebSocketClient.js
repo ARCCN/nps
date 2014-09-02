@@ -12,6 +12,10 @@
 //      document.getElementById('log').appendChild(document.createTextNode(new Date() + '   ' + msg + '\n'));
       document.getElementById('ControllerOutputArea').appendChild(document.createTextNode(msg));
     }
+    function malwarecenter_output(msg) {
+//      document.getElementById('log').appendChild(document.createTextNode(new Date() + '   ' + msg + '\n'));
+      document.getElementById('MalwareCenterOutputArea').appendChild(document.createTextNode(msg));
+    }
     function status(msg) {
 //      log(msg);
       document.getElementById('status').textContent = msg;
@@ -31,11 +35,42 @@ var socket;
         if (event.data.indexOf('msg::groups::') == 0) {
             var groups = event.data.slice('msg::groups::'.length);
             json_groups = JSON.parse(groups);
+
+
+        }
+        else if (event.data.indexOf('msg::leaves::') == 0) {
+            var leaves_str = event.data.slice('msg::leaves::'.length);
+
         }
         else if (event.data.indexOf('msg::controller::') == 0) {
             controller_output(event.data.slice('msg::controller::'.length));
 
             var textArea = document.getElementById('ControllerOutputArea');
+            textArea.scrollTop = textArea.scrollHeight;
+        }
+        else if (event.data.indexOf('msg::malwarecenter::') == 0) {
+            var mal_mess = event.data.slice('msg::malwarecenter::'.length);
+            var host_id = 'None';
+
+            if (mal_mess.indexOf("new worm instance") >= 0) {
+                var mess = mal_mess.split(' ');
+                var tmp_mess = mess[3];
+                var host_intf_name = tmp_mess.split(':');
+                tmp_mess = host_intf_name[0];
+                var host_name = tmp_mess.split('-');
+                tmp_mess = host_name[0];
+                host_id = tmp_mess.substring(1);
+                if (inf_nodes.indexOf(parseInt(host_id)) == -1) {
+                    inf_nodes.append(parseInt(host_id));
+
+                }
+            }
+
+
+            malwarecenter_output(event.data.slice('msg::malwarecenter::'.length));
+//            malwarecenter_output(host_id);
+
+            var textArea = document.getElementById('MalwareCenterOutputArea');
             textArea.scrollTop = textArea.scrollHeight;
         }
         else {
@@ -82,5 +117,24 @@ var socket;
      }
    }
    setInterval(update, 10);
+
+   function add_node_test() {
+       nodes.update({
+           id: 1,
+           label: 'FUCK'
+       });
+
+       var node_ids = nodes.getIds();
+
+       for (n_id in node_ids) {
+           nodes.update({
+               id: n_id,
+               label: 'FUCK'
+           });
+       }
+
+//       nodes.forEach(function (node) {node.group = 6; });
+
+   }
 
 

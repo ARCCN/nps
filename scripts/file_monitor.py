@@ -67,6 +67,11 @@ def db_monitor(malware_center_ip, malware_center_port, db_filename):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+        print 'Testing mode'
+        tell_malware_center_about_infection("localhost", 56565, "testing")
+        exit(-1)
+
     if len(sys.argv) > 1 and sys.argv[1] == '--help':
         print 'args: (malware_center_ip, malware_center_port, file_name)'
         exit(-1)

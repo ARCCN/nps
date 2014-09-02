@@ -9,9 +9,11 @@ from scapy.all import *
 
 
 def catch_sasser_worm_on_host(intf_name):
-    sniff(iface=intf_name, filter="tcp and ( port 445 )", count=1254)
-    sniff(iface=intf_name, filter="tcp and ( port 445 or port 9996 )", count=2*586)
-    sniff(iface=intf_name, filter="tcp and ( port 5554 or port 1033 )", count=2*1)
+    # sniff(iface=intf_name, filter="tcp and ( port 445 )", count=1254)
+    # sniff(iface=intf_name, filter="tcp and ( port 445 or port 9996 )", count=2*586)
+    # sniff(iface=intf_name, filter="tcp and ( port 5554 or port 1033 )", count=2*1)
+    sniff(iface=intf_name, count=1000)
+    pass
 
 
 def write_to_file(host_intf_name, infected_hosts_filename):
@@ -46,13 +48,12 @@ def write_to_db(host_intf_name, db_filename):
 
 def sniffer(host_intf_name, infected_hosts_filename):
     catch_sasser_worm_on_host(host_intf_name)
-    #print('Catched!')
+    print('Catched!')
     #write_to_file(host_intf_name, infected_hosts_filename)
     write_to_db(host_intf_name, infected_hosts_filename)
 
-    cmd = 'python /home/clusternode/MininetScrupts/worm_instance.py ' + host_intf_name + ' &'
+    cmd = 'python /home/clusternode/MininetScripts/worm_instance.py ' + host_intf_name + ' &'
     os.popen(cmd)
-
 
 
 
@@ -60,7 +61,12 @@ def sniffer(host_intf_name, infected_hosts_filename):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '--help':
-        print 'args: (host_intf_name, infected_hosts_filename)'
+        print 'args: (host_intf_name, infected_hosts_db_filename)'
+        exit(-1)
+
+    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+        print 'Tesing mode'
+        write_to_db("vboxnet0", "/Users/vitalyantonenko/PycharmProjects/NPS/tmp/infected_hosts.db")
         exit(-1)
 
     if len(sys.argv) != 3:
@@ -68,10 +74,12 @@ if __name__ == "__main__":
         exit(-123)
 
     host_intf_name = sys.argv[1]
-    infected_hosts_filename = sys.argv[2]
+    infected_hosts_db = sys.argv[2]
 
 
-    sniffer(host_intf_name, infected_hosts_filename)
+    sniffer(host_intf_name, infected_hosts_db)
+
+
 
     #write_to_db(host_intf_name, infected_hosts_filename)
 

@@ -18,10 +18,14 @@ function controller() {
        send_data("msg::controller::");
    }
 
+function malwarecenter() {
+        send_data("msg::malwarecenter::");
+    }
+
 function export_json(nodes, edges) {
     var data = {}, pos, i, exec = '';
     data.vertices = nodes.map(function(n) {
-        return n.label;
+        return n.id;
     });
     data.edges = edges.map(function(e) {
         if (e.label == null) {
@@ -34,28 +38,36 @@ function export_json(nodes, edges) {
     });
     data.name = "test";
     data.netapps = {};
-    for (i = 0; i < nodes.length; i++) {
-        if (typeof nodes[i].title == 'string') {
-            data.netapps[nodes[i].label] = nodes[i].title.split(" ");
-        }
-//        var netapp_list = nodes[i].title.split(" ");
-//
-//        for (x=0;x<netapp_list.length;x++)
-//        {
-//            data.netapps[nodes[i].label][netapp_list[x]] = true;
+//    for (i = 0; i < nodes.length; i++) {
+//        if (typeof nodes[i].title == 'string') {
+////            data.netapps[nodes[i].id] = nodes[i].title.split(" ");
 //        }
-    }
+////        var netapp_list = nodes[i].title.split(" ");
+////
+////        for (x=0;x<netapp_list.length;x++)
+////        {
+////            data.netapps[nodes[i].label][netapp_list[x]] = true;
+////        }
+//    }
     return JSON.stringify(data);
 }
 
 var nodes = null;
+var g_nodes = null;
+var inf_nodes = null;
+
 var edges = null;
+var g_edges = null;
+
 var network = null;
 //    var directionInput = document.getElementById("layoutOn");
 var layoutOn = false;
 var groupsOn = false;
+var malwareOn = false;
 
-var json_groups;
+var json_groups = null;
+var leaves;
+
 
 
 function show_json() {
@@ -77,97 +89,121 @@ function changeLayout (l_cb) {
 
 function changeGroups (g_cb) {
     if (g_cb.checked) {
-        groupsOn = true;
-        send_data('msg::groups::')
+        if (json_groups == null) {
+            send_data('msg::groups::');
+            groupsOn = false;
+            g_cb.checked = false;
+        }
+        else {
+            for (var g in json_groups) {
+                    if (g != "no_group") {
+                        for (var k = 0; k < json_groups[g]["vertexes"].length; k++) {
+                            nodes.update({
+                                id: parseInt(json_groups[g]["vertexes"][k]),
+                                label: String(parseInt(json_groups[g]["vertexes"][k])),
+                                group: parseInt(g)+1
+                            });
+                        }
+                    }
+                }
+        }
     }
     else {
-        groupsOn = false;
+        for (var g in json_groups) {
+                if (g != "no_group") {
+                    for (var k = 0; k < json_groups[g]["vertexes"].length; k++) {
+                        nodes.update({
+                            id: parseInt(json_groups[g]["vertexes"][k]),
+                            label: String(parseInt(json_groups[g]["vertexes"][k])),
+                            group: 'basegroup'
+                        });
+                    }
+                }
+            }
+    }
+}
+
+function changeMalware (m_cb) {
+    if (m_cb.checked) {
+        malwareOn = true;
+    }
+    else {
+        malwareOn = false;
     }
     draw();
 }
 
+
+function create_graph() {
+    nodes = new vis.DataSet();
+    edges = new vis.DataSet();
+    var connectionCount = [];
+    var nodeCount = document.getElementById('nodeCount').value;
+    for (var i = 0; i < nodeCount; i++) {
+        nodes.add({
+          id: i,
+          label: String(i),
+          group: 'basegroup'
+        });
+        connectionCount[i] = 0;
+
+        // create edges in a scale-free-network way
+        if (i == 1) {
+          var from = i;
+          var to = 0;
+          edges.add({
+            from: from,
+            to: to
+          });
+          connectionCount[from]++;
+          connectionCount[to]++;
+        }
+        else if (i > 1) {
+//          alert(edges.get().length);
+          var conn = edges.get().length * 2;
+          var rand = Math.floor(Math.random() * conn);
+          var cum = 0;
+          var j = 0;
+          while (j < connectionCount.length && cum < rand) {
+            cum += connectionCount[j];
+            j++;
+          }
+
+          var from = i;
+          var to = j;
+          edges.add({
+            from: from,
+            to: to
+          });
+          connectionCount[from]++;
+          connectionCount[to]++;
+        }
+    }
+
+}
+
+
 function draw() {
-  nodes = [];
-  edges = [];
-  var connectionCount = [];
 
-  // randomly create some nodes and edges
-  if (groupsOn == true) {
-        for (var g in json_groups) {
-            if (g != "no_group") {
-                for (var k = 0; k < json_groups[g]["vertexes"].length; k++) {
-                    nodes.push({
-                        id: parseInt(json_groups[g]["vertexes"][k]),
-                        label: String(parseInt(json_groups[g]["vertexes"][k])),
-                        group: parseInt(g)+1
-                    });
-                }
-            }
-        }
-
-        for (var g in json_groups) {
-            for (var k = 0; k < json_groups[g]["edges"].length; k++) {
-                edges.push({
-                    from: parseInt(json_groups[g]["edges"][k][0]),
-                    to: parseInt(json_groups[g]["edges"][k][1])
-                });
-            }
-        }
-
-  }
-  else {
-      var nodeCount = document.getElementById('nodeCount').value;
-      for (var i = 0; i < nodeCount; i++) {
-            nodes.push({
-              id: i,
-              label: String(i)
-            });
-            connectionCount[i] = 0;
-
-            // create edges in a scale-free-network way
-            if (i == 1) {
-              var from = i;
-              var to = 0;
-              edges.push({
-                from: from,
-                to: to
-              });
-              connectionCount[from]++;
-              connectionCount[to]++;
-            }
-            else if (i > 1) {
-              var conn = edges.length * 2;
-              var rand = Math.floor(Math.random() * conn);
-              var cum = 0;
-              var j = 0;
-              while (j < connectionCount.length && cum < rand) {
-                cum += connectionCount[j];
-                j++;
-              }
-
-              var from = i;
-              var to = j;
-              edges.push({
-                from: from,
-                to: to
-              });
-              connectionCount[from]++;
-              connectionCount[to]++;
-            }
-      }
-  }
-
-  // create a network
   var container = document.getElementById('mynetwork');
+
+//  if (groupsOn) {
+//      var data = {
+//        nodes: g_nodes,
+//        edges: g_edges
+//      };
+//  }
+//  else {
   var data = {
-    nodes: nodes,
-    edges: edges
+      nodes: nodes,
+      edges: edges
   };
+//  }
+
   var options = {
     hover: true,
     clustering: true,
 
-    stabilize: false,
     navigation: true,
     keyboard: true,
 
@@ -197,7 +233,29 @@ function draw() {
     edges: {
       length: 50
     },
-    stabilize: false,
+
+    groups: {
+        basegroup: {
+          shape: 'circle',
+          color: {
+            border: 'black',
+            background: 'white',
+            highlight: {
+              border: 'yellow',
+              background: 'orange'
+            }
+          },
+          fontColor: 'black',
+          fontSize: 18
+        }
+
+
+    },
+
+    stabilize: true,
+//    freezeForStabilization: true,
+//    physics: {barnesHut: {gravitationalConstant: -500, springConstant: 0.1, springLength: 20}},
+
     dataManipulation: true,
     onAdd: function(data,callback) {
       var span = document.getElementById('operation');
@@ -230,8 +288,8 @@ function draw() {
       labelInput.value = data.label;
 
       // find Index in nodes array
-      var node_index = _.findIndex(nodes, { 'id': data.id });
-      servicesInput.value = nodes[node_index].title;
+//      var node_index = _.findIndex(nodes, { 'id': data.id });
+      servicesInput.value = nodes.get(data.id).title;
 
       saveButton.onclick = saveData.bind(this,data,callback);
       cancelButton.onclick = clearPopUp.bind();
@@ -254,14 +312,17 @@ function draw() {
       }
     }
   };
+
   network = new vis.Network(container, data, options);
 
   // add event listeners
-  network.on('select', function(params) {
+  network.on("select", function(params) {
     document.getElementById('selection').innerHTML = 'Selection: ' + params.nodes;
   });
 
   network.on("resize", function(params) {console.log(params.width,params.height)});
+
+
 
 
 
@@ -284,19 +345,22 @@ function draw() {
     data.label = labelInput.value;
     data.title = servicesInput.value;
 
+//    var node_index = _.findIndex(nodes, { 'id': data.id });
+//    nodes.splice(node_index, 1);
     if (servicesInput.value == ""){
-        nodes.push({
-          id: idInput.value,
+        nodes.update({
+          id: parseInt(idInput.value),
           label: labelInput.value,
           title: undefined
-        })
+        });
+
     }
     else {
-        nodes.push({
-            id: idInput.value,
+        nodes.update({
+            id: parseInt(idInput.value),
             label: labelInput.value,
             title: servicesInput.value
-        })
+        });
     }
 
     clearPopUp();

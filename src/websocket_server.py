@@ -6,8 +6,8 @@ import sys, subprocess, os
 from src.KThread import KThread
 from main import NPS
 
-from config.config_constants import WEB_SOCKET_SERVER_PORT, MSGEXCH_SERVER_IP, \
-    MSGEXCH_SERVER_PORT, MSGEXCH_SERVER_PATH, CONTROLLER_PATH
+from config.config_constants import WEB_SOCKET_SERVER_PORT, MALWARE_CENTER_IP, \
+    MALWARE_CENTER_PATH, MALWARE_CENTER_PORT, CONTROLLER_PATH
 
 
 
@@ -57,6 +57,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             groups = file_.readline()
             file_.close()
             self.write_message('msg::groups::' + groups)
+        elif message.find('msg::malwarecenter::') == 0:
+            malware_center_cmd = "python " + MALWARE_CENTER_PATH + "/malware_center.py " + \
+                                 MALWARE_CENTER_IP + ' ' + str(MALWARE_CENTER_PORT)
+            print malware_center_cmd
+            self.malware_center_proc = subprocess.Popen(malware_center_cmd, stdout=subprocess.PIPE, shell=True)
+            self.malware_center_thread = KThread(target=self.malware_center_thread_func)
+            self.malware_center_thread.setDaemon(True)
+            self.malware_center_thread.start()
         else:
             self.console_proc.stdin.write(message + '\n')
 
@@ -72,13 +80,33 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 self.write_message(out)
 
     def controller_mon_thread_func(self):
+        self.write_message("msg::controller::" + "CONTROLLER ON")
         while True:
             out = self.controller_proc.stdout.readline()
             if not out:
                 break
             else:
                 #print out,
-                self.write_message("msg::controller::" + out)
+                # self.write_message("msg::controller::" + out)
+                pass
+
+    def malware_center_thread_func(self):
+        while True:
+            out = self.malware_center_proc.stdout.readline()
+            if not out:
+                break
+            else:
+                print out,
+                self.write_message("msg::malwarecenter::" + out)
+
+            # if out == '' and self.malware_center_proc.poll() != None:
+            #     break
+            # if out != '':
+            #     if "new worm instance " in out:
+            #         host = out.split()[3].split(':')[0].split('-')[0]
+            #         print "my_graph_editor.set_node_infected(\"" + host[1:] + "\")"
+            #         self.inf_hosts_list.append(host)
+            #     self.write_message("msg::malwarecenter::" + out)
 
 
     # client disconnected
