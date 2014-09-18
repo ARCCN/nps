@@ -19,6 +19,10 @@ def split_graph_on_parts(G, nodes):
     else:
         (edgecuts, parts) = metis.part_graph(G, number_of_parts, contig=True, compress=True)
 
+    node_ids = {}
+    for i, id in enumerate(G.nodes()):
+        node_ids[i] = id
+
     groups = {}
     for p in set(parts):
         group = {}
@@ -26,8 +30,8 @@ def split_graph_on_parts(G, nodes):
         group['edges'] = []
         groups[p] = group
 
-    for i,p in enumerate(parts):
-        groups[p]['vertexes'].append(i)
+    for i, p in enumerate(parts):
+        groups[p]['vertexes'].append(node_ids[i]) # test
 
     special_group = {}
     special_group['vertexes'] = []
@@ -53,6 +57,8 @@ def split_graph_on_parts(G, nodes):
     for key, node in nodes.items():
         if node['group'] not in set(parts):
             del nodes[key]
+
+    # print(groups)
 
     return groups, nodes
 

@@ -84,6 +84,7 @@ class NPS:
             G, pos, node_services = get_networkX_graph(graph_data)
         else:
             G, node_services = get_networkX_graph_without_pos(graph_data)
+            # print(G.nodes())
         ## this function will not use cluster nodes if there is less then 2 graph vertexes to cluster node
         #nodes = mininet_script_operator.nodes_number_optimization(G, nodes)
 
@@ -109,6 +110,10 @@ class NPS:
         # USE WITH NSP with net apps with custom host IP
         self.hosts = mininet_script_generator.generate_mn_ns_script_with_custom_host_ip_auto(self.nodes, self.groups,
                                                                                         leaves, node_services)
+
+        hosts_file = open('tmp/hosts.txt', 'w')
+        hosts_file.write(str(json.dumps(self.hosts)))
+        hosts_file.close()
         print('DONE!')
 
         # open ssh sessions to nodes

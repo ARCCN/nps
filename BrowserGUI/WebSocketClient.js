@@ -35,8 +35,11 @@ var socket;
         if (event.data.indexOf('msg::groups::') == 0) {
             var groups = event.data.slice('msg::groups::'.length);
             json_groups = JSON.parse(groups);
-
-
+        }
+        else if (event.data.indexOf('msg::hosts::') == 0) {
+            var hosts = event.data.slice('msg::hosts::'.length);
+            json_hosts = JSON.parse(hosts);
+//            alert(JSON.stringify(json_hosts));
         }
         else if (event.data.indexOf('msg::leaves::') == 0) {
             var leaves_str = event.data.slice('msg::leaves::'.length);
@@ -57,12 +60,18 @@ var socket;
                 var tmp_mess = mess[3];
                 var host_intf_name = tmp_mess.split(':');
                 tmp_mess = host_intf_name[0];
-                var host_name = tmp_mess.split('-');
-                tmp_mess = host_name[0];
+                var host_title = tmp_mess.split('-');
+                tmp_mess = host_title[0];
+//                var host_name = host_title[0];
                 host_id = tmp_mess.substring(1);
                 if (inf_nodes.indexOf(parseInt(host_id)) == -1) {
-                    inf_nodes.append(parseInt(host_id));
-
+                    inf_nodes.push(parseInt(host_id));
+                    if (malwareOn) {
+                        nodes.update({
+                            id: parseInt(host_id),
+                            group: 'malware_group'
+                        });
+                    }
                 }
             }
 

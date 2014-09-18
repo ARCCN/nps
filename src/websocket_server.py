@@ -15,6 +15,9 @@ from config.config_constants import WEB_SOCKET_SERVER_PORT, MALWARE_CENTER_IP, \
 # from the tornado server
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     # the client connected
+    # def __init__(self):
+    #     self.already_run_simulation = False
+    #
     def open(self):
         print "New client connected"
         if os.path.isfile("tmp/groups.txt"):
@@ -57,6 +60,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             groups = file_.readline()
             file_.close()
             self.write_message('msg::groups::' + groups)
+        elif message.find('msg::hosts::') == 0:
+            file_ = open('tmp/hosts.txt', 'r')
+            hosts = file_.readline()
+            file_.close()
+            self.write_message('msg::hosts::' + hosts)
         elif message.find('msg::malwarecenter::') == 0:
             malware_center_cmd = "python " + MALWARE_CENTER_PATH + "/malware_center.py " + \
                                  MALWARE_CENTER_IP + ' ' + str(MALWARE_CENTER_PORT)

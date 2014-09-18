@@ -18,7 +18,7 @@
 
   <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
-    <script src="js/bootstrap/html5shiv.js"></script>
+    <!--<script src="js/bootstrap/html5shiv.js"></script>-->
     <![endif]-->
 
   <!-- Fav and touch icons -->
@@ -39,8 +39,39 @@
   <script type="text/javascript" src="js/zerorpc/zerorpc.js"></script>
   <link type="text/css" rel="stylesheet" href="js/vis/vis.min.css">
 
+  <script type="text/javascript" src="visGlobalOptions.js"></script>
   <script type="text/javascript" src="BrowserGUI.js"></script>
   <script type="text/javascript" src="WebSocketClient.js"></script>
+
+
+  <!--<meta name="apple-mobile-web-app-capable" content="yes" />-->
+  <!--<meta name="apple-mobile-web-app-status-bar-style" content="black" />-->
+  <!--<meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />-->
+  <!--<link href="freeboard/css/jquery.gridster.min.css" rel="stylesheet" />-->
+  <!--&lt;!&ndash;<link href="freeboard/css/styles.css" rel="stylesheet" />&ndash;&gt;-->
+  <!--<script src="freeboard/js/head.js"></script>-->
+  <!--<script type="text/javascript">-->
+        <!--head.js("freeboard/js/knockout.js",-->
+                <!--"freeboard/js/jquery.js",-->
+                <!--"freeboard/js/jquery-ui.js",-->
+                <!--"freeboard/js/underscore.js",-->
+                <!--"freeboard/js/jquery.gridster.js",-->
+                <!--"freeboard/js/jquery.sparkline.min.js",-->
+                <!--"freeboard/js/jquery.caret.js",-->
+                <!--"freeboard/js/raphael.2.1.0.min.js",-->
+                <!--"freeboard/js/justgage.1.0.1.js",-->
+                <!--"freeboard/js/freeboard/freeboard.js",-->
+                <!--"freeboard/js/freeboard/plugins/freeboard.datasources.js",-->
+                <!--"freeboard/js/freeboard/plugins/freeboard.widgets.js",-->
+                <!--"freeboard/examples/plugin_example.js",-->
+                <!--// *** Load more plugins here ***-->
+                <!--function(){-->
+                    <!--$(function()-->
+                    <!--{ //DOM Ready-->
+                        <!--freeboard.initialize(true);-->
+                    <!--});-->
+                <!--});-->
+    <!--</script>-->
 
   <script type="text/javascript">
 
@@ -99,7 +130,10 @@
             <a href="#panel-633842" data-toggle="tab">Editor</a>
           </li>
           <li>
-            <a href="#panel-189333" data-toggle="tab">...</a>
+            <a href="#panel-189333" data-toggle="tab">Info</a>
+          </li>
+          <li>
+            <a href="#panel-189334" data-toggle="tab">...</a>
           </li>
         </ul>
         <div class="tab-content">
@@ -123,8 +157,17 @@
               <div id="mynetwork"></div>
           </div>
           <div class="tab-pane" id="panel-189333">
+            <!--<p>-->
+              <!--Howdy, I'm in Section 2.-->
+            <!--</p>-->
+            <iframe id="freeboard" src="freeboard/index.html" align="left">
+                Ваш браузер не поддерживает плавающие фреймы!
+            </iframe>
+
+          </div>
+          <div class="tab-pane" id="panel-189334">
             <p>
-              Howdy, I'm in Section 2.
+              Howdy, I'm in Section 3.
             </p>
           </div>
         </div>

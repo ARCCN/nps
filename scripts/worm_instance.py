@@ -6,8 +6,8 @@ import sys
 import time
 
 IP_GENERATION_FLAG = False
-WORM_PROP_SLEEP = 2
-HIT_LIST_SIZE = 33
+WORM_PROP_SLEEP = 1
+HIT_LIST_SIZE = 77
 
 default_ip_db = ['1.2.3.2', '1.2.3.3', '1.2.3.4', '1.2.3.5', '1.2.3.6', '1.2.3.7', '1.2.3.8']
 #ip_db = ['172.0.1.100']
@@ -26,13 +26,15 @@ def gen_sasser_traffic(dst_ip, out_intf):
 
 
 def worm_activity(out_intf):
-    # hit_list = gen_hit_list(HIT_LIST_SIZE)
-    hit_list = default_ip_db
+    hit_list = gen_hit_list(HIT_LIST_SIZE)
+    # hit_list = default_ip_db
     while True:
         # select IP address of next target
-        if not IP_GENERATION_FLAG:
-            current_target_ip = choice(hit_list)
-            print current_target_ip
+        # if not IP_GENERATION_FLAG:
+        #     current_target_ip = choice(hit_list)
+        #     print current_target_ip
+        current_target_ip = choice(hit_list)
+        print current_target_ip
 
         # send its body to target
         gen_sasser_traffic(current_target_ip, out_intf)

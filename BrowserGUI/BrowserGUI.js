@@ -53,19 +53,16 @@ function export_json(nodes, edges) {
 }
 
 var nodes = null;
-var g_nodes = null;
-var inf_nodes = null;
+var inf_nodes = [];
 
 var edges = null;
-var g_edges = null;
 
 var network = null;
 //    var directionInput = document.getElementById("layoutOn");
-var layoutOn = false;
-var groupsOn = false;
 var malwareOn = false;
 
 var json_groups = null;
+var json_hosts = null;
 var leaves;
 
 
@@ -73,16 +70,18 @@ var leaves;
 function show_json() {
     var span = document.getElementById("debug");
     span.textContent = export_json(nodes, edges);
-//        span.textContent = nodes[0].title;
-//    var json_groups = JSON.parse(groups);
 }
 
 function changeLayout (l_cb) {
     if (l_cb.checked) {
-        layoutOn = true;
+        var options = global_options;
+        options.hierarchicalLayout = true;
+        network.setOptions(options);
     }
     else {
-        layoutOn = false;
+        var options = global_options;
+        options.hierarchicalLayout = false;
+        network.setOptions(options);
     }
     draw();
 }
@@ -91,7 +90,6 @@ function changeGroups (g_cb) {
     if (g_cb.checked) {
         if (json_groups == null) {
             send_data('msg::groups::');
-            groupsOn = false;
             g_cb.checked = false;
         }
         else {
@@ -100,7 +98,7 @@ function changeGroups (g_cb) {
                         for (var k = 0; k < json_groups[g]["vertexes"].length; k++) {
                             nodes.update({
                                 id: parseInt(json_groups[g]["vertexes"][k]),
-                                label: String(parseInt(json_groups[g]["vertexes"][k])),
+//                                label: String(parseInt(json_groups[g]["vertexes"][k])),
                                 group: parseInt(g)+1
                             });
                         }
@@ -109,28 +107,52 @@ function changeGroups (g_cb) {
         }
     }
     else {
-        for (var g in json_groups) {
-                if (g != "no_group") {
-                    for (var k = 0; k < json_groups[g]["vertexes"].length; k++) {
-                        nodes.update({
-                            id: parseInt(json_groups[g]["vertexes"][k]),
-                            label: String(parseInt(json_groups[g]["vertexes"][k])),
-                            group: 'basegroup'
-                        });
+          for (var g in json_groups) {
+                    if (g != "no_group") {
+                        for (var k = 0; k < json_groups[g]["vertexes"].length; k++) {
+                            nodes.update({
+                                id: parseInt(json_groups[g]["vertexes"][k]),
+//                                label: String(parseInt(json_groups[g]["vertexes"][k])),
+                                group: 'base_group'
+                            });
+                        }
                     }
-                }
-            }
+           }
+//        for (node_ID in nodes.getIds()) {
+//            nodes.update({
+//                id: node_ID,
+//                group: 'base_group'
+//            });
+//        }
     }
 }
 
 function changeMalware (m_cb) {
     if (m_cb.checked) {
         malwareOn = true;
+        if (json_hosts == null) {
+            send_data('msg::hosts::');
+            m_cb.checked = false;
+            malwareOn = false;
+        }
+        else {
+            for (var i in inf_nodes) {
+                nodes.update({
+                    id: inf_nodes[i],
+                    group: 'malware_group'
+                });
+            }
+        }
     }
     else {
         malwareOn = false;
+        for (node_ID in nodes.getIds()) {
+            nodes.update({
+                id: node_ID,
+                group: 'base_group'
+            });
+        }
     }
-    draw();
 }
 
 
@@ -143,7 +165,7 @@ function create_graph() {
         nodes.add({
           id: i,
           label: String(i),
-          group: 'basegroup'
+          group: 'base_group'
         });
         connectionCount[i] = 0;
 
@@ -184,134 +206,14 @@ function create_graph() {
 
 
 function draw() {
-
   var container = document.getElementById('mynetwork');
 
-//  if (groupsOn) {
-//      var data = {
-//        nodes: g_nodes,
-//        edges: g_edges
-//      };
-//  }
-//  else {
   var data = {
       nodes: nodes,
       edges: edges
   };
-//  }
 
-  var options = {
-    hover: true,
-    clustering: true,
-
-    navigation: true,
-    keyboard: true,
-
-    hierarchicalLayout: layoutOn,
-
-    tooltip: {
-        delay: 300,
-        fontColor: "black",
-        fontSize: 14, // px
-        fontFace: "candara",
-        color: {
-          border: "#666",
-          background: "#FFFFC6"
-        }
-    },
-
-    nodes: {
-        title:undefined,
-        color: {
-          border: 'black',
-          hover: {
-            background: 'pink',
-            border: 'red'
-          }
-        }
-    },
-    edges: {
-      length: 50
-    },
-
-    groups: {
-        basegroup: {
-          shape: 'circle',
-          color: {
-            border: 'black',
-            background: 'white',
-            highlight: {
-              border: 'yellow',
-              background: 'orange'
-            }
-          },
-          fontColor: 'black',
-          fontSize: 18
-        }
-
-
-    },
-
-    stabilize: true,
-//    freezeForStabilization: true,
-//    physics: {barnesHut: {gravitationalConstant: -500, springConstant: 0.1, springLength: 20}},
-
-    dataManipulation: true,
-    onAdd: function(data,callback) {
-      var span = document.getElementById('operation');
-      var idInput = document.getElementById('node-id');
-      var labelInput = document.getElementById('node-label');
-      var servicesInput = document.getElementById('node-services');
-      var saveButton = document.getElementById('saveButton');
-      var cancelButton = document.getElementById('cancelButton');
-      var div = document.getElementById('network-popUp');
-      span.innerHTML = "Add Node";
-      idInput.value = data.id;
-      labelInput.value = data.label;
-      servicesInput.value = "";
-      saveButton.onclick = saveData.bind(this,data,callback);
-      cancelButton.onclick = clearPopUp.bind();
-      div.style.display = 'block';
-
-    },
-    onEdit: function(data,callback) {
-
-      var span = document.getElementById('operation');
-      var idInput = document.getElementById('node-id');
-      var labelInput = document.getElementById('node-label');
-      var servicesInput = document.getElementById('node-services');
-      var saveButton = document.getElementById('saveButton');
-      var cancelButton = document.getElementById('cancelButton');
-      var div = document.getElementById('network-popUp');
-      span.innerHTML = "Edit Node";
-      idInput.value = data.id;
-      labelInput.value = data.label;
-
-      // find Index in nodes array
-//      var node_index = _.findIndex(nodes, { 'id': data.id });
-      servicesInput.value = nodes.get(data.id).title;
-
-      saveButton.onclick = saveData.bind(this,data,callback);
-      cancelButton.onclick = clearPopUp.bind();
-      div.style.display = 'block';
-
-    },
-    onConnect: function(data,callback) {
-      if (data.from == data.to) {
-        var r=confirm("Do you want to connect the node to itself?");
-        if (r==true) {
-          callback(data);
-        }
-      }
-      else {
-        edges.push({
-            from: data.from,
-            to: data.to
-        });
-        callback(data);
-      }
-    }
-  };
+  var options = global_options;
 
   network = new vis.Network(container, data, options);
 
@@ -322,52 +224,8 @@ function draw() {
 
   network.on("resize", function(params) {console.log(params.width,params.height)});
 
-
-
-
-
-  function clearPopUp() {
-    var saveButton = document.getElementById('saveButton');
-    var cancelButton = document.getElementById('cancelButton');
-    saveButton.onclick = null;
-    cancelButton.onclick = null;
-    var div = document.getElementById('network-popUp');
-    div.style.display = 'none';
-
-  }
-
-  function saveData(data,callback) {
-    var idInput = document.getElementById('node-id');
-    var labelInput = document.getElementById('node-label');
-    var servicesInput = document.getElementById('node-services');
-    var div = document.getElementById('network-popUp');
-    data.id = idInput.value;
-    data.label = labelInput.value;
-    data.title = servicesInput.value;
-
-//    var node_index = _.findIndex(nodes, { 'id': data.id });
-//    nodes.splice(node_index, 1);
-    if (servicesInput.value == ""){
-        nodes.update({
-          id: parseInt(idInput.value),
-          label: labelInput.value,
-          title: undefined
-        });
-
-    }
-    else {
-        nodes.update({
-            id: parseInt(idInput.value),
-            label: labelInput.value,
-            title: servicesInput.value
-        });
-    }
-
-    clearPopUp();
-    callback(data);
-
-  }
-
 }
+
+
 
 
