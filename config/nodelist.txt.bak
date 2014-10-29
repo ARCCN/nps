@@ -1,0 +1,7 @@
+10.211.55.11 clusternode-Parallels-Virtual-Platform root eth1 10.211.55.2 6633
+10.211.55.12 clusternode-Parallels-Virtual-Platform root eth1 10.211.55.2 6633
+10.211.55.13 clusternode-Parallels-Virtual-Platform root eth1 10.211.55.2 6633
+
+
+172.0.1.101 n001 root eth1 172.0.1.100 6633
+172.0.1.102 n002 root eth1 172.0.1.100 6633
