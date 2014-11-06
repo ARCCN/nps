@@ -14,7 +14,7 @@ from src.clustertools.cluster_mininet_cmd_manager import *
 from src.clustertools.cluster_support             import *
 from src.mininettools.host_configurator           import *
 from src.clustertools.cluster_manager_modes       import *
-from GUIApp                                       import *
+# from GUIApp                                       import *
 
 
 #nodes = {} # IP -> username, machine_name, out_intf, ssh, ssh_chan, IP_pool, controller
